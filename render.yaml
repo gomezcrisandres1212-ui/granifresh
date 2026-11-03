@@ -13,3 +13,4 @@ services:
         generateValue: true
       - key: SEED_DEMO_DATA
         value: "true"
+
