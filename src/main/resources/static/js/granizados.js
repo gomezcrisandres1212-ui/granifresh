@@ -13,29 +13,20 @@
     return "$" + Number(n).toLocaleString("es-CO");
   };
 
-  // 1. Selector de Recetas Frutales para el Vaso de Granizado
-  var TH = {
-    mango: ["#FFE600", "#FFB703", "#FB8500", "#FF7A00", "#FF5400", "#E60049"],
-    berry: ["#FF758F", "#FF4D6D", "#E60049", "#C9184A", "#800F2F", "#590D22"],
-    citrus: ["#A7F3D0", "#34D399", "#10B981", "#059669", "#047857", "#065F46"]
-  };
-  // Compatibilidad
-  TH.tropical = TH.mango;
-  TH.neon = TH.citrus;
-
-  function theme(k) {
-    if (!TH[k]) return;
-    TH[k].forEach(function (v, i) {
-      R.style.setProperty("--t" + (i + 1), v);
-    });
-    $$("#dots button").forEach(function (b) {
-      b.classList.toggle("on", b.dataset.t === k);
-    });
+  // 1. Aplicación de Colores de Marca al Vaso de Granizado (desde Configuración del Negocio)
+  function aplicarColoresGranizadoHero(c1, c2) {
+    var col1 = c1 || "#FFB703";
+    var col2 = c2 || "#FB8500";
+    if (R) {
+      R.style.setProperty("--t1", col1);
+      R.style.setProperty("--t2", col1);
+      R.style.setProperty("--t3", col1);
+      R.style.setProperty("--t4", col2);
+      R.style.setProperty("--t5", col2);
+      R.style.setProperty("--t6", col2);
+    }
   }
-
-  $$("#dots button").forEach(function (b) {
-    b.onclick = function () { theme(b.dataset.t); };
-  });
+  window.aplicarColoresGranizadoHero = aplicarColoresGranizadoHero;
 
   // 2. Extraer emoji frutal representativo según sabor o nombre
   function getFlavorEmoji(nombre, tipo) {
@@ -369,8 +360,11 @@
         }
       }
 
-      // Configuración de negocio (marquesina, WhatsApp y costo de envío)
+      // Configuración de negocio (colores del granizado, marquesina, WhatsApp y costo de envío)
       if (data.configuracion) {
+        if (data.configuracion.colorGranizado1 && data.configuracion.colorGranizado2) {
+          aplicarColoresGranizadoHero(data.configuracion.colorGranizado1, data.configuracion.colorGranizado2);
+        }
         if (data.configuracion.costoEnvioBase) {
           checkoutState.costoEnvio = data.configuracion.costoEnvioBase;
           var badgeEnv = $("#chk-delivery-cost-badge");
@@ -625,24 +619,6 @@
   initFilterEvents();
 
   $("#q").oninput = filt;
-
-  function mode(m) {
-    $$(".sw button").forEach(function (b) {
-      b.classList.toggle("on", b.dataset.m === m);
-    });
-    if (m === "berries") theme("berry");
-    else if (m === "citrus") theme("citrus");
-    else theme("mango");
-
-    $$("#flt button").forEach(function (b) {
-      b.classList.toggle("on", b.dataset.f === m);
-    });
-    filt();
-  }
-
-  $$(".sw button").forEach(function (b) {
-    b.onclick = function () { mode(b.dataset.m); };
-  });
 
   // ==========================================================
   // 9. CHECKOUT MULTI-PASO SEGURO CON LÍNEA DE GRANIZADOS

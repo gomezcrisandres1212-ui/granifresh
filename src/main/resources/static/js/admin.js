@@ -2024,6 +2024,13 @@ async function cargarConfiguracionAdmin() {
         const elHist = document.getElementById('cfg-historia');
         if (elHist) elHist.value = cfg.historiaNosotros || 'En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable. Cero concentrados artificiales, puro sabor y frescura en cada vaso.';
 
+        const col1 = cfg.colorGranizado1 || '#FFB703';
+        const col2 = cfg.colorGranizado2 || '#FB8500';
+        if (document.getElementById('cfg-color1')) document.getElementById('cfg-color1').value = col1;
+        if (document.getElementById('cfg-color1-picker')) document.getElementById('cfg-color1-picker').value = col1;
+        if (document.getElementById('cfg-color2')) document.getElementById('cfg-color2').value = col2;
+        if (document.getElementById('cfg-color2-picker')) document.getElementById('cfg-color2-picker').value = col2;
+
         inicializarMapaAdminConfig(cfg.latitud, cfg.longitud);
 
     } catch (e) {
@@ -2051,7 +2058,9 @@ async function guardarConfiguracionAdmin(e) {
         direccionSede: document.getElementById('cfg-direccion').value.trim(),
         latitud: parseFloat(document.getElementById('cfg-lat').value) || 10.4075,
         longitud: parseFloat(document.getElementById('cfg-lng').value) || -75.5255,
-        historiaNosotros: document.getElementById('cfg-historia').value.trim()
+        historiaNosotros: document.getElementById('cfg-historia').value.trim(),
+        colorGranizado1: document.getElementById('cfg-color1') ? document.getElementById('cfg-color1').value.trim() : '#FFB703',
+        colorGranizado2: document.getElementById('cfg-color2') ? document.getElementById('cfg-color2').value.trim() : '#FB8500'
     };
 
     try {

@@ -27,6 +27,8 @@ public class ConfiguracionNegocio {
     private Double longitud;
     private Integer zoomMapa;
     private String historiaNosotros;
+    private String colorGranizado1;
+    private String colorGranizado2;
 
     public ConfiguracionNegocio() {
         this.nombreNegocio = "GRANIFRESH";
@@ -48,6 +50,8 @@ public class ConfiguracionNegocio {
         this.longitud = -75.5255;
         this.zoomMapa = 16;
         this.historiaNosotros = "En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable. Cero concentrados artificiales, puro sabor y frescura en cada vaso.";
+        this.colorGranizado1 = "#FFB703";
+        this.colorGranizado2 = "#FB8500";
     }
 
     public String getId() { return id; }
@@ -109,5 +113,11 @@ public class ConfiguracionNegocio {
 
     public String getHistoriaNosotros() { return historiaNosotros; }
     public void setHistoriaNosotros(String historiaNosotros) { this.historiaNosotros = historiaNosotros; }
+
+    public String getColorGranizado1() { return colorGranizado1; }
+    public void setColorGranizado1(String colorGranizado1) { this.colorGranizado1 = colorGranizado1; }
+
+    public String getColorGranizado2() { return colorGranizado2; }
+    public void setColorGranizado2(String colorGranizado2) { this.colorGranizado2 = colorGranizado2; }
 }
 

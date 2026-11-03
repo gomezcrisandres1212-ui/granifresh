@@ -48,6 +48,8 @@ public class AdminConfigController {
         if (datos.getLongitud() != null) config.setLongitud(datos.getLongitud());
         if (datos.getZoomMapa() != null) config.setZoomMapa(datos.getZoomMapa());
         if (datos.getHistoriaNosotros() != null) config.setHistoriaNosotros(datos.getHistoriaNosotros());
+        if (datos.getColorGranizado1() != null) config.setColorGranizado1(datos.getColorGranizado1());
+        if (datos.getColorGranizado2() != null) config.setColorGranizado2(datos.getColorGranizado2());
 
         ConfiguracionNegocio guardado = configRepository.save(config);
         return ResponseEntity.ok(Map.of("exito", true, "configuracion", guardado));

@@ -68,8 +68,6 @@
       Pura fruta natural en textura frappé glacial. Servidos en empaque térmico antifusión directo a tu puerta en 35 minutos.
     </p>
 
-    <div class="sw" role="group" aria-label="Líneas Frutales"><button class="on" data-m="tropical">🥭 Tropicales</button><button data-m="berries">🍓 Frutos Rojos</button><button data-m="citrus">🍋 Cítricos</button></div><br>
-    
     <div class="hero-cta-box">
       <a class="cta hero-cta-pulsing" href="#menu">🛵 ¡Pedir mis granizados naturales!</a>
     </div>
@@ -279,11 +277,6 @@
   <use href="#st" x="286" y="295" class="tw" style="--l:.3s" fill="#FF7A00"/>
 </g>
 </svg>
-    <div class="dots" id="dots">
-      <button class="on" data-t="mango">🥭 Mango Maracuyá</button>
-      <button data-t="berry">🍓 Frutos Rojos</button>
-      <button data-t="citrus">🌿 Lulo Menta</button>
-    </div>
   </div>
 </div></section>
 
@@ -1613,6 +1606,26 @@
                             <label>Mensaje Alerta Superior (Cintillo Animado)</label>
                             <input type="text" class="form-control" id="cfg-alerta" placeholder="🧊 ¡100% Fruta Natural Cosechada! Pura pulpa en textura frappé glacial a domicilio">
                             <small class="form-hint">Aparece en la marquesina superior de toda la tienda web.</small>
+                        </div>
+
+                        <div class="form-section-title">🎨 Colores Principales del Granizado (Vaso de Portada)</div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Color Superior del Degradado</label>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <input type="color" id="cfg-color1-picker" value="#FFB703" oninput="document.getElementById('cfg-color1').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(this.value, document.getElementById('cfg-color2').value);" style="width:44px; height:38px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                    <input type="text" class="form-control" id="cfg-color1" value="#FFB703" style="width:120px;" oninput="document.getElementById('cfg-color1-picker').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(this.value, document.getElementById('cfg-color2').value);">
+                                </div>
+                                <small class="form-hint">Color superior del vaso principal interactivo.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Color Inferior del Degradado</label>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <input type="color" id="cfg-color2-picker" value="#FB8500" oninput="document.getElementById('cfg-color2').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(document.getElementById('cfg-color1').value, this.value);" style="width:44px; height:38px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                    <input type="text" class="form-control" id="cfg-color2" value="#FB8500" style="width:120px;" oninput="document.getElementById('cfg-color2-picker').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(document.getElementById('cfg-color1').value, this.value);">
+                                </div>
+                                <small class="form-hint">Color inferior del vaso principal interactivo.</small>
+                            </div>
                         </div>
 
                         <div class="form-section-title">💳 Cuentas para Pagos Digitales</div>
