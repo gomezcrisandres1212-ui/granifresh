@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "None",
+    "checkJs": false,
+    "allowJs": true
+  },
+  "exclude": [
+    "node_modules",
+    "target",
+    "**/target/**",
+    ".git"
+  ]
+}
+

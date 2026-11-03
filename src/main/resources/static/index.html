@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
+<link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="/css/granizados.css">
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<!-- Chart.js para analíticas administrativas -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+<div class="promo"><div class="mq" id="mq">🍃 ¡Granifresh! Refresca tu día con granizados 100% fruta natural artesanal a domicilio &nbsp;·&nbsp; ⚡ Entrega en 35 min con empaque térmico antifusión &nbsp;·&nbsp; 🥭 Mango Biche Cítrico &nbsp;·&nbsp; 🍓 Fresa Campesina &nbsp;·&nbsp; 🍊 Maracuyá Silvestre &nbsp;·&nbsp; 🍋 Lulo Valluno &nbsp;·&nbsp; 🍃 ¡Granifresh! Refresca tu día &nbsp;·&nbsp; </div></div>
+<nav>
+  <div class="nav-spacer" aria-hidden="true"></div>
+  <a class="brand-logo-link" href="#hero" aria-label="Granifresh — Refresca tu día">
+    <div class="brand-logo-badge">
+      <img src="/img/granifresh-logo.jpg" alt="Granifresh — Refresca Tu Día" class="brand-logo-img" />
+      <div class="logo-glass-dome"></div>
+      <div class="logo-shimmer-sweep"></div>
+    </div>
+  </a>
+  <div class="nav-client-links">
+    <a href="#menu" class="nav-link-pill"><span>🥭</span> Menú</a>
+    <a href="#nosotros" class="nav-link-pill"><span>🍃</span> Nosotros</a>
+    <a href="#track" class="nav-link-pill"><span>🛵</span> Rastrear</a>
+  </div>
+  <button class="cartb" id="cartb" aria-label="Ver mi carrito de granizados">
+    <span>🛒 Carrito</span> <i id="cn">0</i>
+  </button>
+</nav>
+
+<!-- Canvas 2D Acelerado por GPU: Corrientes Líquidas de Néctar & Micro-Cristales de Hielo (Cero Lag / Ultra Ligero) -->
+<canvas id="ambient-canvas" class="ambient-canvas" aria-hidden="true"></canvas>
+
+<section id="hero"><div class="hero">
+  <div class="hero-left-content">
+    <div class="hero-emblem-container">
+      <div class="brand-logo-badge hero-logo-large" aria-label="Granifresh Logo Oficial">
+        <img src="/img/granifresh-logo.jpg" alt="Granifresh — Refresca Tu Día" class="brand-logo-img" />
+        <div class="logo-glass-dome"></div>
+        <div class="logo-shimmer-sweep"></div>
+      </div>
+      <div class="hero-emblem-meta">
+        <span class="tag hero-tag-animated">
+          <span class="tag-spin">🥭</span> 100% PULPA DE FRUTA REAL <span class="tag-dot">·</span> BATIDO ARTESANAL -4°C <span class="tag-spin">🍃</span>
+        </span>
+        <div class="hero-emblem-subtag">✨ Cosecha Fresca &amp; Nieve Frappé</div>
+      </div>
+    </div>
+
+    <div class="hero-brand-block">
+      <h1 class="hero-title-granifresh">
+        <span class="neon-title-grani">GRANIFRESH</span>
+      </h1>
+      <div class="hero-slogan-strip">
+        <span class="slogan-txt">FULL SABOR,</span>
+        <span class="slogan-txt gold-bright">FULL FRESCURA</span>
+      </div>
+    </div>
+
+    <p class="hero-sub-punch">
+      Pura fruta natural en textura frappé glacial. Servidos en empaque térmico antifusión directo a tu puerta en 35 minutos.
+    </p>
+
+    <div class="sw" role="group" aria-label="Líneas Frutales"><button class="on" data-m="tropical">🥭 Tropicales</button><button data-m="berries">🍓 Frutos Rojos</button><button data-m="citrus">🍋 Cítricos</button></div><br>
+    
+    <div class="hero-cta-box">
+      <a class="cta hero-cta-pulsing" href="#menu">🛵 ¡Pedir mis granizados naturales!</a>
+    </div>
+
+    <div class="stats"><div><b>100%</b><span>FRUTA REAL</span></div><div><b>0%</b><span>QUÍMICOS</span></div><div><b>-4°C</b><span>FRAPPÉ PURO</span></div><div><b>35 min</b><span>ENTREGA EXPRESS</span></div></div>
+  </div>
+  <div class="stage">
+    <div class="stage-aura"></div>
+    <div class="hero-badge badge-left">🍃 100% Fruta Cosechada</div>
+    <div class="hero-badge badge-right">🧊 Hielo Frappé -4°C</div>
+<svg class="gl" viewBox="0 -35 320 440" role="img" aria-label="Vaso de granizado artesanal con textura cristalina de hielo molido frappé y pitillo">
+<defs>
+  <!-- Contorno interior del vaso de granizado -->
+  <clipPath id="cupClip">
+    <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
+  </clipPath>
+
+  <!-- Degradados de color dinámicos según el sabor (Neón / Berry / Tropical) -->
+  <linearGradient id="gT" x2="0" y2="1"><stop style="stop-color:var(--t1)"/><stop offset="1" style="stop-color:var(--t2)"/></linearGradient>
+  <linearGradient id="gM" x2="0" y2="1"><stop style="stop-color:var(--t3)"/><stop offset="1" style="stop-color:var(--t4)"/></linearGradient>
+  <linearGradient id="gB" x2="0" y2="1"><stop style="stop-color:var(--t5)"/><stop offset="1" style="stop-color:var(--t6)"/></linearGradient>
+
+  <!-- PATRÓN VECTORIAL DE HIELO MOLIDO (CRUSHED ICE CRYSTALS)
+       Textura de micro-facetas cristalinas geométricas que refractan luz
+       sin ensuciar ni opacar los colores vivos del sabor -->
+  <pattern id="iceCrystals" width="36" height="36" patternUnits="userSpaceOnUse">
+    <!-- Micro-esquirla 1 (romboide con destello) -->
+    <polygon points="6,4 12,2 14,8 8,10" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+    <line x1="8" y1="4" x2="12" y2="8" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
+
+    <!-- Micro-esquirla 2 (prisma triangular de hielo) -->
+    <polygon points="22,5 30,7 26,14" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.25"/>
+
+    <!-- Micro-faceta 3 (diamante refractante) -->
+    <polygon points="16,18 20,15 24,19 20,23" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
+    <circle cx="20" cy="19" r="0.8" fill="#ffffff" fill-opacity="0.7"/>
+
+    <!-- Micro-esquirla 4 (gránulo de hielo picado lateral) -->
+    <polygon points="3,22 9,20 11,27 5,28" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.3"/>
+
+    <!-- Micro-esquirla 5 (pequeño cristal trapezoidal) -->
+    <polygon points="28,24 34,22 35,28 30,31" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+
+    <!-- Micro-esquirla 6 (prisma inferior) -->
+    <polygon points="12,30 18,28 16,35 10,34" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+
+    <!-- Micro-destellos puntuales de escarcha -->
+    <circle cx="4" cy="14" r="0.7" fill="#ffffff" fill-opacity="0.5"/>
+    <circle cx="28" cy="17" r="0.9" fill="#ffffff" fill-opacity="0.6"/>
+    <circle cx="15" cy="8" r="0.6" fill="#ffffff" fill-opacity="0.5"/>
+    <circle cx="22" cy="33" r="0.8" fill="#ffffff" fill-opacity="0.6"/>
+  </pattern>
+
+  <!-- Gradiente plástico transparente hiperrealista del vaso -->
+  <linearGradient id="plasticCupGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#ffffff" stop-opacity=".42"/>
+    <stop offset="10%" stop-color="#ffffff" stop-opacity=".08"/>
+    <stop offset="78%" stop-color="#ffffff" stop-opacity=".04"/>
+    <stop offset="90%" stop-color="#ffffff" stop-opacity=".15"/>
+    <stop offset="100%" stop-color="#ffffff" stop-opacity=".38"/>
+  </linearGradient>
+
+  <!-- Gradiente cilíndrico 3D para el pitillo recto -->
+  <linearGradient id="strawGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#00b4d8"/>
+    <stop offset="35%" stop-color="#90e0ef"/>
+    <stop offset="70%" stop-color="#0077b6"/>
+    <stop offset="100%" stop-color="#03045e"/>
+  </linearGradient>
+
+  <!-- Destello estrellado de escarcha -->
+  <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
+  <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+
+<!-- Resplandor luminoso en la base del vaso -->
+<ellipse class="ground-shadow" cx="160" cy="358" rx="95" ry="14" fill="#ff2d9b" opacity=".45" filter="url(#bl)"/>
+
+<!-- ==============================================
+     CAMA DE HIELO MOLIDO EN LA BASE (REFERENCIA FOTO)
+     Esquirlas de hielo picado cristalino descansando en la base
+     ============================================== -->
+<g class="crushed-base" opacity="0.85">
+  <!-- Cristal 1 izquierda -->
+  <polygon points="76,354 84,348 92,352 86,358" fill="#d8fbff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.8"/>
+  <!-- Cristal 2 -->
+  <polygon points="96,356 104,350 110,355 102,360" fill="#ffffff" fill-opacity="0.55" stroke="#d8fbff" stroke-width="0.8"/>
+  <!-- Cristal 3 centro-izq -->
+  <polygon points="120,358 130,353 138,357 128,362" fill="#d8fbff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.7"/>
+  <!-- Cristal 4 centro-der -->
+  <polygon points="182,358 192,352 200,356 190,361" fill="#ffffff" fill-opacity="0.5" stroke="#d8fbff" stroke-width="0.7"/>
+  <!-- Cristal 5 derecha -->
+  <polygon points="212,356 220,349 228,354 220,359" fill="#d8fbff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.8"/>
+  <!-- Cristal 6 extrema derecha -->
+  <polygon points="234,352 242,347 248,353 240,357" fill="#ffffff" fill-opacity="0.4" stroke="#d8fbff" stroke-width="0.8"/>
+</g>
+
+<!-- GRUPO PRINCIPAL CON BALANCEO SUAVE (.bob) -->
+<g class="bob">
+
+  <!-- ==============================================
+       1. PITILLO RECTO CLÁSICO (Insertado en el frappé)
+       ============================================== -->
+  <g transform="translate(182, -22) rotate(6)">
+    <!-- Cuerpo cilíndrico del pitillo -->
+    <rect x="-8" y="0" width="16" height="150" rx="3" fill="url(#strawGrad)"/>
+    <!-- Orificio superior del pitillo -->
+    <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#03045e" stroke="#90e0ef" stroke-width="1"/>
+  </g>
+
+  <!-- ==============================================
+       2. CONTENIDO DEL VASO: CAPAS DE SABOR Y HIELO MOLIDO
+       ============================================== -->
+  <g clip-path="url(#cupClip)">
+    <!-- Capa 1: Sabor y pulpa superior de granizado -->
+    <rect x="40" y="10" width="240" height="340" fill="url(#gT)"/>
+
+    <!-- Capa 2: Ondas de sabor medio con textura frappé -->
+    <path class="wave" fill="url(#gM)" d="M-120 150 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 V400 H-120 Z"/>
+
+    <!-- Capa 3: Ondas de sabor base con textura frappé -->
+    <path class="wave2" fill="url(#gB)" d="M-120 240 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 V400 H-120 Z"/>
+
+    <!-- MICRO-TEXTURA CRISTALINA INTEGRADA:
+         Esquirlas y facetas de hielo molido refractando directamente
+         los colores del granizado -->
+    <rect x="40" y="10" width="240" height="340" fill="url(#iceCrystals)"/>
+
+    <!-- Destellos internos de cristales de hielo en el líquido -->
+    <polygon points="110,130 115,124 122,128 116,134" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="200,165 208,160 214,166 206,171" fill="#ffffff" fill-opacity="0.28" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="90,210 98,204 104,210 96,216" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="175,225 183,218 190,224 182,230" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="130,285 138,278 145,284 137,290" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="190,305 197,299 203,305 196,310" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+
+    <!-- Burbujas y efervescencia criogénica en ascenso -->
+    <g id="bubs" fill="none" stroke="#fff" stroke-width="1.5"></g>
+  </g>
+
+  <!-- ==============================================
+       3. CÚPULA DE HIELO MOLIDO COLOREADO EN LA CIMA
+       (Montaña de hielo triturado artesanal con pulpa, rebosando el vaso)
+       ============================================== -->
+  <g class="slush-dome">
+    <!-- Masa principal de hielo molido con relieve orgánico -->
+    <path d="M58 70 
+             C65 52, 85 36, 110 28 
+             C126 22, 142 16, 160 16 
+             C180 16, 196 22, 212 28 
+             C236 37, 255 52, 262 70 
+             Z" 
+          fill="url(#gT)"/>
+
+    <!-- Textura de cristales en la cúpula -->
+    <path d="M58 70 
+             C65 52, 85 36, 110 28 
+             C126 22, 142 16, 160 16 
+             C180 16, 196 22, 212 28 
+             C236 37, 255 52, 262 70 
+             Z" 
+          fill="url(#iceCrystals)"/>
+
+    <!-- Relieves y crestas de hielo molido escarchado en la cima -->
+    <path d="M82 54 Q100 42 124 45 T168 38 T212 44 T238 58" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+    <path d="M102 38 Q128 26 156 27 T204 32" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+    <path d="M136 22 Q160 16 184 20" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+
+    <!-- Esquirlas y micro-facetas brillantes en la superficie del hielo -->
+    <polygon points="120,32 126,27 132,31 126,36" fill="#ffffff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="152,24 158,19 164,23 158,28" fill="#ffffff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="186,30 192,25 198,29 192,34" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="98,46 104,41 110,45 104,50" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+    <polygon points="218,48 224,43 230,47 224,52" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+  </g>
+
+  <!-- ==============================================
+       4. VASO PLÁSTICO TRANSPARENTE
+       ============================================== -->
+  <!-- Paredes del vaso con transparencia y contorno -->
+  <path d="M58 70 L86 332 Q88 350 108 350 H212 Q232 350 234 332 L262 70 Z" fill="url(#plasticCupGrad)" stroke="rgba(216, 251, 255, 0.75)" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Reflejos verticales brillantes del vaso de plástico -->
+  <path d="M74 88 L98 325" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".4"/>
+  <path d="M84 94 L104 320" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+  <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
+
+  <!-- Borde plástico enrollado superior del vaso (Rim) -->
+  <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
+  <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+
+</g>
+
+<!-- ==============================================
+     5. BRUMA FRÍA Y DESTELLOS GLACIALES
+     ============================================== -->
+<g filter="url(#bl)" fill="#d8fbff">
+  <ellipse class="mist" cx="120" cy="22" rx="24" ry="8" style="--l:0s"/>
+  <ellipse class="mist" cx="170" cy="12" rx="28" ry="9" style="--l:1.6s"/>
+  <ellipse class="mist" cx="215" cy="24" rx="22" ry="7" style="--l:3.2s"/>
+</g>
+
+<g fill="#fff">
+  <use href="#st" x="42" y="58" class="tw" style="--l:0s" fill="#FFB703"/>
+  <use href="#st" x="282" y="130" class="tw" style="--l:.6s" fill="#10B981"/>
+  <use href="#st" x="38" y="250" class="tw" style="--l:1.1s" fill="#FF1E56"/>
+  <use href="#st" x="286" y="295" class="tw" style="--l:.3s" fill="#FF7A00"/>
+</g>
+</svg>
+    <div class="dots" id="dots">
+      <button class="on" data-t="mango">🥭 Mango Maracuyá</button>
+      <button data-t="berry">🍓 Frutos Rojos</button>
+      <button data-t="citrus">🌿 Lulo Menta</button>
+    </div>
+  </div>
+</div></section>
+
+<section id="menu">
+  <div class="eyebrow">COSECHA &amp; NATURALEZA</div><h2>Explosión de Fruta Pura 100% Natural</h2><p class="sub">Fruta fresca seleccionada diariamente, triturada en frío al punto de nieve exacto sin colorantes ni conservantes artificiales.</p>
+  <div class="filters" id="flt">
+    <button class="on" data-f="all">🥤 Todos los Sabores</button>
+    <button data-f="tropical">🥭 Tropicales &amp; Dulces</button>
+    <button data-f="berries">🍓 Frutos Rojos</button>
+    <button data-f="citrus">🍋 Cítricos &amp; Exóticos</button>
+  </div>
+  <input class="search" id="q" placeholder="🔍 Buscar fruta o sabor (Mango Biche, Fresa, Maracuyá, Lulo, Mora…)" aria-label="Buscar fruta o sabor">
+  
+  <div class="carousel-wrapper">
+    <button class="carousel-nav-btn prev" onclick="scrollCatalog('grid', -1)" aria-label="Anterior">❮</button>
+    <div class="grid carousel-track" id="grid"></div>
+    <button class="carousel-nav-btn next" onclick="scrollCatalog('grid', 1)" aria-label="Siguiente">❯</button>
+  </div>
+</section>
+
+<section id="track"><div class="track">
+  <div class="eyebrow">RASTREO RÁPIDO</div><h2>¿Dónde viene mi pedido?</h2><p class="sub">Ingresa tu código (ej: GRZ-82910) y mira el estado de tu granizado en vivo.</p>
+  <form class="tin" id="tf"><input id="tc" placeholder="CÓDIGO: GRZ-XXXXX" aria-label="Código de pedido"><button class="cta" style="animation:none;padding:14px 26px">Buscar 📍</button></form>
+  <div class="steps" id="steps"><i id="bar"></i><div class="st"><b>📥</b>Recibido</div><div class="st"><b>🧊</b>Batido Frutal</div><div class="st"><b>🛵</b>En camino</div><div class="st"><b>🎉</b>Entregado</div></div>
+  <div id="eta"></div>
+</div></section>
+
+<!-- ==========================================================
+     SECCIÓN "NOSOTROS" (CONEXIÓN REDES SOCIALES & MAPA GOOGLE MAPS)
+     ========================================================== -->
+<section id="nosotros" class="seccion-nosotros">
+  <div class="nosotros-container">
+    <div class="nosotros-header-block">
+      <div class="eyebrow">🍃 NUESTRA ESENCIA</div>
+      <h2 class="nosotros-title">Pasión por la Fruta 100% Pura &amp; Natural</h2>
+      <p class="sub nosotros-sub" id="nosotros-historia-txt">
+        En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable. Cero concentrados artificiales, puro sabor y frescura en cada vaso.
+      </p>
+    </div>
+
+    <!-- Tarjetas de Pilares de Calidad -->
+    <div class="nosotros-grid-pilares">
+      <div class="pilar-card">
+        <div class="pilar-icon">🥭</div>
+        <h4>100% Pulpa Real</h4>
+        <p>Fruta fresca cosechada sin preservantes, pulpas artificiales ni jarabes químicos.</p>
+      </div>
+      <div class="pilar-card">
+        <div class="pilar-icon">❄️</div>
+        <h4>Batido Glacial -4°C</h4>
+        <p>Triturado criogénico artesanal que mantiene la textura sedosa de nieve frappé.</p>
+      </div>
+      <div class="pilar-card">
+        <div class="pilar-icon">⚡</div>
+        <h4>Empaque Antifusión</h4>
+        <p>Aislamiento térmico sub-cero para que tu granizado llegue intacto a cualquier punto.</p>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         TARJETA UNIFICADA: SEDE, REDES SOCIALES & MAPA COMPACTO
+         ========================================================== -->
+    <div class="nosotros-unified-card">
+      <div class="unified-content-grid">
+        <!-- Columna Izquierda: Información de Sede, Horario y Redes Sociales -->
+        <div class="unified-info-side">
+          <div class="unified-sede-header">
+            <span class="map-card-badge">📍 SEDE PRINCIPAL &amp; ATENCIÓN</span>
+            <h3 class="map-card-address" id="nosotros-direccion-titulo">Cra. 50 #31b, Olaya Herrera</h3>
+            <p class="map-card-sub" id="nosotros-horario-sub">🕒 Horario: Lunes a Domingo 12:00 PM - 11:30 PM &nbsp;·&nbsp; Cobertura en toda la ciudad</p>
+          </div>
+
+          <!-- Redes Sociales Oficiales -->
+          <div class="unified-social-section">
+            <div class="unified-social-header">
+              <h4 class="unified-social-title"><span>📲</span> Síguenos en Redes Sociales</h4>
+              <p class="unified-social-sub">Entérate de nuevas cosechas, combinaciones y promociones exclusivas.</p>
+            </div>
+            <div class="nosotros-social-pills">
+              <a id="btn-social-instagram" class="social-pill-btn btn-insta" href="https://instagram.com/granifresh" target="_blank" rel="noopener noreferrer" aria-label="Instagram Oficial Granifresh">
+                <div class="social-pill-icon-wrap">
+                  <svg class="social-icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </div>
+                <div class="social-pill-meta">
+                  <span class="social-pill-label">Instagram</span>
+                  <span class="social-pill-username" id="nosotros-instagram-user">@granifresh</span>
+                </div>
+                <span class="social-pill-arrow">↗</span>
+              </a>
+
+              <a id="btn-social-facebook" class="social-pill-btn btn-fb" href="https://facebook.com/granifresh" target="_blank" rel="noopener noreferrer" aria-label="Facebook Oficial Granifresh">
+                <div class="social-pill-icon-wrap">
+                  <svg class="social-icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </div>
+                <div class="social-pill-meta">
+                  <span class="social-pill-label">Facebook</span>
+                  <span class="social-pill-username" id="nosotros-facebook-user">Granifresh Oficial</span>
+                </div>
+                <span class="social-pill-arrow">↗</span>
+              </a>
+
+              <a id="btn-social-whatsapp" class="social-pill-btn btn-wsp" href="https://wa.me/573013557467" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Granifresh">
+                <div class="social-pill-icon-wrap">
+                  <svg class="social-icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.63C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.59 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67ZM8.53 7.33C8.37 7.33 8.1 7.39 7.87 7.64C7.65 7.89 7.02 8.48 7.02 9.69C7.02 10.9 7.9 12.06 8.02 12.23C8.14 12.39 9.74 14.87 12.19 15.93C14.23 16.81 14.65 16.63 15.1 16.59C15.54 16.55 16.53 16 16.73 15.43C16.94 14.86 16.94 14.37 16.88 14.27C16.81 14.17 16.65 14.11 16.41 13.99C16.16 13.87 14.96 13.28 14.73 13.2C14.51 13.12 14.35 13.08 14.18 13.33C14.02 13.57 13.56 14.11 13.42 14.27C13.28 14.44 13.14 14.46 12.9 14.34C12.65 14.21 11.86 13.96 10.93 13.13C10.2 12.48 9.71 11.68 9.57 11.43C9.43 11.19 9.55 11.06 9.68 10.93C9.79 10.82 9.93 10.64 10.05 10.5C10.17 10.36 10.22 10.25 10.3 10.09C10.38 9.93 10.34 9.78 10.28 9.66C10.22 9.54 9.75 8.38 9.55 7.9C9.36 7.43 9.16 7.5 9.01 7.49C8.87 7.48 8.7 7.48 8.53 7.48V7.33Z"/></svg>
+                </div>
+                <div class="social-pill-meta">
+                  <span class="social-pill-label">WhatsApp</span>
+                  <span class="social-pill-username" id="nosotros-whatsapp-user">+57 301 355 7467</span>
+                </div>
+                <span class="social-pill-arrow">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Mapa Compacto con Logo Destacado -->
+        <div class="unified-map-side">
+          <div class="unified-map-header">
+            <span class="unified-map-badge">📍 COORDENADAS SATELITALES</span>
+            <a id="nosotros-gmaps-link" class="btn-open-gmaps" href="https://maps.google.com/?q=10.4075,-75.5255" target="_blank" rel="noopener noreferrer">
+              🗺️ Abrir en Google Maps
+            </a>
+          </div>
+          <div class="unified-map-frame">
+            <div id="mapa-publico-nosotros" class="mapa-publico-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <b>GRANIFRESH © 2026</b><br>
+  Granizados artesanales 100% fruta natural a domicilio. Refresca tu día con pura pulpa de fruta real.<br>
+  <small style="opacity:0.6; margin-top:8px; display:inline-block;">
+    <a href="javascript:void(0)" id="btn-admin-modal-open" style="color:inherit; text-decoration:none;">🔐 Panel de Administración</a>
+  </small>
+</footer>
+<div id="cf"></div>
+<!-- Toast Notification Container (Flotante superior independiente para PC y Móvil) -->
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<aside id="panel" aria-live="polite"><ul id="pl"></ul><div id="pt" style="font-weight:900;margin-bottom:12px"></div><button class="cta" id="ok" style="animation:none;width:100%;padding:13px">Confirmar pedido ➜</button></aside>
+<button class="fbar" id="fbar" aria-label="Ver mi carrito de granizados">
+  <span class="fbar-badge">
+    <span class="fbar-icon">🛒</span>
+    <span id="fbar-count">0</span> granizados <span class="fbar-sep">•</span> <span id="fbar-total">$0</span>
+  </span>
+  <span class="fbar-cta">
+    <span>Ver Carrito</span> <span class="fbar-arrow">➜</span>
+  </span>
+</button>
+
+<!-- ==========================================================
+     BOTÓN FLOTANTE DE WHATSAPP (MODIFICABLE EN PANEL ADMIN)
+     ========================================================== -->
+<a id="btn-whatsapp-flotante" 
+   class="btn-whatsapp-flotante" 
+   href="https://wa.me/573013557467?text=%C2%A1Hola%20Granifresh!%20%F0%9F%A5%A4%20Quiero%20consultar%20sobre%20los%20granizados%20100%25%20fruta%20natural%20y%20hacer%20un%20pedido" 
+   target="_blank" 
+   rel="noopener noreferrer" 
+   aria-label="Chatear por WhatsApp">
+    <svg class="whatsapp-flotante-svg" viewBox="0 0 24 24" fill="#FFFFFF" aria-hidden="true">
+        <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.63C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2ZM12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.59 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19.01L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67ZM8.53 7.33C8.37 7.33 8.1 7.39 7.87 7.64C7.65 7.89 7.02 8.48 7.02 9.69C7.02 10.9 7.9 12.06 8.02 12.23C8.14 12.39 9.74 14.87 12.19 15.93C14.23 16.81 14.65 16.63 15.1 16.59C15.54 16.55 16.53 16 16.73 15.43C16.94 14.86 16.94 14.37 16.88 14.27C16.81 14.17 16.65 14.11 16.41 13.99C16.16 13.87 14.96 13.28 14.73 13.2C14.51 13.12 14.35 13.08 14.18 13.33C14.02 13.57 13.56 14.11 13.42 14.27C13.28 14.44 13.14 14.46 12.9 14.34C12.65 14.21 11.86 13.96 10.93 13.13C10.2 12.48 9.71 11.68 9.57 11.43C9.43 11.19 9.55 11.06 9.68 10.93C9.79 10.82 9.93 10.64 10.05 10.5C10.17 10.36 10.22 10.25 10.3 10.09C10.38 9.93 10.34 9.78 10.28 9.66C10.22 9.54 9.75 8.38 9.55 7.9C9.36 7.43 9.16 7.5 9.01 7.49C8.87 7.48 8.7 7.48 8.53 7.48V7.33Z"/>
+    </svg>
+</a>
+
+<!-- ==========================================================
+     CHECKOUT MULTI-PASO SEGURO GRANIFRESH (PANEL DERECHO / FULLSCREEN)
+     ========================================================== -->
+<div class="modal-overlay" id="modal-checkout">
+    <div class="modal-box modal-checkout-box">
+        
+        <!-- HEADER DEL CHECKOUT CON BADGE Y SUBTÍTULO DINÁMICO -->
+        <div class="checkout-header">
+            <div class="checkout-header-info">
+                <div class="checkout-badge-icon">
+                    <span class="chk-cart-icon">🛒</span>
+                    <span class="chk-cart-count-badge" id="chk-header-count">0</span>
+                </div>
+                <div>
+                    <h3 class="checkout-title">Carrito Seguro <b>GRANIFRESH</b></h3>
+                    <p class="checkout-subtitle" id="chk-step-subtitle">Paso 1 de 3: Revisa tus granizados seleccionados</p>
+                </div>
+            </div>
+            <button type="button" class="btn-close-drawer" onclick="cerrarModales()" aria-label="Cerrar checkout">✕</button>
+        </div>
+
+        <!-- LÍNEA DE PROGRESO CON GRANIZADOS ESTILIZADOS -->
+        <div class="checkout-steps-bar" role="tablist" aria-label="Pasos del checkout">
+            <!-- PASO 1: ÍTEMS -->
+            <button type="button" class="step-cup-btn active" id="step-tab-1" onclick="irAPasoCheckout(1)">
+                <div class="step-cup-graphic">
+                    <svg class="step-cup-svg" viewBox="0 0 32 36" aria-hidden="true">
+                        <line x1="20" y1="2" x2="16" y2="12" class="cup-straw" stroke-width="2.6" stroke-linecap="round"/>
+                        <ellipse cx="16" cy="11" rx="10" ry="3.5" class="cup-rim" stroke-width="1.8"/>
+                        <path class="cup-liquid liquid-mango" d="M7 11 L9 29 Q9 32 12 32 L20 32 Q23 32 23 29 L25 11 Z"/>
+                        <ellipse cx="16" cy="11" rx="8" ry="2.2" class="cup-ice-surface"/>
+                        <path class="cup-check-mark" d="M11 21 L15 25 L21 17" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="step-cup-label">
+                    <span class="step-cup-title">Ítems</span>
+                    <small class="step-cup-sub" id="chk-step1-count-txt">0 granizados</small>
+                </div>
+            </button>
+
+            <!-- LÍNEA CONECTORA 1-2 (DUCTO DE NÉCTAR GLACIAL) -->
+            <div class="step-cup-connector" id="connector-1-2">
+                <div class="connector-fill"></div>
+            </div>
+
+            <!-- PASO 2: ENVÍO & DATOS -->
+            <button type="button" class="step-cup-btn" id="step-tab-2" onclick="irAPasoCheckout(2)">
+                <div class="step-cup-graphic">
+                    <svg class="step-cup-svg" viewBox="0 0 32 36" aria-hidden="true">
+                        <line x1="20" y1="2" x2="16" y2="12" class="cup-straw" stroke-width="2.6" stroke-linecap="round"/>
+                        <ellipse cx="16" cy="11" rx="10" ry="3.5" class="cup-rim" stroke-width="1.8"/>
+                        <path class="cup-liquid liquid-mint" d="M7 11 L9 29 Q9 32 12 32 L20 32 Q23 32 23 29 L25 11 Z"/>
+                        <ellipse cx="16" cy="11" rx="8" ry="2.2" class="cup-ice-surface"/>
+                        <path class="cup-check-mark" d="M11 21 L15 25 L21 17" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="step-cup-label">
+                    <span class="step-cup-title">Envío &amp; Datos</span>
+                    <small class="step-cup-sub" id="chk-step2-dest-txt">Domicilio</small>
+                </div>
+            </button>
+
+            <!-- LÍNEA CONECTORA 2-3 -->
+            <div class="step-cup-connector" id="connector-2-3">
+                <div class="connector-fill"></div>
+            </div>
+
+            <!-- PASO 3: PAGO & WHATSAPP -->
+            <button type="button" class="step-cup-btn" id="step-tab-3" onclick="irAPasoCheckout(3)">
+                <div class="step-cup-graphic">
+                    <svg class="step-cup-svg" viewBox="0 0 32 36" aria-hidden="true">
+                        <line x1="20" y1="2" x2="16" y2="12" class="cup-straw" stroke-width="2.6" stroke-linecap="round"/>
+                        <ellipse cx="16" cy="11" rx="10" ry="3.5" class="cup-rim" stroke-width="1.8"/>
+                        <path class="cup-liquid liquid-ruby" d="M7 11 L9 29 Q9 32 12 32 L20 32 Q23 32 23 29 L25 11 Z"/>
+                        <ellipse cx="16" cy="11" rx="8" ry="2.2" class="cup-ice-surface"/>
+                        <path class="cup-check-mark" d="M11 21 L15 25 L21 17" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="step-cup-label">
+                    <span class="step-cup-title">Pago &amp; WhatsApp</span>
+                    <small class="step-cup-sub">Confirmación</small>
+                </div>
+            </button>
+        </div>
+
+        <form id="form-checkout-domicilio" onsubmit="event.preventDefault();">
+            
+            <!-- CONTENIDO PASO 1: ÍTEMS EN EL CARRITO -->
+            <div class="checkout-step-content active" id="chk-pane-1">
+                <div class="chk-section-eyebrow">
+                    <span>🥤</span> 1. REVISA TUS GRANIZADOS (100% FRUTA NATURAL)
+                </div>
+
+                <div class="checkout-items-wrapper" id="checkout-items-list">
+                    <!-- Inyectado dinámicamente -->
+                </div>
+
+                <div class="chk-price-strip">
+                    <div class="chk-price-row">
+                        <span>Subtotal de granizados:</span>
+                        <strong id="chk-step1-subtotal">$0</strong>
+                    </div>
+                    <small class="chk-price-hint">🍃 Pura pulpa de fruta real en empaque térmico antifusión.</small>
+                </div>
+            </div>
+
+            <!-- CONTENIDO PASO 2: MÉTODO DE ENVÍO & DATOS -->
+            <div class="checkout-step-content" id="chk-pane-2">
+                <!-- 1. Método de entrega -->
+                <div class="chk-section-eyebrow">
+                    <span>🛵</span> 1. SELECCIONA MÉTODO DE ENTREGA
+                </div>
+
+                <div class="chk-delivery-options">
+                    <!-- Opción A: Domicilio Express -->
+                    <label class="chk-radio-card active" id="label-delivery-express">
+                        <input type="radio" name="chk-delivery-type" value="DOMICILIO" checked onchange="cambiarMetodoEntrega('DOMICILIO')">
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-delivery-content">
+                            <div class="chk-delivery-head">
+                                <span class="chk-delivery-name">🛵 Domicilio Express a Casa</span>
+                                <span class="chk-delivery-price" id="chk-delivery-cost-badge">$5.000 COP</span>
+                            </div>
+                            <p class="chk-delivery-desc">Entrega directa en tu puerta en 30 a 45 minutos con empaque térmico antifusión.</p>
+                        </div>
+                    </label>
+
+                    <!-- Opción B: Recogida en el Local -->
+                    <label class="chk-radio-card" id="label-delivery-pickup">
+                        <input type="radio" name="chk-delivery-type" value="RECOGIDA" onchange="cambiarMetodoEntrega('RECOGIDA')">
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-delivery-content">
+                            <div class="chk-delivery-head">
+                                <span class="chk-delivery-name">🏪 Recogida en el Local Físico</span>
+                                <span class="chk-delivery-badge-free">¡GRATIS!</span>
+                            </div>
+                            <p class="chk-delivery-desc">Recoge inmediatamente sin costo en Calle 45 # 23 - 10 Barrio El Prado.</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- 2. Datos para la entrega -->
+                <div class="chk-section-eyebrow" style="margin-top: 22px;">
+                    <span>👤</span> 2. DATOS PARA LA ENTREGA
+                </div>
+
+                <div class="chk-fields-grid">
+                    <div class="chk-form-field">
+                        <label for="checkout-nombre">NOMBRE COMPLETO DE QUIEN RECIBE *</label>
+                        <div class="input-with-icon">
+                            <span class="field-icon">👤</span>
+                            <input type="text" class="chk-input" id="checkout-nombre" required placeholder="Ej: María Camila López">
+                        </div>
+                    </div>
+
+                    <div class="chk-form-field">
+                        <label for="checkout-telefono">TELÉFONO WHATSAPP DE CONTACTO *</label>
+                        <div class="input-with-icon">
+                            <span class="field-icon">📱</span>
+                            <input type="tel" class="chk-input" id="checkout-telefono" required placeholder="Ej: 3001234567 (10 dígitos)">
+                        </div>
+                    </div>
+
+                    <div class="chk-form-field" id="wrap-field-direccion">
+                        <label for="checkout-direccion">DIRECCIÓN EXACTA DE ENTREGA *</label>
+                        <div class="input-with-icon">
+                            <span class="field-icon">📍</span>
+                            <input type="text" class="chk-input" id="checkout-direccion" required placeholder="Ej: Calle 45 # 23 – 10 Barrio El Prado">
+                        </div>
+                    </div>
+
+                    <div class="chk-form-field">
+                        <label for="checkout-indicaciones">INDICACIONES O NOTAS ADICIONALES (OPCIONAL)</label>
+                        <div class="input-with-icon">
+                            <span class="field-icon">📝</span>
+                            <input type="text" class="chk-input" id="checkout-indicaciones" placeholder="Ej: Apto 302 / Timbre rojo / Entregar en portería">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO PASO 3: MÉTODO DE PAGO & VALIDACIÓN DE COMPROBANTE -->
+            <div class="checkout-step-content" id="chk-pane-3">
+                <!-- 1. Cuentas para Transferencia Directa -->
+                <div class="chk-section-eyebrow">
+                    <span>💳</span> 1. TRANSFIERE A CUALQUIERA DE NUESTRAS CUENTAS
+                </div>
+
+                <div class="chk-payments-grid" style="grid-template-columns: 1fr; gap:12px;">
+                    <!-- Nequi -->
+                    <label class="chk-payment-card active" id="pay-card-nequi" onclick="cambiarMetodoPago('NEQUI')">
+                        <input type="radio" name="chk-metodo-pago-radio" value="NEQUI" checked>
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-pay-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <span class="chk-pay-name">🟣 Transferencia Nequi</span>
+                                <span style="font-size:11px; color:#A78BFA; background:rgba(167,139,250,0.12); border:1px solid rgba(167,139,250,0.3); padding:2px 8px; border-radius:99px; font-weight:700;">Celular / QR</span>
+                            </div>
+                            <div class="chk-account-copy-row">
+                                <span class="chk-acc-label">Número Nequi:</span>
+                                <strong class="chk-account-number" id="chk-num-nequi">301 355 7467</strong>
+                                <button type="button" class="btn-copy-acc" onclick="event.stopPropagation(); copiarCuenta('chk-num-nequi', this)">
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <small class="chk-pay-desc">Envío inmediato desde cualquier cuenta Nequi o PSE sin comisiones.</small>
+                        </div>
+                    </label>
+
+                    <!-- Bancolombia -->
+                    <label class="chk-payment-card" id="pay-card-bancolombia" onclick="cambiarMetodoPago('BANCOLOMBIA')">
+                        <input type="radio" name="chk-metodo-pago-radio" value="BANCOLOMBIA">
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-pay-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <span class="chk-pay-name">🟡 Bancolombia Transferencia</span>
+                                <span style="font-size:11px; color:#FBBF24; background:rgba(251,191,36,0.12); border:1px solid rgba(251,191,36,0.3); padding:2px 8px; border-radius:99px; font-weight:700;">Ahorros</span>
+                            </div>
+                            <div class="chk-account-copy-row">
+                                <span class="chk-acc-label">Cuenta Ahorros:</span>
+                                <strong class="chk-account-number" id="chk-num-bancolombia">245-883921-04</strong>
+                                <button type="button" class="btn-copy-acc" onclick="event.stopPropagation(); copiarCuenta('chk-num-bancolombia', this)">
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <small class="chk-pay-desc">Acepta transferencias App Bancolombia, QR Bancolombia y fondos digitales.</small>
+                        </div>
+                    </label>
+
+                    <!-- Daviplata -->
+                    <label class="chk-payment-card" id="pay-card-daviplata" onclick="cambiarMetodoPago('DAVIPLATA')">
+                        <input type="radio" name="chk-metodo-pago-radio" value="DAVIPLATA">
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-pay-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <span class="chk-pay-name">🔴 Daviplata Móvil</span>
+                                <span style="font-size:11px; color:#F87171; background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.3); padding:2px 8px; border-radius:99px; font-weight:700;">Daviplata</span>
+                            </div>
+                            <div class="chk-account-copy-row">
+                                <span class="chk-acc-label">Número Daviplata:</span>
+                                <strong class="chk-account-number" id="chk-num-daviplata">301 355 7467</strong>
+                                <button type="button" class="btn-copy-acc" onclick="event.stopPropagation(); copiarCuenta('chk-num-daviplata', this)">
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <small class="chk-pay-desc">Transfiere gratis desde Daviplata o Davivienda en un toque.</small>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- 2. Pasos a Seguir para Validar Comprobante -->
+                <div class="chk-transfer-steps-card">
+                    <div class="chk-transfer-steps-header">
+                        <span class="chk-steps-badge-icon">📑</span>
+                        <div>
+                            <strong style="color:#fff; font-size:0.92rem;">Pasos para validar tu comprobante de compra:</strong>
+                            <div style="color:var(--mut); font-size:0.78rem;">Sigue estos pasos para activar el batido de tu pedido:</div>
+                        </div>
+                    </div>
+                    <div class="chk-steps-list-guide">
+                        <div class="chk-step-row">
+                            <span class="chk-step-num">1</span>
+                            <div class="chk-step-text"><strong>Copia el número</strong> de cuenta deseado arriba y abre tu aplicación bancaria (Nequi, Bancolombia o Daviplata).</div>
+                        </div>
+                        <div class="chk-step-row">
+                            <span class="chk-step-num">2</span>
+                            <div class="chk-step-text"><strong>Transfiere el valor total exacto:</strong> <span class="chk-steps-total-pill" id="chk-step3-total-pill">$0 COP</span></div>
+                        </div>
+                        <div class="chk-step-row">
+                            <span class="chk-step-num">3</span>
+                            <div class="chk-step-text"><strong>Toma captura de pantalla (pantallazo)</strong> legible de tu comprobante de transferencia exitosa.</div>
+                        </div>
+                        <div class="chk-step-row">
+                            <span class="chk-step-num">4</span>
+                            <div class="chk-step-text">Presiona el botón de abajo <strong>"📲 Enviar Comprobante por WhatsApp"</strong> para abrir el chat con nuestro equipo y adjuntar tu comprobante. ¡Iniciaremos el batido al instante! 🚀</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Resumen final del pedido -->
+                <div class="chk-section-eyebrow" style="margin-top: 18px;">
+                    <span>📋</span> 3. RESUMEN FINAL DE TU PEDIDO
+                </div>
+
+                <div class="chk-summary-card">
+                    <div class="chk-summary-detail">
+                        <div><strong id="chk-resumen-cliente">María Camila</strong></div>
+                        <small id="chk-resumen-contacto" style="color:var(--mut);">300 123 4567</small> · 
+                        <small id="chk-resumen-destino" style="color:var(--mut);">Calle 45 # 23-10</small>
+                    </div>
+
+                    <div class="chk-summary-lines">
+                        <div class="chk-summary-row">
+                            <span style="color:var(--mut);">Subtotal (<span id="chk-resumen-cant">0</span> granizados):</span>
+                            <strong id="checkout-subtotal-val">$0</strong>
+                        </div>
+                        <div class="chk-summary-row">
+                            <span style="color:var(--mut);">Método de entrega:</span>
+                            <span id="chk-resumen-envio-txt" style="color:var(--li); font-weight:700;">$5.000 (Domicilio térmico)</span>
+                        </div>
+                        <div class="chk-summary-row chk-summary-total">
+                            <span>TOTAL A PAGAR:</span>
+                            <span class="chk-total-badge" id="checkout-total-val">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER DE NAVEGACIÓN INFERIOR DINÁMICO -->
+            <div class="checkout-footer">
+                <button type="button" class="chk-btn-prev" id="btn-chk-prev" onclick="retrocederPasoCheckout()">
+                    ⬅ Seguir comprando
+                </button>
+                <button type="button" class="chk-btn-next cta" id="btn-chk-next" onclick="avanzarPasoCheckout()">
+                    Continuar a Envío &amp; Datos ➔
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL DE ÉXITO Y TICKET DIGITAL CON BOTÓN WHATSAPP
+     ========================================================== -->
+<div class="modal-overlay" id="modal-exito-pedido">
+    <div class="modal-box" style="text-align: center; max-width: 480px;">
+        <div class="exito-cup-celebration">
+            <svg class="chk-granizado-svg celebration-cup" viewBox="0 0 100 135" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Granizado artesanal en preparación">
+              <line x1="64" y1="6" x2="48" y2="46" stroke="#00B4D8" stroke-width="7" stroke-linecap="round"/>
+              <line x1="62" y1="10" x2="50" y2="42" stroke="#90E0EF" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M22 46 C22 26, 78 26, 78 46 Z" fill="url(#slushExitoGrad)"/>
+              <polygon points="40,30 46,24 52,28 46,34" fill="#FFFFFF" fill-opacity="0.65"/>
+              <polygon points="56,32 62,26 68,31 61,36" fill="#FFFFFF" fill-opacity="0.55"/>
+              <ellipse cx="50" cy="46" rx="30" ry="7.5" fill="#FFFFFF" fill-opacity="0.25" stroke="#FFFFFF" stroke-width="1.8"/>
+              <path d="M20 46 L32 116 Q33 124 42 124 L58 124 Q67 124 68 116 L80 46 Z" fill="rgba(255,255,255,0.1)" stroke="#FFFFFF" stroke-width="1.8" stroke-opacity="0.45"/>
+              <path d="M23 52 L33 114 Q34 120 42 120 L58 120 Q66 120 67 114 L77 52 Q64 56 50 52 Q36 48 23 52 Z" fill="url(#slushExitoBodyGrad)"/>
+              <circle cx="42" cy="72" r="2" fill="#FFFFFF" fill-opacity="0.75"/>
+              <circle cx="58" cy="86" r="2.5" fill="#FFFFFF" fill-opacity="0.75"/>
+              <path d="M26 54 L35 112" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.45"/>
+              <defs>
+                <linearGradient id="slushExitoGrad" x1="22" y1="26" x2="78" y2="46" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFE600"/><stop offset="0.5" stop-color="#FFB703"/><stop offset="1" stop-color="#10B981"/>
+                </linearGradient>
+                <linearGradient id="slushExitoBodyGrad" x1="23" y1="52" x2="77" y2="120" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFB703"/><stop offset="0.4" stop-color="#FB8500"/><stop offset="0.75" stop-color="#FF1E56"/><stop offset="1" stop-color="#10B981"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="exito-sparkle-stars">✨ 🍃 ✨</div>
+        </div>
+        <h2 style="font-size: 1.7rem; margin-bottom: 6px; color:#fff;">¡PEDIDO RECIBIDO!</h2>
+        <p style="color: var(--mut); font-size: 0.92rem; margin-bottom: 20px;">Tus granizados de fruta pura están entrando a preparación y batido a -4°C.</p>
+
+        <div style="background: rgba(0, 240, 255, 0.08); border: 1px dashed var(--cy); border-radius: 16px; padding: 18px; margin-bottom: 20px; text-align: left;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+                <span style="color:var(--mut); font-size:0.85rem;">Código de Pedido:</span>
+                <strong style="color:var(--cy); font-size:1.2rem;" id="exito-codigo-pedido">GRZ-00000</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+                <span style="color:var(--mut); font-size:0.85rem;">Cliente:</span>
+                <span id="exito-cliente-nombre" style="color:#fff; font-weight:800;">-</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom: 6px;">
+                <span style="color:var(--mut); font-size:0.85rem;">Entrega en:</span>
+                <span id="exito-direccion" style="color:#fff;">-</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--bd); padding-top:8px;">
+                <span style="color:var(--mut); font-size:0.85rem;">Total a Pagar:</span>
+                <strong style="color:var(--li); font-size:1.15rem;" id="exito-total">$0</strong>
+            </div>
+        </div>
+
+        <a id="btn-whatsapp-confirmar" href="#" target="_blank" class="cta" style="display:block; text-decoration:none; background: #25D366; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); margin-bottom: 12px; padding:14px;">
+            💬 Enviar Pedido a WhatsApp
+        </a>
+
+        <button onclick="cerrarModales()" style="background: none; border: none; color: var(--mut); cursor: pointer; font-size: 0.9rem; font-weight:700;">
+            Cerrar y seguir navegando
+        </button>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL LOGIN ADMINISTRATIVO
+     ========================================================== -->
+<div class="modal-overlay" id="modal-admin-login">
+    <div class="modal-box" style="max-width: 400px;">
+        <div class="modal-header">
+            <h3><span>🔒</span> Panel Admin GRANIFRESH</h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+        <form id="form-admin-login">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" class="form-control" id="admin-user-input" required value="admin">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" class="form-control" id="admin-pass-input" required value="admin123">
+            </div>
+            <div id="admin-login-error" style="color:var(--mg); font-size:0.85rem; margin-bottom:12px; display:none;"></div>
+            <button type="submit" class="cta" style="width: 100%; border:none; cursor:pointer; padding:12px;">
+                Ingresar al Panel
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================================
+     PANEL ADMINISTRATIVO EJECUTIVO (BARRA HORIZONTAL ESTILO ISIVI)
+     ========================================================== -->
+<div class="admin-view-container" id="admin-view">
+    <div class="admin-layout-wrapper">
+        <!-- HEADER SUPERIOR HORIZONTAL: LOGO, SALUDO & ACCIONES MAESTRAS -->
+        <header class="admin-top-master-header">
+            <div class="admin-brand-horizontal">
+                <div class="admin-brand-icon">🥭</div>
+                <div class="admin-brand-info">
+                    <h2 class="admin-brand-title">GRANIFRESH</h2>
+                    <span class="admin-brand-badge">CONTROL MAESTRO 100% FRUTA</span>
+                </div>
+            </div>
+
+            <div class="admin-header-center-info">
+                <h3 class="admin-greeting" id="admin-greeting-text">¡Hola, Administrador! 🥤</h3>
+                <p class="admin-date-label" id="admin-current-date">Cargando fecha...</p>
+            </div>
+
+            <div class="admin-top-actions-right">
+                <div class="admin-user-pill">
+                    <span class="admin-user-avatar">❄️</span>
+                    <span class="admin-user-name" id="admin-display-username">Admin Principal</span>
+                    <i class="status-dot-pulse"></i>
+                </div>
+                <button id="btn-refresh-admin" class="btn-admin-action" title="Actualizar datos en tiempo real">
+                    <span id="admin-refresh-icon">🔄</span> Refrescar
+                </button>
+            </div>
+        </header>
+
+        <!-- BARRA HORIZONTAL DE APARTADOS / PESTAÑAS (ESTILO IMAGEN) -->
+        <nav class="admin-horizontal-nav-bar">
+            <div class="admin-pills-scroll-track">
+                <!-- Pestañas de Navegación -->
+                <button type="button" class="admin-nav-pill active" data-tab="dashboard" id="adm-nav-dashboard">
+                    <span class="pill-icon">📊</span>
+                    <span class="pill-text">Dashboard</span>
+                    <span class="nav-badge hidden" id="badge-nav-alertas">0</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="pedidos" id="adm-nav-pedidos">
+                    <span class="pill-icon">🛵</span>
+                    <span class="pill-text">Pedidos</span>
+                    <span class="nav-badge" id="badge-nav-pedidos-activos">0</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="catalogo" id="adm-nav-catalogo">
+                    <span class="pill-icon">🥤</span>
+                    <span class="pill-text">Productos &amp; Inventario</span>
+                    <span class="nav-badge nav-badge-cyan" id="badge-nav-total-productos">0</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="historial" id="adm-nav-historial">
+                    <span class="pill-icon">📜</span>
+                    <span class="pill-text">Historial</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="config" id="adm-nav-config">
+                    <span class="pill-icon">⚙️</span>
+                    <span class="pill-text">Configuración Negocio</span>
+                </button>
+
+                <div class="admin-nav-divider"></div>
+
+                <!-- Botones Ver Tienda y Cerrar Sesión integrados en la barra -->
+                <button type="button" id="btn-admin-volver-tienda" class="admin-nav-pill btn-pill-store" title="Ir a la tienda pública de clientes">
+                    <span class="pill-icon">🌐</span>
+                    <span class="pill-text">Ver Tienda</span>
+                </button>
+
+                <button type="button" id="btn-admin-logout" class="admin-nav-pill btn-pill-logout" title="Cerrar sesión de administrador">
+                    <span class="pill-icon">🚪</span>
+                    <span class="pill-text">Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ÁREA PRINCIPAL DEL PANEL (ANCHO COMPLETO) -->
+        <main class="admin-main-content admin-main-fullwidth">
+
+            <!-- ==========================================
+                 PESTAÑA 1: DASHBOARD EJECUTIVO (ESTILO ISIVI)
+                 ========================================== -->
+            <div class="admin-tab-pane" id="tab-content-dashboard">
+                <!-- KPIS EJECUTIVOS CON DESGLOSES -->
+                <div class="admin-kpis-grid">
+                    <div class="kpi-card kpi-card-lime">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Ventas de Hoy</span>
+                            <span class="kpi-card-icon">💰</span>
+                        </div>
+                        <div class="kpi-card-value" id="kpi-ventas-hoy">$0</div>
+                        <div class="kpi-card-breakdown" id="kpi-ventas-hoy-breakdown">
+                            <span class="trend-badge trend-up" id="kpi-pedidos-hoy-badge">⚡ 0 pedidos hoy</span> · <span id="kpi-ticket-promedio">Ticket: $0</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-card-cyan">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Ventas Totales</span>
+                            <span class="kpi-card-icon">📈</span>
+                        </div>
+                        <div class="kpi-card-value" id="kpi-ventas-totales">$0</div>
+                        <div class="kpi-card-breakdown">
+                            <span class="text-cyan-frost" id="kpi-ventas-mes-badge">Mes: $0</span> · <span id="kpi-total-pedidos-count">0 pedidos</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-card-magenta">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Pedidos en Proceso</span>
+                            <span class="kpi-card-icon">🛵</span>
+                        </div>
+                        <div class="kpi-card-value" id="kpi-pedidos-activos-count">0</div>
+                        <div class="kpi-card-breakdown" id="kpi-pedidos-breakdown">
+                            <span class="text-magenta-neon" id="kpi-pendientes-sub">0 por batir</span> · <span class="text-lime-frost" id="kpi-camino-sub">0 en ruta</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card kpi-card-orange">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Control de Stock</span>
+                            <span class="kpi-card-icon">⚠️</span>
+                        </div>
+                        <div class="kpi-card-value" id="kpi-stock-alerta-count">0</div>
+                        <div class="kpi-card-breakdown" id="kpi-stock-breakdown">
+                            <span class="text-amber-warning">Sabores bajos o agotados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN SOLICITUDES WEB PENDIENTES DE ACCIÓN (COMPROBANTE WHATSAPP) -->
+                <div class="admin-section-card" id="dash-urgent-orders-section">
+                    <div class="admin-section-header">
+                        <div>
+                            <h4 class="admin-section-title">⚡ Solicitudes Web Pendientes de Acción</h4>
+                            <p class="admin-section-subtitle">Órdenes entrantes de la web pendientes de verificar comprobante de pago por WhatsApp para <b>Aprobar</b> la orden o <b>Rechazar/Eliminar</b> la solicitud.</p>
+                        </div>
+                        <button onclick="cambiarPestanaAdmin('pedidos')" class="btn-link-action">
+                            Ir a Pedidos en Vivo ➜
+                        </button>
+                    </div>
+                    <div class="dash-urgent-grid" id="dash-urgent-orders-list">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- ANALÍTICAS DEL NEGOCIO: RESUMEN DE VENTAS (7 DÍAS) & STOCK BAJO -->
+                <div class="admin-two-cols-grid">
+                    <!-- 1. RESUMEN DE VENTAS CON HISTORIAL DIARIO (ÚLTIMOS 7 DÍAS) -->
+                    <div class="dash-sales-summary-card">
+                        <div class="dash-sales-summary-header">
+                            <div>
+                                <h4 class="dash-sales-title">📊 RESUMEN DE VENTAS</h4>
+                                <p class="dash-sales-subtitle">Ingresos confirmados del negocio</p>
+                            </div>
+                            <span class="dash-sales-avg-pill" id="dash-ticket-prom-pill">Ticket prom: $0</span>
+                        </div>
+                        <div class="dash-sales-kpi-row">
+                            <div class="dash-sales-kpi-box">
+                                <span class="dash-sales-kpi-lbl">HOY</span>
+                                <strong class="dash-sales-kpi-val" id="dash-res-hoy">$0</strong>
+                            </div>
+                            <div class="dash-sales-kpi-box">
+                                <span class="dash-sales-kpi-lbl">ESTA SEMANA</span>
+                                <strong class="dash-sales-kpi-val text-emerald-neon" id="dash-res-semana">$0</strong>
+                            </div>
+                            <div class="dash-sales-kpi-box">
+                                <span class="dash-sales-kpi-lbl">ESTE MES</span>
+                                <strong class="dash-sales-kpi-val text-amber-gold" id="dash-res-mes">$0</strong>
+                            </div>
+                        </div>
+                        <div class="dash-sales-categories-row">
+                            <div class="dash-sales-cat-pill">
+                                <span>🥤 Granizados</span>
+                                <strong id="dash-res-subtotal-prod">$0</strong>
+                            </div>
+                            <div class="dash-sales-cat-pill">
+                                <span>🛵 Domicilios</span>
+                                <strong id="dash-res-total-envios">$0</strong>
+                            </div>
+                        </div>
+                        <!-- Gráfica de barras Últimos 7 Días -->
+                        <div class="dash-chart-container">
+                            <div class="dash-chart-header">
+                                <span style="font-weight:800; font-size:0.85rem; color:#fff; letter-spacing:0.5px;">ÚLTIMOS 7 DÍAS</span>
+                                <small style="color:var(--mut);">Historial diario</small>
+                            </div>
+                            <div class="dash-chart-bars-wrap" id="dash-chart-7days">
+                                <!-- Inyectado dinámicamente con los 7 días reales -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. STOCK BAJO / REPONER (3 O MENOS EXISTENCIAS O AGOTADOS) -->
+                    <div class="dash-low-stock-card">
+                        <div class="dash-low-stock-header">
+                            <div>
+                                <h4 class="dash-low-stock-title">📦 STOCK BAJO / REPONER</h4>
+                                <p class="dash-low-stock-subtitle">Productos con 3 o menos existencias o agotados</p>
+                            </div>
+                            <button type="button" onclick="cambiarPestanaAdmin('catalogo')" class="btn-link-action" style="font-size:0.8rem; color:#FFB703;">
+                                Ver inventario ➔
+                            </button>
+                        </div>
+                        <div class="dash-low-stock-list" id="dash-low-stock-items-container">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. RANKING DE SABORES REALES MÁS VENDIDOS -->
+                <div class="admin-section-card" style="margin-top:20px;">
+                    <div class="admin-section-header">
+                        <div>
+                            <h4 class="admin-section-title">🏆 Sabores Más Vendidos</h4>
+                            <p class="admin-section-subtitle">Preferencia real de los clientes en fruta 100% natural.</p>
+                        </div>
+                    </div>
+                    <div class="dash-top-flavors-list" id="dash-top-flavors-container">
+                        <!-- Inyectado dinámicamente según pedidos reales -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 PESTAÑA 2: GESTOR DE PEDIDOS EN VIVO (COCINA & RUTA)
+                 ========================================== -->
+            <div class="admin-tab-pane" id="tab-content-pedidos" style="display:none;">
+                <div class="admin-header-bar">
+                    <div>
+                        <h2 class="admin-pane-title">Pedidos Activos en Cocina & Ruta</h2>
+                        <p class="admin-pane-subtitle">Control de estados paso a paso sin casillas manuales. Al marcar como entregado, el pedido pasa automáticamente al Historial.</p>
+                    </div>
+                    <div class="admin-header-tools">
+                        <input type="text" id="filtro-pedidos-search" class="admin-search-input" placeholder="🔍 Buscar código, cliente, teléfono o barrio...">
+                    </div>
+                </div>
+
+                <!-- BARRA DE FILTROS POR ESTADO EN VIVO -->
+                <div class="admin-filters-bar" id="orders-status-filters">
+                    <button class="filter-pill active" data-status="TODOS">
+                        Todos en Vivo <span class="pill-count" id="count-order-todos">0</span>
+                    </button>
+                    <button class="filter-pill" data-status="RECIBIDO">
+                        📥 Por Validar <span class="pill-count pill-magenta" id="count-order-recibido">0</span>
+                    </button>
+                    <button class="filter-pill" data-status="EN_PREPARACION">
+                        🧊 En Batido <span class="pill-count pill-cyan" id="count-order-prep">0</span>
+                    </button>
+                    <button class="filter-pill" data-status="EN_CAMINO">
+                        🛵 En Ruta <span class="pill-count pill-yellow" id="count-order-camino">0</span>
+                    </button>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Código / Hora</th>
+                                <th>Cliente / WhatsApp</th>
+                                <th>Dirección de Entrega</th>
+                                <th>Granizados Pedidos</th>
+                                <th>Total / Pago</th>
+                                <th>Estado</th>
+                                <th style="text-align:right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-pedidos-body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 PESTAÑA 3: INVENTARIO & GRANIZADOS (CRUD INLINE)
+                 ========================================== -->
+            <div class="admin-tab-pane" id="tab-content-catalogo" style="display:none;">
+                <div class="admin-header-bar">
+                    <div>
+                        <h2 class="admin-pane-title">Catálogo & Inventario de Granizados</h2>
+                        <p class="admin-pane-subtitle">Control de sabores 100% fruta natural, recetas, precios por tamaño y existencias en tiempo real.</p>
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     SECCIÓN SUPERIOR: CATEGORÍAS DE PRODUCTOS (IMAGEN 3)
+                     ========================================================== -->
+                <div class="admin-section-card admin-cat-manager-card" style="margin-bottom:24px;">
+                    <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.15); padding-bottom:12px; margin-bottom:14px;">
+                        <div>
+                            <h3 class="admin-section-title" style="font-size:1.1rem; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+                                🏷️ CATEGORÍAS DE PRODUCTOS
+                            </h3>
+                            <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut);">
+                                Organiza tu catálogo. Las categorías activas se muestran como filtros a los clientes.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="cat-manager-input-row" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:16px;">
+                        <input type="text" id="cat-nueva-nombre" class="form-control" placeholder="Ej: Tropicales, Cítricos, Frutos Rojos, Nuevos Sabores..." onkeydown="if(event.key==='Enter'){event.preventDefault();agregarCategoriaAdmin();}" style="flex:1; min-width:240px;">
+                        <button type="button" id="btn-agregar-categoria" onclick="agregarCategoriaAdmin()" class="btn-admin-action" style="background:var(--em, #10B981); color:#031009; font-weight:800; border:none; padding:11px 22px; border-radius:12px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                            <span>+</span> Añadir categoría
+                        </button>
+                    </div>
+                    <div class="cat-chips-wrapper" id="contenedor-chips-categorias" style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <!-- Chips dinámicos renderizados por admin.js -->
+                    </div>
+                </div>
+
+                <!-- ==========================================================
+                     ESTACIÓN PERMANENTE: CREAR / EDITAR PRODUCTO (IMAGENES 3 Y 4)
+                     ========================================================== -->
+                <div class="admin-section-card admin-product-workstation-card" id="granizado-workstation-card" style="margin-bottom:28px;">
+                    <form id="form-modal-granizado">
+                        <input type="hidden" id="granizado-form-id">
+
+                        <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.15); padding-bottom:12px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h3 class="admin-section-title" id="granizado-form-title-text" style="font-size:1.15rem; color:#FFFFFF; display:flex; align-items:center; gap:8px;">
+                                    <span id="granizado-form-icon">➕</span> CREAR NUEVO PRODUCTO O GRANIZADO
+                                </h3>
+                                <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut);">
+                                    Configura ingredientes, precios por tamaño, encuadre de imagen y visualiza en tiempo real cómo lo verá el cliente.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-sidebar-secondary" onclick="limpiarFormularioGranizado()" title="Limpiar y crear uno nuevo" style="padding:8px 16px; font-size:0.85rem;">
+                                ↺ Nuevo / Limpiar
+                            </button>
+                        </div>
+
+                        <!-- FILA 1: Nombre del Granizado y Categoría -->
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Nombre del Granizado / Sabor *</label>
+                                <input type="text" class="form-control" id="granizado-form-nombre" required placeholder="Ej: Mango Biche con Sal Marina & Limón">
+                            </div>
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select class="form-control" id="granizado-form-tipo">
+                                    <option value="tropical">🥭 Tropicales</option>
+                                    <option value="berries">🍓 Frutos Rojos</option>
+                                    <option value="citrus">🍋 Cítricos & Exóticos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- FILA 2: Modelo de Precios, Precio Venta, Precio Antes / Regular, Cantidad Stock -->
+                        <!-- FILA 2: Stock, Precio Antes (Opcional), Insignia (Opcional) -->
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Cantidad en inventario *</label>
+                                <input type="number" class="form-control" id="granizado-form-stock" required value="25" min="0">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Stock total disponible.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio Antes / Regular ($ COP)</label>
+                                <input type="number" class="form-control" id="granizado-form-precio-regular" placeholder="Ej: 15000 (Opcional)">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Si se llena, muestra el precio tachado y badge de ahorro.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Insignia / Badge Comercial (Opcional)</label>
+                                <input type="text" class="form-control" id="granizado-form-insignia" placeholder="Ej: ⭐ MÁS VENDIDO, 🥭 DE COSECHA (Opcional)">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Si se deja vacío no aparece ningún badge.</small>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN DINÁMICA DE CONFIGURACIÓN DE VASOS (OZ) & PRECIOS -->
+                        <div class="tamanos-config-panel" style="background:rgba(4,20,11,0.65); border:1px solid rgba(52,211,153,0.22); border-radius:14px; padding:16px; margin:12px 0 16px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                                <div>
+                                    <label style="font-weight:800; font-size:0.95rem; color:#fff; display:flex; align-items:center; gap:6px;">
+                                        <span>🥤</span> TAMAÑOS DE VASO &amp; PRECIOS
+                                    </label>
+                                    <small style="color:var(--mut); font-size:0.76rem;">Configura las medidas de vaso (ej: 10oz, 12oz, 16oz, 24oz, 32oz...) y su precio respectivo.</small>
+                                </div>
+                                <button type="button" class="btn-add-tamano-row" onclick="agregarFilaTamano()" style="background:linear-gradient(135deg, #10B981, #059669); color:#fff; border:none; border-radius:8px; padding:7px 14px; font-size:0.8rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:5px; box-shadow:0 3px 10px rgba(16,185,129,0.3);">
+                                    <span>➕</span> Añadir Vaso / Tamaño
+                                </button>
+                            </div>
+
+                            <div id="contenedor-filas-tamanos" style="display:flex; flex-direction:column; gap:10px;">
+                                <!-- Se llena dinámicamente con las medidas y precios configurados -->
+                            </div>
+                            <input type="hidden" id="granizado-form-precio" value="13000">
+                        </div>
+
+                        <!-- FILA 4: FOTO PRINCIPAL + ESTADO INICIAL DE STOCK -->
+                        <div class="form-grid-2" style="align-items:start; margin-top:8px;">
+                            <div class="form-group">
+                                <label>⭐ Foto Principal del Granizado (Opcional)</label>
+                                <div class="photo-upload-container">
+                                    <div class="photo-upload-card" style="display:flex; align-items:center; gap:12px; background:rgba(4,20,11,0.7); border:1px solid rgba(52,211,153,0.2); padding:10px 14px; border-radius:14px;">
+                                        <div class="photo-upload-thumb" id="granizado-img-preview-box" style="width:48px; height:48px; border-radius:10px; background:#020b06; border:1px solid rgba(52,211,153,0.3); display:grid; place-items:center; overflow:hidden;">
+                                            <img id="granizado-thumb-img" src="" alt="Foto" style="display:none; width:100%; height:100%; object-fit:cover;">
+                                            <span id="granizado-thumb-placeholder" style="font-size:1.4rem;">📷</span>
+                                        </div>
+                                        <div class="photo-upload-info" style="flex:1;">
+                                            <strong style="color:#fff; font-size:0.9rem; display:block;">Foto Principal</strong>
+                                            <span class="photo-active-badge" style="color:var(--em, #10B981); font-size:0.75rem; font-weight:700;">● Activa como portada de la tarjeta</span>
+                                        </div>
+                                        <button type="button" class="btn-delete-photo" onclick="eliminarFotoGranizado()" title="Eliminar foto" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.35); color:#EF4444; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:0.8rem; font-weight:800;">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
+                                    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                                        <input type="file" id="granizado-form-file" accept="image/*" class="form-control" style="flex:1; min-width:200px;">
+                                        <input type="url" id="granizado-form-img" class="form-control" placeholder="O pegar link: https://..." style="flex:1; min-width:200px;">
+                                    </div>
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem; margin-top:4px; display:block;">Selecciona una imagen JPG, PNG o WebP o pega una URL para establecerla o reemplazarla.</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Estado Inicial de Stock</label>
+                                <select class="form-control" id="granizado-form-estado-stock">
+                                    <option value="EN_STOCK">En Stock (Disponible)</option>
+                                    <option value="STOCK_BAJO">Stock Bajo (&lt; 5 unidades)</option>
+                                    <option value="AGOTADO">Agotado</option>
+                                </select>
+
+                                <div style="margin-top:14px;">
+                                    <label>Colores Gradiente del Vaso Si No Hay Foto</label>
+                                    <div style="display:flex; gap:10px; align-items:center; margin-top:6px;">
+                                        <input type="color" id="granizado-form-color1-picker" value="#FFB703" oninput="document.getElementById('granizado-form-color1').value = this.value; if(window.actualizarPreviewCliente) actualizarPreviewCliente();">
+                                        <input type="text" class="form-control" id="granizado-form-color1" value="#FFB703" style="width:105px;">
+                                        <input type="color" id="granizado-form-color2-picker" value="#FB8500" oninput="document.getElementById('granizado-form-color2').value = this.value; if(window.actualizarPreviewCliente) actualizarPreviewCliente();">
+                                        <input type="text" class="form-control" id="granizado-form-color2" value="#FB8500" style="width:105px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FILA 5: Descripción Breve -->
+                        <div class="form-group" style="margin-top:12px;">
+                            <label>Descripción Breve o Beneficios / Ingredientes</label>
+                            <textarea class="form-control" id="granizado-form-desc" rows="2" placeholder="Describe los beneficios o ingredientes principales (ej: Pura pulpa de mango verde con limón mandarino y toque de sal marina, batido a -4°C...)"></textarea>
+                        </div>
+
+                        <!-- ==========================================================
+                             SPLIT GRID: ENCUADRE DE IMAGEN (Izq) + VISTA PREVIA (Der)
+                             (IMAGEN 4 DE REFERENCIA)
+                             ========================================================== -->
+                        <div class="encuadre-preview-split" style="display:grid; grid-template-columns: 1fr 340px; gap:24px; margin-top:20px; align-items:start;">
+                            <!-- BLOQUE IZQUIERDO: ENCUADRE DE IMAGEN -->
+                            <div class="encuadre-controls-box" style="background:rgba(4,20,11,0.65); border:1px solid rgba(52,211,153,0.2); border-radius:18px; padding:20px;">
+                                <div class="encuadre-header" style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px; margin-bottom:14px;">
+                                    <h4 class="encuadre-title" style="margin:0 0 4px 0; color:#fff; font-size:1.05rem; display:flex; align-items:center; gap:8px;">
+                                        📐 ENCUADRE DE IMAGEN EN TARJETA
+                                    </h4>
+                                    <p class="encuadre-subtitle" style="margin:0; font-size:0.78rem; color:var(--mut);">
+                                        Ajusta el modo de encuadre, zoom y posición de cada foto para que luzca impecable en la tarjeta y en la vitrina.
+                                    </p>
+                                </div>
+
+                                <div class="encuadre-photo-pill-row" style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                                    <span style="font-size:0.8rem; color:var(--mut);">⭐ Foto a configurar encuadre:</span>
+                                    <span class="encuadre-photo-pill" style="background:rgba(255,183,3,0.14); border:1px solid rgba(255,183,3,0.35); color:#FFB703; font-size:0.75rem; font-weight:800; padding:4px 10px; border-radius:99px;">
+                                        ⭐ Foto Principal
+                                    </span>
+                                </div>
+
+                                <div class="encuadre-grid-sliders" style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                                    <div class="form-group">
+                                        <label>Modo de Ajuste</label>
+                                        <select id="slider-img-fit" class="form-control" onchange="if(window.actualizarPreviewCliente) actualizarPreviewCliente();">
+                                            <option value="cover">Cubrir Marco (Cover - Fotos de Estudio)</option>
+                                            <option value="contain">Contener (Contain - Vaso Completo)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                            <label style="margin:0;">Zoom / Escala (0.7x – 3.0x)</label>
+                                            <span id="val-img-zoom" style="color:var(--em, #10B981); font-weight:800; font-size:0.82rem;">1.00x</span>
+                                        </div>
+                                        <input type="range" id="slider-img-zoom" min="0.7" max="3.0" step="0.05" value="1.0" class="custom-range-slider" style="width:100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                            <label style="margin:0;">Posición Horizontal (X)</label>
+                                            <span id="val-img-posx" style="color:var(--cy, #00F0FF); font-weight:800; font-size:0.82rem;">50%</span>
+                                        </div>
+                                        <input type="range" id="slider-img-posx" min="0" max="100" step="1" value="50" class="custom-range-slider" style="width:100%;">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                                            <label style="margin:0;">Posición Vertical (Y)</label>
+                                            <span id="val-img-posy" style="color:var(--cy, #00F0FF); font-weight:800; font-size:0.82rem;">50%</span>
+                                        </div>
+                                        <input type="range" id="slider-img-posy" min="0" max="100" step="1" value="50" class="custom-range-slider" style="width:100%;">
+                                    </div>
+                                </div>
+
+                                <div class="encuadre-presets-row" style="display:flex; gap:10px; margin-top:16px;">
+                                    <button type="button" class="btn-encuadre-preset" onclick="setEncuadrePreset('completo')">
+                                        🍱 Producto Completo
+                                    </button>
+                                    <button type="button" class="btn-encuadre-preset" onclick="setEncuadrePreset('cover')">
+                                        🔍 Cubrir Marco
+                                    </button>
+                                    <button type="button" class="btn-encuadre-preset" onclick="setEncuadrePreset('reset')">
+                                        ↺ Restablecer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- BLOQUE DERECHO: VISTA PREVIA DE CLIENTE 100% IDÉNTICA -->
+                            <div class="client-preview-box" style="background:rgba(4,20,11,0.65); border:1px solid rgba(52,211,153,0.2); border-radius:18px; padding:18px; display:flex; flex-direction:column; align-items:center;">
+                                <div class="preview-box-header" style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                                    <h4 class="preview-box-title" style="margin:0; font-size:0.95rem; color:#fff; display:flex; align-items:center; gap:6px;">
+                                        👁️ VISTA PREVIA DE CLIENTE
+                                    </h4>
+                                    <span class="preview-badge-identical" style="background:rgba(16,185,129,0.18); border:1px solid rgba(16,185,129,0.4); color:#34D399; font-size:0.7rem; font-weight:900; padding:2px 8px; border-radius:99px; letter-spacing:0.5px;">
+                                        100% IDÉNTICA
+                                    </span>
+                                </div>
+
+                                <!-- TARJETA EXACTA IDÉNTICA A LA VISTA PÚBLICA -->
+                                <div class="preview-card-wrap" style="width:100%; max-width:300px;">
+                                    <article class="card live-preview-card" id="customer-card-preview" style="margin:0; transform:none; box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+                                        <div class="art" id="preview-art" style="--a:#FFB703;--b:#FB8500; height:200px;">
+                                            <span class="bd r" id="preview-badge-tag" style="display:none;"></span>
+                                            <img class="pic" id="preview-img-tag" src="" alt="Vista Previa" style="display:none;">
+                                            <div class="cupw" id="preview-cupw-fallback">
+                                                <span class="top" id="preview-cup-emoji">🥭</span>
+                                                <span class="str"></span>
+                                                <div class="cup"></div>
+                                            </div>
+                                        </div>
+                                        <div class="cb" style="padding:16px 18px 18px;">
+                                            <h3 id="preview-title" style="font-size:17px; margin-bottom:6px;">Nombre de Ejemplo</h3>
+                                            <p id="preview-desc" style="font-size:12.5px; min-height:44px; margin-bottom:10px;">Pura fruta fresca batida a -4°C con textura frappé subcero artesanal.</p>
+                                            <div class="sz" id="preview-sizes-row" style="margin-bottom:12px;">
+                                                <button class="on" type="button" style="padding:6px 2px; font-size:11.5px;">12oz</button>
+                                                <button type="button" style="padding:6px 2px; font-size:11.5px;">16oz</button>
+                                                <button type="button" style="padding:6px 2px; font-size:11.5px;">24oz</button>
+                                            </div>
+                                            <div class="ft">
+                                                <div class="pr" style="font-size:20px;">
+                                                    <small style="font-size:9px;">PRECIO</small>
+                                                    <span id="preview-old-price" style="display:none; text-decoration:line-through; font-size:11.5px; color:#94A3B8; margin-right:4px;"></span>
+                                                    <span id="preview-price">$13.000</span>
+                                                </div>
+                                                <button class="add" type="button" style="pointer-events:none; font-size:12px; padding:7px 14px;">+ Añadir</button>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BOTONES DE ACCIÓN FINAL -->
+                        <div class="workstation-footer-actions" style="margin-top:22px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:16px; align-items:center; justify-content:flex-end; flex-wrap:wrap;">
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="checkbox" id="granizado-form-activo" checked style="width:18px; height:18px; accent-color: var(--em, #10B981);">
+                                <span style="font-weight:700; color:#fff; font-size:0.85rem;">🟢 Disponible para la venta</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin-right:auto;">
+                                <input type="checkbox" id="granizado-form-destacado" checked style="width:18px; height:18px; accent-color: var(--cy, #00F0FF);">
+                                <span style="font-weight:700; color:#fff; font-size:0.85rem;">⭐ Destacar en vitrina</span>
+                            </label>
+                            <button type="submit" class="btn-save-granizado-master" onclick="guardarGranizadoAdmin(event)" style="background:var(--em, #10B981); color:#031009; font-weight:900; font-size:0.95rem; padding:13px 30px; border-radius:14px; border:none; cursor:pointer; box-shadow:0 4px 20px rgba(16,185,129,0.35); transition:transform 0.2s, filter 0.2s;">
+                                💾 Guardar Granizado / Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ==========================================================
+                     SECCIÓN INFERIOR: INVENTARIO ACTUAL DE PRODUCTOS
+                     ========================================================== -->
+                <div class="admin-inventory-header-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:14px; margin-top:10px;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.15rem; color:#FFFFFF; font-weight:900; display:flex; align-items:center; gap:8px;">
+                            📦 INVENTARIO ACTUAL DE SABORES & PRODUCTOS
+                        </h3>
+                        <p style="margin:2px 0 0; font-size:0.8rem; color:var(--mut);">Explora existencias, ajusta stock con 1 clic y edita sabores en la estación.</p>
+                    </div>
+                    <div style="flex:1; max-width:420px; min-width:260px;">
+                        <input type="text" id="filtro-granizados-search" class="admin-search-input" placeholder="🔍 Buscar sabor, pulpa o ingrediente en inventario..." style="width:100%;">
+                    </div>
+                </div>
+
+                <!-- FILTROS POR CATEGORÍA Y STOCK -->
+                <div class="admin-filters-bar" id="products-category-filters">
+                    <button class="filter-pill active" data-cat="TODOS">Todos</button>
+                    <button class="filter-pill" data-cat="tropical">🥭 Tropicales</button>
+                    <button class="filter-pill" data-cat="berries">🍓 Frutos Rojos</button>
+                    <button class="filter-pill" data-cat="citrus">🍋 Cítricos</button>
+                    <button class="filter-pill" data-cat="STOCK_BAJO">⚠️ Stock Bajo (&lt;10)</button>
+                    <button class="filter-pill" data-cat="AGOTADO">❌ Agotados</button>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Visual</th>
+                                <th>Sabor / Categoría</th>
+                                <th>Origen de Fruta / Sabor</th>
+                                <th>Precios por Tamaño</th>
+                                <th>Stock en Tiempo Real</th>
+                                <th>Disponibilidad</th>
+                                <th style="text-align:right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-granizados-body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 PESTAÑA 4: HISTORIAL DE REGISTROS & AUDITORÍA
+                 ========================================== -->
+            <div class="admin-tab-pane" id="tab-content-historial" style="display:none;">
+                <div class="admin-header-bar">
+                    <div>
+                        <h2 class="admin-pane-title">Historial de Registros & Auditoría</h2>
+                        <p class="admin-pane-subtitle">Trazabilidad completa de órdenes despachadas, cancelaciones y cierre financiero.</p>
+                    </div>
+                    <div class="admin-header-tools">
+                        <input type="text" id="filtro-historial-search" class="admin-search-input" placeholder="🔍 Buscar por código, cliente o fecha...">
+                    </div>
+                </div>
+
+                <!-- RESUMEN FINANCIERO DEL HISTORIAL -->
+                <div class="admin-kpis-grid" style="margin-bottom:20px;">
+                    <div class="kpi-card kpi-card-lime">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Entregados con Éxito</span>
+                            <span class="kpi-card-icon">✅</span>
+                        </div>
+                        <div class="kpi-card-value" id="hist-pedidos-entregados-count">0</div>
+                        <div class="kpi-card-breakdown">
+                            Total recaudado: <strong id="hist-total-recaudado" style="color:var(--li);">$0</strong>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-card-magenta">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Pedidos Cancelados</span>
+                            <span class="kpi-card-icon">❌</span>
+                        </div>
+                        <div class="kpi-card-value" id="hist-pedidos-cancelados-count">0</div>
+                        <div class="kpi-card-breakdown">
+                            Tasa de cancelación: <span id="hist-tasa-cancelacion">0%</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-card-cyan">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Venta Neta en Granizados</span>
+                            <span class="kpi-card-icon">🥤</span>
+                        </div>
+                        <div class="kpi-card-value" id="hist-subtotal-productos">$0</div>
+                        <div class="kpi-card-breakdown">
+                            Excluye fletes de domicilio
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-card-orange">
+                        <div class="kpi-card-header">
+                            <span class="kpi-card-title">Total Fletes de Domicilio</span>
+                            <span class="kpi-card-icon">🛵</span>
+                        </div>
+                        <div class="kpi-card-value" id="hist-total-envios">$0</div>
+                        <div class="kpi-card-breakdown">
+                            Acumulado domicilios express
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha / Hora</th>
+                                <th>Código</th>
+                                <th>Cliente / WhatsApp</th>
+                                <th>Granizados Pedidos</th>
+                                <th>Método de Pago</th>
+                                <th>Total Pagado</th>
+                                <th>Estado Final</th>
+                                <th style="text-align:right;">Inspección</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-historial-body">
+                            <!-- Inyectado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==========================================
+                 PESTAÑA 5: AJUSTES DEL NEGOCIO
+                 ========================================== -->
+            <div class="admin-tab-pane" id="tab-content-config" style="display:none;">
+                <div class="admin-header-bar">
+                    <div>
+                        <h2 class="admin-pane-title">Configuración Comercial de GRANIFRESH</h2>
+                        <p class="admin-pane-subtitle">Gestiona teléfonos de recepción, WhatsApp de pedidos & flotante, valor del domicilio y cintillo.</p>
+                    </div>
+                </div>
+
+                <div class="admin-config-container">
+                    <form id="form-admin-config" class="admin-form-luxury">
+                        <div class="form-section-title">📍 Datos Comerciales & Atención</div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Nombre del Negocio *</label>
+                                <input type="text" class="form-control" id="cfg-nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Eslogan o Subtítulo</label>
+                                <input type="text" class="form-control" id="cfg-slogan" placeholder="Full Sabor, Full Frescura">
+                            </div>
+                        </div>
+
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>WhatsApp de Pedidos & Botón Flotante *</label>
+                                <input type="text" class="form-control" id="cfg-whatsapp" required placeholder="3013557467 o 573013557467">
+                                <small class="form-hint">Número de contacto oficial (se actualiza en el botón flotante y confirmación de pedidos).</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Costo Domicilio Térmico ($) *</label>
+                                <input type="number" class="form-control" id="cfg-envio" required value="5000">
+                            </div>
+                            <div class="form-group">
+                                <label>Pedido Mínimo ($) *</label>
+                                <input type="number" class="form-control" id="cfg-minimo" required value="15000">
+                            </div>
+                        </div>
+
+                        <div class="form-section-title">⏱️ Horarios & Marquesina en Vivo</div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Horario de Atención</label>
+                                <input type="text" class="form-control" id="cfg-horario" placeholder="Lunes a Domingo 12:00 PM - 11:30 PM">
+                            </div>
+                            <div class="form-group">
+                                <label>Estado del Local para Recibir Pedidos</label>
+                                <select class="form-control" id="cfg-abierto">
+                                    <option value="true">🟢 ABIERTO (Recibiendo pedidos a domicilio)</option>
+                                    <option value="false">🔴 CERRADO (Solo exhibición de carta)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mensaje Alerta Superior (Cintillo Animado)</label>
+                            <input type="text" class="form-control" id="cfg-alerta" placeholder="🧊 ¡100% Fruta Natural Cosechada! Pura pulpa en textura frappé glacial a domicilio">
+                            <small class="form-hint">Aparece en la marquesina superior de toda la tienda web.</small>
+                        </div>
+
+                        <div class="form-section-title">💳 Cuentas para Pagos Digitales</div>
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Número Nequi</label>
+                                <input type="text" class="form-control" id="cfg-nequi" placeholder="301 355 7467">
+                            </div>
+                            <div class="form-group">
+                                <label>Número Daviplata</label>
+                                <input type="text" class="form-control" id="cfg-daviplata" placeholder="301 355 7467">
+                            </div>
+                            <div class="form-group">
+                                <label>Cuenta Bancolombia</label>
+                                <input type="text" class="form-control" id="cfg-bancolombia" placeholder="Ahorros 245-883921-04">
+                            </div>
+                        </div>
+
+                        <!-- REDES SOCIALES OFICIALES (INSTAGRAM, FACEBOOK, WHATSAPP) -->
+                        <div class="form-section-title">🌐 Redes Sociales Oficiales</div>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label>Enlace Perfil Instagram *</label>
+                                <input type="url" class="form-control" id="cfg-instagram" placeholder="https://instagram.com/granifresh">
+                                <small class="form-hint">Se actualizará en los botones sociales de la sección Nosotros.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Enlace Fanpage Facebook *</label>
+                                <input type="url" class="form-control" id="cfg-facebook" placeholder="https://facebook.com/granifresh">
+                                <small class="form-hint">Enlace a la página o comunidad de Facebook.</small>
+                            </div>
+                        </div>
+
+                        <!-- UBICACIÓN FÍSICA & MAPA INTERACTIVO (GEOCODIFICACIÓN AUTOMÁTICA EN TIEMPO REAL) -->
+                        <div class="form-section-title">📍 Ubicación de la Sede &amp; Mapa Interactivo</div>
+                        <div class="form-group" style="margin-bottom:14px;">
+                            <label>Dirección o Municipio de la Sede Física *</label>
+                            <div class="admin-address-search-box">
+                                <span class="admin-address-icon">📍</span>
+                                <input type="text" class="form-control admin-address-input" id="cfg-direccion" placeholder="Escribe la dirección, barrio o municipio (ej: Arjona Bolívar, Cra. 50 #31b Cartagena...)" required>
+                                <span id="cfg-direccion-geocoding-status" class="admin-geocoding-spinner" style="display:none;">
+                                    <span class="spinner-icon">🔄</span> Ubicando en mapa...
+                                </span>
+                            </div>
+                            <small class="form-hint">Escribe la dirección o lugar y el mapa se moverá automáticamente al punto exacto.</small>
+                            <!-- Coordenadas gestionadas automáticamente sin casillas manuales -->
+                            <input type="hidden" id="cfg-lat" value="10.4075">
+                            <input type="hidden" id="cfg-lng" value="-75.5255">
+                        </div>
+
+                        <!-- CONTENEDOR PREVIEW DEL MAPA LEAFLET / GOOGLE MAPS -->
+                        <div class="admin-map-preview-wrapper">
+                            <div class="admin-map-preview-toolbar">
+                                <div class="admin-map-preview-tip">
+                                    <span>📍</span> <b>Arrastra el pin con el logo de Granifresh</b> o haz clic en cualquier calle para posicionar la sede exacta.
+                                </div>
+                                <button type="button" class="btn-geo-locate" id="btn-admin-geolocate" onclick="localizarSedeAdminActual()">
+                                    🎯 Mi Ubicación GPS
+                                </button>
+                            </div>
+                            <div id="admin-map-preview" class="admin-map-preview-container"></div>
+                            <div class="admin-map-coords-badge" id="admin-map-coords-badge">
+                                Coordenadas fijadas: <span id="admin-map-coords-txt">10.407500, -75.525500</span>
+                            </div>
+                        </div>
+
+                        <div class="form-section-title" style="margin-top:20px;">🍃 Historia &amp; Esencia del Negocio</div>
+                        <div class="form-group">
+                            <label>Texto Narrativo de "Nosotros" en Tienda</label>
+                            <textarea class="form-control" id="cfg-historia" rows="3" placeholder="En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable..."></textarea>
+                            <small class="form-hint">Aparece en la cabecera de la sección Nosotros en la vista del cliente.</small>
+                        </div>
+
+                        <div class="admin-form-actions">
+                            <button type="submit" class="cta btn-save-config">
+                                💾 Guardar Configuración en Base de Datos
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL DETALLE / INSPECCIÓN DE PEDIDO ADMIN (Z-INDEX SUPERIOR)
+     ========================================================== -->
+<div class="modal-overlay" id="modal-detalle-pedido" style="z-index: 9999 !important;">
+    <div class="modal-box modal-box-large">
+        <div class="modal-header">
+            <h3><span>🛵</span> Ticket de Pedido <b id="modal-ped-codigo" style="color:var(--cy);">GRZ-00000</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <div id="modal-ped-body" class="modal-ped-body-content">
+            <!-- Inyectado dinámicamente -->
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de la aplicación -->
+<script src="/js/granizados.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>
