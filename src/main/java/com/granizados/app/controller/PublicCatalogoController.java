@@ -33,6 +33,11 @@ public class PublicCatalogoController {
         this.configuracionNegocioRepository = configuracionNegocioRepository;
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("pong");
+    }
+
     @GetMapping("/catalogo")
     public ResponseEntity<Map<String, Object>> obtenerCatalogoCompleto() {
         Map<String, Object> respuesta = new HashMap<>();
