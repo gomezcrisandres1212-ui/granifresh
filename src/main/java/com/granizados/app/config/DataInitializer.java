@@ -22,7 +22,7 @@ public class DataInitializer {
     @Value("${granizados.admin.initial-password:admin123}")
     private String adminPassword;
 
-    @Value("${granizados.seed.demo-data:true}")
+    @Value("${granizados.seed.demo-data:false}")
     private boolean seedDemoData;
 
     @Bean
@@ -60,7 +60,40 @@ public class DataInitializer {
                 log.info("-> Configuración de negocio existente detectada. Se respeta 100% sin modificaciones.");
             }
 
+            // 3. Purgar productos, pedidos y categorías de demostración para respetar 100% el inventario real del usuario
+            List<String> demoSabores = List.of(
+                    "Mango Biche Artesanal con Limón y Sal",
+                    "Maracuyá Silvestre Cítrico Dorado",
+                    "Fresa Campesina & Menta Glacial",
+                    "Lulo Valluno Refrescante con Hierbabuena",
+                    "Frutos Rojos Andinos (Fresa, Mora & Arándano)",
+                    "Limonada de Coco Caribeño & Lima",
+                    "Piña Golden Dulce con Maracuyá"
+            );
+            granizadoRepo.findAll().stream()
+                    .filter(g -> demoSabores.stream().anyMatch(d -> d.equalsIgnoreCase(g.getNombre())))
+                    .forEach(granizadoRepo::delete);
+
+            List<String> demoPedidos = List.of("GRZ-10482", "GRZ-10483", "GRZ-10475");
+            for (String cod : demoPedidos) {
+                pedidoRepo.findByCodigoPedido(cod).ifPresent(pedidoRepo::delete);
+            }
+
+            categoriaRepo.findBySlug("berries").ifPresent(c -> {
+                boolean hasProds = granizadoRepo.findAll().stream().anyMatch(g -> "berries".equalsIgnoreCase(g.getCategoriaSlug()));
+                if (!hasProds) categoriaRepo.delete(c);
+            });
+            categoriaRepo.findBySlug("citrus").ifPresent(c -> {
+                boolean hasProds = granizadoRepo.findAll().stream().anyMatch(g -> "citrus".equalsIgnoreCase(g.getCategoriaSlug()));
+                if (!hasProds) categoriaRepo.delete(c);
+            });
+
+            if (categoriaRepo.count() == 0) {
+                categoriaRepo.save(new Categoria("tropical", "🥭 Tropicales", "Frutas tropicales", "sun", 1));
+            }
+
             if (!seedDemoData) {
+                log.info("-> Modo de demostración desactivado. Catálogo limpio listo para productos del usuario.");
                 return;
             }
 

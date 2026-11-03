@@ -84,110 +84,8 @@
     return '<div class="cupw"><span class="top">' + x.e + '</span><span class="str"></span><div class="cup"></div></div>';
   }
 
-  // Catálogo base con frutas 100% naturales garantizado de inicio inmediato
-  var DEFAULT_FRUITS = [
-    {
-      id: "grz-mango-biche",
-      n: "Mango Biche Artesanal con Limón y Sal",
-      d: "Puro mango verde seleccionado en textura frappé glacial, limón mandarino recién exprimido y escarchado de sal marina con tajín suave.",
-      p: 13000,
-      a: "0.0% FRUTA PURA",
-      t: "🥭 FAVORITO DE COSECHA",
-      c: ["#FFB703", "#FB8500"],
-      e: "🥭",
-      k: "tropical",
-      img: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [13000, 16500, 22000]
-    },
-    {
-      id: "grz-maracuya-silvestre",
-      n: "Maracuyá Silvestre Cítrico Dorado",
-      d: "Pulpa pura de maracuyá de campo con semillas crujientes aromáticas, néctar cítrico y escarcha subcero de hielo ultra fino.",
-      p: 13500,
-      a: "0.0% FRUTA PURA",
-      t: "☀️ 100% NATURAL",
-      c: ["#FF7A00", "#FFB703"],
-      e: "🍊",
-      k: "tropical",
-      img: "https://images.unsplash.com/photo-1534353473418-4cfa6c56fd38?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [13500, 17000, 23000]
-    },
-    {
-      id: "grz-fresa-campesina",
-      n: "Fresa Campesina & Menta Glacial",
-      d: "Fresas rojas maduras cosechadas en su punto de dulzor óptimo, trituradas a -4°C con hojas de menta fresca de huerta.",
-      p: 13500,
-      a: "0.0% FRUTA PURA",
-      t: "🍓 DULZURA NATURAL",
-      c: ["#FF1E56", "#E60049"],
-      e: "🍓",
-      k: "berries",
-      img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [13500, 17000, 23000]
-    },
-    {
-      id: "grz-lulo-valluno",
-      n: "Lulo Valluno Criogénico con Hierbabuena",
-      d: "Pura pulpa de lulo silvestre con acidez equilibrada, cristales frappé que crujen al paladar y hojas de hierbabuena de campo.",
-      p: 14000,
-      a: "0.0% FRUTA PURA",
-      t: "🍃 ACIDEZ PERFECTA",
-      c: ["#10B981", "#34D399"],
-      e: "🍈",
-      k: "citrus",
-      img: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [14000, 17500, 23500]
-    },
-    {
-      id: "grz-frutos-rojos",
-      n: "Frutos Rojos Silvestres de la Montaña",
-      d: "Concentrado antioxidante de mora de castilla silvestre, arándanos azules y frambuesas frescas con hielo frappeado puro.",
-      p: 14500,
-      a: "0.0% FRUTA PURA",
-      t: "🫐 ANTIOXIDANTE PURO",
-      c: ["#9B111E", "#FF1E56"],
-      e: "🫐",
-      k: "berries",
-      img: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [14500, 18000, 24000]
-    },
-    {
-      id: "grz-limonada-coco",
-      n: "Limonada de Coco Glacial Artesanal",
-      d: "Cremosa leche de coco natural macerada en frío con zumo de lima persa fresca y nieve de frappé artesanal.",
-      p: 14000,
-      a: "0.0% FRUTA PURA",
-      t: "🥥 CREMOSIDAD GLACIAL",
-      c: ["#00B4D8", "#90E0EF"],
-      e: "🥥",
-      k: "citrus",
-      img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [14000, 17500, 23500]
-    },
-    {
-      id: "grz-pina-golden",
-      n: "Piña Golden & Hierbabuena Silvestre",
-      d: "Piña oro miel madurada al sol con toque refrescante de hierbabuena fresca campesina y escarcha subcero de hielo.",
-      p: 13000,
-      a: "0.0% FRUTA PURA",
-      t: "🍍 TROPICAL REFRESH",
-      c: ["#FFB703", "#FFE600"],
-      e: "🍍",
-      k: "tropical",
-      img: "https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?auto=format&fit=crop&w=700&q=80",
-      sizes: ["12oz", "16oz", "24oz"],
-      priceList: [13000, 16500, 22000]
-    }
-  ];
-
   // Estructuras de datos conectadas a la API
-  var P = DEFAULT_FRUITS.slice(); // Cosecha inicial inmediata
+  var P = [];
   var rawCatalog = { 
     granizados: [], 
     configuracion: { 
@@ -426,37 +324,35 @@
         return g.tipo !== "COMBO" && g.activo && g.tipo !== "CON_ALCOHOL";
       });
 
-      if (reg.length > 0) {
-        // Mapear Granizados Frutales a P
-        P = reg.map(function (g) {
-          var precios = g.preciosPorTamano && Object.keys(g.preciosPorTamano).length > 0
-            ? g.preciosPorTamano
-            : { "12oz": g.precioBase, "16oz": g.precioBase + 3500, "24oz": g.precioBase + 7000 };
-          var sizes = Object.keys(precios);
-          var priceList = Object.values(precios);
-          var fruitCat = getFruitCategory(g.nombre, g.categoriaSlug);
+      // Mapear Granizados Frutales a P directamente desde la base de datos
+      P = reg.map(function (g) {
+        var precios = g.preciosPorTamano && Object.keys(g.preciosPorTamano).length > 0
+          ? g.preciosPorTamano
+          : { "12oz": g.precioBase, "16oz": g.precioBase + 3500, "24oz": g.precioBase + 7000 };
+        var sizes = Object.keys(precios);
+        var priceList = Object.values(precios);
+        var fruitCat = getFruitCategory(g.nombre, g.categoriaSlug);
 
-          return {
-            id: g.id,
-            n: g.nombre,
-            d: g.descripcion,
-            p: priceList[0] || g.precioBase,
-            a: "0.0% FRUTA PURA",
-            t: (g.insignia && g.insignia.trim()) ? g.insignia.trim() : "",
-            c: g.coloresGradiente && g.coloresGradiente.length >= 2
-              ? g.coloresGradiente
-              : (fruitCat === "berries" ? ["#FF1E56", "#8A1C58"] : (fruitCat === "citrus" ? ["#10B981", "#34D399"] : ["#FFB703", "#FB8500"])),
-            e: getFlavorEmoji(g.nombre, g.tipo),
-            k: fruitCat,
-            img: g.imagenUrl || "",
-            ajusteImagen: g.ajusteImagen || null,
-            sizes: sizes,
-            priceList: priceList
-          };
-        });
+        return {
+          id: g.id,
+          n: g.nombre,
+          d: g.descripcion,
+          p: priceList[0] || g.precioBase,
+          a: "0.0% FRUTA PURA",
+          t: (g.insignia && g.insignia.trim()) ? g.insignia.trim() : "",
+          c: g.coloresGradiente && g.coloresGradiente.length >= 2
+            ? g.coloresGradiente
+            : (fruitCat === "berries" ? ["#FF1E56", "#8A1C58"] : (fruitCat === "citrus" ? ["#10B981", "#34D399"] : ["#FFB703", "#FB8500"])),
+          e: getFlavorEmoji(g.nombre, g.tipo),
+          k: fruitCat,
+          img: g.imagenUrl || "",
+          ajusteImagen: g.ajusteImagen || null,
+          sizes: sizes,
+          priceList: priceList
+        };
+      });
 
-        renderCatalog();
-      }
+      renderCatalog();
 
       // Renderizar dinámicamente los botones de categorías de clientes si vienen en el catálogo
       if (Array.isArray(data.categorias) && data.categorias.length > 0) {
@@ -490,15 +386,16 @@
         renderizarSeccionNosotros(data.configuracion);
       }
     } catch (err) {
-      console.warn("Aviso al consultar catálogo remoto (usando cosecha local):", err);
-      if (!P || P.length === 0) {
-        P = DEFAULT_FRUITS.slice();
-      }
+      console.warn("Aviso al consultar catálogo remoto:", err);
       renderCatalog();
     }
   }
 
   function renderCatalog() {
+    if (!P || P.length === 0) {
+      $("#grid").innerHTML = '<div style="grid-column: 1 / -1; width:100%; text-align: center; padding: 48px 16px; color: var(--mut);"><span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🥤</span><h4 style="color: #fff; margin-bottom: 6px;">Catálogo de productos</h4><p style="font-size: 0.9rem; margin: 0;">No hay productos disponibles por ahora.</p></div>';
+      return;
+    }
     // Render Granizados
     $("#grid").innerHTML = P.map(function (x, i) {
       return (

@@ -12,5 +12,5 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: SEED_DEMO_DATA
-        value: "true"
+        value: "false"
 
