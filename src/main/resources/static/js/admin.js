@@ -374,9 +374,8 @@ async function actualizarDatosAdminSilencioso() {
         }
         if (resGranizados.ok) {
             AdminState.granizados = await resGranizados.json();
+            actualizarBadgesNavegacion();
             renderizarAlertasStockDashboard();
-            const badgeTotal = document.getElementById('badge-nav-total-productos');
-            if (badgeTotal) badgeTotal.textContent = AdminState.granizados.length;
             if (AdminState.pestañaActiva === 'catalogo') renderizarTablaGranizados();
         }
     } catch (e) {
@@ -419,10 +418,11 @@ async function cargarDashboard() {
     actualizarSaludoYFechaAdmin();
 
     try {
-        const [resKpis, resPedidos, resGranizados] = await Promise.all([
+        const [resKpis, resPedidos, resGranizados, resAdmins] = await Promise.all([
             fetch('/api/admin/dashboard/resumen', { headers: getAuthHeaders() }),
             fetch('/api/admin/pedidos', { headers: getAuthHeaders() }),
-            fetch('/api/admin/granizados', { headers: getAuthHeaders() })
+            fetch('/api/admin/granizados', { headers: getAuthHeaders() }),
+            fetch('/api/admin/usuarios', { headers: getAuthHeaders() })
         ]);
 
         if (resKpis.ok) {
@@ -431,15 +431,16 @@ async function cargarDashboard() {
         if (resPedidos.ok) {
             AdminState.pedidos = await resPedidos.json();
             actualizarConteosFiltrosPedidos();
-            actualizarBadgesNavegacion();
         }
         if (resGranizados.ok) {
             AdminState.granizados = await resGranizados.json();
             renderizarAlertasStockDashboard();
-            const badgeTotal = document.getElementById('badge-nav-total-productos');
-            if (badgeTotal) badgeTotal.textContent = AdminState.granizados.length;
+        }
+        if (resAdmins.ok) {
+            AdminState.admins = await resAdmins.json();
         }
 
+        actualizarBadgesNavegacion();
         renderizarKPIsDashboard(AdminState.kpis);
         renderizarPedidosUrgentesDashboard();
 
@@ -695,22 +696,65 @@ function renderizarTopSabores() {
 
 function renderizarAlertasStockDashboard() {
     const stockBajos = (AdminState.granizados || []).filter(g => (g.stockDisponible ?? 25) <= 10);
-    const badgeAlertas = document.getElementById('badge-nav-alertas');
-    if (badgeAlertas) {
-        if (stockBajos.length > 0) {
-            badgeAlertas.classList.remove('hidden');
-            badgeAlertas.textContent = stockBajos.length;
-        } else {
-            badgeAlertas.classList.add('hidden');
-        }
-    }
+    const elStockAlerta = document.getElementById('kpi-stock-alerta-count');
+    if (elStockAlerta) elStockAlerta.textContent = stockBajos.length;
 }
 
 function actualizarBadgesNavegacion() {
-    const activos = AdminState.pedidos.filter(p => ['RECIBIDO', 'EN_PREPARACION', 'EN_CAMINO'].includes(p.estado)).length;
+    const pedidos = AdminState.pedidos || [];
+    const granizados = AdminState.granizados || [];
+
+    // 1. Contador del Dashboard: Solicitudes Web pendientes de acción / validación (PENDIENTE_VALIDACION)
+    const solicitudesPendientes = pedidos.filter(p => p.estado === 'PENDIENTE_VALIDACION').length;
+    const badgeDashboard = document.getElementById('badge-nav-dashboard') || document.getElementById('badge-nav-alertas');
+    if (badgeDashboard) {
+        badgeDashboard.textContent = solicitudesPendientes;
+        badgeDashboard.classList.remove('hidden');
+        if (solicitudesPendientes > 0) {
+            badgeDashboard.style.background = '#FF0055';
+            badgeDashboard.style.color = '#FFFFFF';
+            badgeDashboard.style.boxShadow = '0 0 12px rgba(255, 0, 85, 0.7)';
+        } else {
+            badgeDashboard.style.background = 'rgba(255, 255, 255, 0.12)';
+            badgeDashboard.style.color = 'var(--mut)';
+            badgeDashboard.style.boxShadow = 'none';
+        }
+    }
+
+    // 2. Contador de Pedidos: Todos los pedidos en proceso en vivo (excluye solo los archivados ENTREGADO y CANCELADO)
+    const pedidosActivos = pedidos.filter(p => p.estado !== 'ENTREGADO' && p.estado !== 'CANCELADO').length;
     const badgePedidos = document.getElementById('badge-nav-pedidos-activos');
     if (badgePedidos) {
-        badgePedidos.textContent = activos;
+        badgePedidos.textContent = pedidosActivos;
+        if (pedidosActivos > 0) {
+            badgePedidos.style.background = '#00FF87';
+            badgePedidos.style.color = '#04140B';
+            badgePedidos.style.boxShadow = '0 0 10px rgba(0, 255, 135, 0.4)';
+        } else {
+            badgePedidos.style.background = 'rgba(255, 255, 255, 0.12)';
+            badgePedidos.style.color = 'var(--mut)';
+            badgePedidos.style.boxShadow = 'none';
+        }
+    }
+
+    // 3. Contador de Productos & Inventario
+    const badgeTotalProds = document.getElementById('badge-nav-total-productos');
+    if (badgeTotalProds) {
+        badgeTotalProds.textContent = granizados.length;
+    }
+
+    // 4. Contador de Historial (Pedidos completados/archivados)
+    const badgeHistorial = document.getElementById('badge-nav-historial');
+    if (badgeHistorial) {
+        const historialCount = pedidos.filter(p => p.estado === 'ENTREGADO' || p.estado === 'CANCELADO').length;
+        badgeHistorial.textContent = historialCount;
+    }
+
+    // 5. Contador de Administradores
+    const badgeAdmins = document.getElementById('badge-nav-admins');
+    if (badgeAdmins) {
+        const countAdmins = (AdminState.admins && AdminState.admins.length) ? AdminState.admins.length : 1;
+        badgeAdmins.textContent = countAdmins;
     }
 }
 
@@ -733,7 +777,7 @@ async function cargarPedidosAdmin() {
 function actualizarConteosFiltrosPedidos() {
     const p = AdminState.pedidos || [];
     const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    const activos = p.filter(x => x.estado !== 'ENTREGADO');
+    const activos = p.filter(x => x.estado !== 'ENTREGADO' && x.estado !== 'CANCELADO');
     setTxt('count-order-todos', activos.length);
     setTxt('count-order-recibido', p.filter(x => x.estado === 'RECIBIDO' || x.estado === 'PENDIENTE_VALIDACION').length);
     setTxt('count-order-prep', p.filter(x => x.estado === 'EN_PREPARACION').length);
@@ -2167,6 +2211,7 @@ async function cargarAdministradoresAdmin() {
         if (!res.ok) throw new Error('Error al consultar administradores');
         const admins = await res.json();
         AdminState.admins = admins;
+        actualizarBadgesNavegacion();
 
         if (badge) badge.textContent = `${admins.length} Usuario${admins.length === 1 ? '' : 's'}`;
 
