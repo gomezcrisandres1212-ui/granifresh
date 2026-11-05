@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PingController {
 
-    @RequestMapping(value = "/ping", method = {RequestMethod.GET, RequestMethod.HEAD})
+    @RequestMapping(value = "/ping", method = { RequestMethod.GET, RequestMethod.HEAD })
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
@@ -18,7 +18,7 @@ public class PingController {
                 .body("pong");
     }
 
-    @RequestMapping(value = "/health", method = {RequestMethod.GET, RequestMethod.HEAD})
+    @RequestMapping(value = "/health", method = { RequestMethod.GET, RequestMethod.HEAD })
     public ResponseEntity<Void> health() {
         return ResponseEntity.noContent().build();
     }

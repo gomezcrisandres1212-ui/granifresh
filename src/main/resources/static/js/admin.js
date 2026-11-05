@@ -23,6 +23,7 @@ const AdminState = {
     filtroCategoriaGranizado: 'TODOS',
     busquedaGranizado: '',
     busquedaHistorial: '',
+    admins: [],
     pollingTimer: null
 };
 
@@ -229,6 +230,12 @@ function initAdminEvents() {
     if (formConfig) {
         formConfig.addEventListener('submit', guardarConfiguracionAdmin);
     }
+
+    // 11. Formulario Crear Administrador
+    const formCrearAdmin = document.getElementById('form-crear-admin');
+    if (formCrearAdmin) {
+        formCrearAdmin.addEventListener('submit', guardarNuevoAdministradorAdmin);
+    }
 }
 
 // Saludo dinámico según la hora y fecha colombiana
@@ -348,6 +355,9 @@ function cambiarPestanaAdmin(tabName) {
     else if (tabName === 'config') {
         cargarConfiguracionAdmin();
         setTimeout(() => { if (adminMap) adminMap.invalidateSize(); }, 250);
+    }
+    else if (tabName === 'admins') {
+        cargarAdministradoresAdmin();
     }
 }
 
@@ -2094,3 +2104,125 @@ async function guardarConfiguracionAdmin(e) {
         alert('Error al guardar la configuración.');
     }
 }
+
+// ==========================================================
+// 8. GESTIÓN DE ADMINISTRADORES (USUARIOS Y CONTRASEÑAS)
+// ==========================================================
+async function cargarAdministradoresAdmin() {
+    const contenedor = document.getElementById('contenedor-lista-admins');
+    const badge = document.getElementById('badge-total-admins');
+    if (!contenedor) return;
+
+    try {
+        const res = await fetch('/api/admin/usuarios', { headers: getAuthHeaders() });
+        if (!res.ok) throw new Error('Error al consultar administradores');
+        const admins = await res.json();
+        AdminState.admins = admins;
+
+        if (badge) badge.textContent = `${admins.length} Usuario${admins.length === 1 ? '' : 's'}`;
+
+        if (!admins || admins.length === 0) {
+            contenedor.innerHTML = '<div style="text-align:center; padding:30px; color:var(--mut);">No se encontraron administradores registrados.</div>';
+            return;
+        }
+
+        const usuarioActual = document.getElementById('admin-display-username')?.textContent?.trim() || '';
+
+        contenedor.innerHTML = admins.map(adm => {
+            const esUsuarioActual = usuarioActual && adm.usuario.toLowerCase() === usuarioActual.toLowerCase();
+            return `
+                <div class="admin-item-row" style="display:flex; justify-content:space-between; align-items:center; background:rgba(4,20,11,0.65); border:1px solid rgba(52,211,153,0.18); border-radius:12px; padding:14px 18px; gap:14px; flex-wrap:wrap;">
+                    <div style="display:flex; align-items:center; gap:14px;">
+                        <div style="width:42px; height:42px; border-radius:10px; background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(0,240,255,0.15)); border:1px solid rgba(52,211,153,0.3); display:grid; place-items:center; font-size:1.25rem;">
+                            👤
+                        </div>
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <strong style="color:#fff; font-size:0.95rem;">@${adm.usuario}</strong>
+                                ${esUsuarioActual ? '<span style="background:rgba(0,240,255,0.15); border:1px solid rgba(0,240,255,0.3); color:#00F0FF; font-size:0.7rem; font-weight:800; padding:1px 8px; border-radius:99px;">Tú (Sesión actual)</span>' : ''}
+                                <span style="background:rgba(52,211,153,0.12); color:#34D399; font-size:0.72rem; font-weight:800; padding:1px 8px; border-radius:99px;">${adm.rol || 'ROLE_ADMIN'}</span>
+                            </div>
+                            <span style="color:var(--mut); font-size:0.8rem; display:block; margin-top:2px;">${adm.nombreCompleto || 'Administrador General'}</span>
+                        </div>
+                    </div>
+                    <div>
+                        ${admins.length > 1 ? `
+                            <button type="button" onclick="eliminarAdministradorAdmin('${adm.id}', '${adm.usuario}')" class="btn-cancel-action" style="padding:7px 14px; font-size:0.8rem; font-weight:700; background:rgba(239,68,68,0.12); color:#EF4444; border:1px solid rgba(239,68,68,0.3); border-radius:8px; cursor:pointer;" title="Eliminar acceso de @${adm.usuario}">
+                                🗑️ Eliminar
+                            </button>
+                        ` : '<span style="color:var(--mut); font-size:0.75rem;">Administrador Principal</span>'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch (e) {
+        console.error('Error al cargar administradores:', e);
+        contenedor.innerHTML = '<div style="text-align:center; padding:20px; color:#EF4444;">Error al cargar lista de administradores.</div>';
+    }
+}
+
+async function guardarNuevoAdministradorAdmin(e) {
+    e.preventDefault();
+    const usuarioEl = document.getElementById('nuevo-admin-usuario');
+    const passwordEl = document.getElementById('nuevo-admin-password');
+    const nombreEl = document.getElementById('nuevo-admin-nombre');
+
+    const usuario = usuarioEl ? usuarioEl.value.trim() : '';
+    const contrasena = passwordEl ? passwordEl.value.trim() : '';
+    const nombreCompleto = nombreEl ? nombreEl.value.trim() : '';
+
+    if (!usuario || !contrasena) {
+        if (window.showToast) window.showToast('Debes ingresar usuario y contraseña', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/admin/usuarios', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ usuario, contrasena, nombreCompleto })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            alert(data.error || 'Error al crear administrador');
+            return;
+        }
+
+        if (window.showToast) window.showToast(`¡Administrador @${usuario} creado exitosamente! 👥✨`, 'success');
+        if (usuarioEl) usuarioEl.value = '';
+        if (passwordEl) passwordEl.value = '';
+        if (nombreEl) nombreEl.value = '';
+
+        cargarAdministradoresAdmin();
+
+    } catch (err) {
+        console.error('Error al crear administrador:', err);
+        alert('Error al comunicarse con el servidor.');
+    }
+}
+
+window.eliminarAdministradorAdmin = async function (id, usuario) {
+    if (!confirm(`¿Estás seguro de que deseas eliminar el acceso al administrador @${usuario}?`)) return;
+
+    try {
+        const res = await fetch(`/api/admin/usuarios/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            alert(data.error || 'No fue posible eliminar el administrador');
+            return;
+        }
+
+        if (window.showToast) window.showToast(`Administrador @${usuario} eliminado.`, 'success');
+        cargarAdministradoresAdmin();
+
+    } catch (e) {
+        console.error('Error al eliminar admin:', e);
+        alert('Error al eliminar el administrador.');
+    }
+};

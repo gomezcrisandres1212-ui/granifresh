@@ -1349,6 +1349,38 @@
     });
   });
 
+  // Acceso Secreto al Panel Admin (4 toques seguidos en el logo del header)
+  var logoClicks = 0;
+  var logoClickTimer = null;
+  var headerLogo = document.getElementById("header-brand-logo");
+
+  if (headerLogo) {
+    headerLogo.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      logoClicks++;
+      clearTimeout(logoClickTimer);
+
+      if (logoClicks >= 4) {
+        logoClicks = 0;
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate([40, 50, 40]);
+        }
+        var token = localStorage.getItem("frost_admin_token");
+        if (token && window.abrirPanelAdmin) {
+          window.abrirPanelAdmin();
+        } else {
+          var modal = document.getElementById("modal-admin-login");
+          if (modal) modal.classList.add("active");
+        }
+      } else {
+        logoClickTimer = setTimeout(function () {
+          logoClicks = 0;
+        }, 2200);
+      }
+    });
+  }
+
   var btnAdmin = document.getElementById("btn-admin-modal-open");
   if (btnAdmin) {
     btnAdmin.addEventListener("click", function (e) {
@@ -1372,6 +1404,6 @@
     cargarCatalogo();
     loadSavedCart();
     actualizarBotonFlotanteWhatsapp();
-    theme("mango");
+    if (window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero();
   });
 })();

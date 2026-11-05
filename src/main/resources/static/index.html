@@ -18,13 +18,13 @@
 <div class="promo"><div class="mq" id="mq">🍃 ¡Granifresh! Refresca tu día con granizados 100% fruta natural artesanal a domicilio &nbsp;·&nbsp; ⚡ Entrega en 35 min con empaque térmico antifusión &nbsp;·&nbsp; 🥭 Mango Biche Cítrico &nbsp;·&nbsp; 🍓 Fresa Campesina &nbsp;·&nbsp; 🍊 Maracuyá Silvestre &nbsp;·&nbsp; 🍋 Lulo Valluno &nbsp;·&nbsp; 🍃 ¡Granifresh! Refresca tu día &nbsp;·&nbsp; </div></div>
 <nav>
   <div class="nav-spacer" aria-hidden="true"></div>
-  <a class="brand-logo-link" href="#hero" aria-label="Granifresh — Refresca tu día">
+  <div class="brand-logo-link" id="header-brand-logo" role="button" tabindex="0" aria-label="Granifresh Oficial" style="cursor: pointer; user-select: none;">
     <div class="brand-logo-badge">
       <img src="/img/granifresh-logo.jpg" alt="Granifresh — Refresca Tu Día" class="brand-logo-img" />
       <div class="logo-glass-dome"></div>
       <div class="logo-shimmer-sweep"></div>
     </div>
-  </a>
+  </div>
   <div class="nav-client-links">
     <a href="#menu" class="nav-link-pill"><span>🥭</span> Menú</a>
     <a href="#nosotros" class="nav-link-pill"><span>🍃</span> Nosotros</a>
@@ -408,10 +408,7 @@
 
 <footer>
   <b>GRANIFRESH © 2026</b><br>
-  Granizados artesanales 100% fruta natural a domicilio. Refresca tu día con pura pulpa de fruta real.<br>
-  <small style="opacity:0.6; margin-top:8px; display:inline-block;">
-    <a href="javascript:void(0)" id="btn-admin-modal-open" style="color:inherit; text-decoration:none;">🔐 Panel de Administración</a>
-  </small>
+  Granizados artesanales 100% fruta natural a domicilio. Refresca tu día con pura pulpa de fruta real.
 </footer>
 <div id="cf"></div>
 <!-- Toast Notification Container (Flotante superior independiente para PC y Móvil) -->
@@ -913,6 +910,11 @@
                 <button type="button" class="admin-nav-pill" data-tab="config" id="adm-nav-config">
                     <span class="pill-icon">⚙️</span>
                     <span class="pill-text">Configuración Negocio</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="admins" id="adm-nav-admins">
+                    <span class="pill-icon">👥</span>
+                    <span class="pill-text">Administradores</span>
                 </button>
 
                 <div class="admin-nav-divider"></div>
@@ -1705,6 +1707,67 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- TAB: GESTIÓN DE ADMINISTRADORES -->
+            <div class="admin-tab-pane" id="tab-content-admins" style="display:none;">
+                <div class="admin-section-card" style="margin-bottom:28px;">
+                    <form id="form-crear-admin">
+                        <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.15); padding-bottom:12px; margin-bottom:18px;">
+                            <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                <span>➕</span> Crear Nuevo Administrador
+                            </h3>
+                            <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                Crea credenciales de acceso (usuario y contraseña) para permitir la gestión del panel.
+                            </p>
+                        </div>
+
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Usuario *</label>
+                                <input type="text" class="form-control" id="nuevo-admin-usuario" required placeholder="Ej: gerente, socio..." autocomplete="off">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Nombre único para iniciar sesión.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Contraseña *</label>
+                                <input type="password" class="form-control" id="nuevo-admin-password" required placeholder="Mínimo 4 caracteres" autocomplete="new-password">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Contraseña de acceso protegida.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre Completo (Opcional)</label>
+                                <input type="text" class="form-control" id="nuevo-admin-nombre" placeholder="Ej: Cristian Gómez">
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Nombre visible en el saludo del sistema.</small>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                            <button type="submit" class="cta" style="padding:10px 24px; font-size:0.9rem; font-weight:800; border-radius:10px; cursor:pointer;">
+                                <span>➕</span> Guardar Administrador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- LISTA DE ADMINISTRADORES REGISTRADOS -->
+                <div class="admin-section-card">
+                    <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.15); padding-bottom:12px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                <span>👥</span> Administradores del Sistema
+                            </h3>
+                            <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                Lista de usuarios autorizados para gestionar la tienda, catálogo, pedidos y reportes.
+                            </p>
+                        </div>
+                        <span id="badge-total-admins" style="background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.3); color:#34D399; font-size:0.78rem; font-weight:800; padding:4px 12px; border-radius:99px;">
+                            0 Usuarios
+                        </span>
+                    </div>
+
+                    <div id="contenedor-lista-admins" style="display:flex; flex-direction:column; gap:12px;">
+                        <!-- Se llena dinámicamente con JavaScript -->
+                    </div>
                 </div>
             </div>
         </main>
