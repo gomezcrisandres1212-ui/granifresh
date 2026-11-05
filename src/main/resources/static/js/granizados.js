@@ -798,6 +798,16 @@
       }
     }
 
+    // Método de pago en Efectivo (Solo disponible para Recogida en Local)
+    var cardEfectivo = $("#pay-card-efectivo");
+    if (cardEfectivo) {
+      cardEfectivo.style.display = isDom ? "none" : "";
+    }
+    // Si era Efectivo y el cliente cambió a Domicilio, reasignar a NEQUI
+    if (isDom && checkoutState.metodoPago === "EFECTIVO") {
+      cambiarMetodoPago("NEQUI");
+    }
+
     actualizarValoresTotales();
   };
 
@@ -831,6 +841,26 @@
       var input = card.querySelector("input");
       if (input) card.classList.toggle("active", input.value === metodo);
     });
+
+    var esEfectivo = metodo === "EFECTIVO";
+    var guideTrans = $("#chk-steps-transferencia");
+    var guideCash = $("#chk-steps-efectivo");
+    if (guideTrans) guideTrans.style.display = esEfectivo ? "none" : "block";
+    if (guideCash) guideCash.style.display = esEfectivo ? "block" : "none";
+
+    var sub = $("#chk-step-subtitle");
+    if (sub && checkoutState.pasoActual === 3) {
+      sub.textContent = esEfectivo
+        ? "Paso 3 de 3: Confirma tu pedido para pagar en caja al recoger"
+        : "Paso 3 de 3: Transfiere a cuenta y envía comprobante";
+    }
+
+    var btnNext = $("#btn-chk-next");
+    if (btnNext && checkoutState.pasoActual === 3) {
+      btnNext.innerHTML = esEfectivo
+        ? "📲 Confirmar Pedido para Recogida ➔"
+        : "📲 Enviar Comprobante por WhatsApp ➔";
+    }
   };
 
   // Calcular y refrescar totales
@@ -847,6 +877,11 @@
 
     var elTotal = $("#checkout-total-val");
     if (elTotal) elTotal.textContent = fmt(total);
+
+    var pillTot = $("#chk-step3-total-pill");
+    if (pillTot) pillTot.textContent = fmt(total) + " COP";
+    var pillCashTot = $("#chk-step3-cash-total-pill");
+    if (pillCashTot) pillCashTot.textContent = fmt(total) + " COP";
 
     var elCountRes = $("#chk-resumen-cant");
     if (elCountRes) elCountRes.textContent = count;
@@ -904,11 +939,21 @@
     if (sub) {
       if (paso === 1) sub.textContent = "Paso 1 de 3: Revisa tus granizados seleccionados";
       else if (paso === 2) sub.textContent = "Paso 2 de 3: Método de envío y datos de entrega";
-      else if (paso === 3) sub.textContent = "Paso 3 de 3: Transfiere a cuenta y envía comprobante";
+      else if (paso === 3) {
+        sub.textContent = checkoutState.metodoPago === "EFECTIVO"
+          ? "Paso 3 de 3: Confirma tu pedido para pagar en caja al recoger"
+          : "Paso 3 de 3: Transfiere a cuenta y envía comprobante";
+      }
     }
 
     // Si entra al paso 3, refrescar cuentas bancarias e importe total en la guía
     if (paso === 3) {
+      var esEfectivo = checkoutState.metodoPago === "EFECTIVO";
+      var guideTrans = $("#chk-steps-transferencia");
+      var guideCash = $("#chk-steps-efectivo");
+      if (guideTrans) guideTrans.style.display = esEfectivo ? "none" : "block";
+      if (guideCash) guideCash.style.display = esEfectivo ? "block" : "none";
+
       if (rawCatalog && rawCatalog.configuracion) {
         var cfg = rawCatalog.configuracion;
         var elN = $("#chk-num-nequi"); if (elN && cfg.numeroNequi) elN.textContent = cfg.numeroNequi;
@@ -920,6 +965,8 @@
       var totStep3 = subtotalStep3 + costoStep3;
       var pillTot = $("#chk-step3-total-pill");
       if (pillTot) pillTot.textContent = fmt(totStep3) + " COP";
+      var pillCashTot = $("#chk-step3-cash-total-pill");
+      if (pillCashTot) pillCashTot.textContent = fmt(totStep3) + " COP";
     }
 
     // 2. Vasitos de Granizado (Step Tabs)
@@ -964,8 +1011,11 @@
         btnNext.style.boxShadow = "";
         btnNext.disabled = false;
       } else if (paso === 3) {
+        var esEfectivo = checkoutState.metodoPago === "EFECTIVO";
         btnPrev.textContent = "⬅ Volver a Datos";
-        btnNext.innerHTML = "📲 Enviar Comprobante por WhatsApp ➔";
+        btnNext.innerHTML = esEfectivo
+          ? "📲 Confirmar Pedido para Recogida ➔"
+          : "📲 Enviar Comprobante por WhatsApp ➔";
         btnNext.style.background = "linear-gradient(135deg, #10B981, #059669)";
         btnNext.style.boxShadow = "0 4px 18px rgba(16, 185, 129, 0.4)";
         btnNext.disabled = false;
@@ -1099,20 +1149,31 @@
 
       var entregaTxt = isDom ? "🛵 Domicilio Express a " + payload.clienteDireccion : "🏪 Recogida en el punto físico";
 
-      var nomMetodo = payload.metodoPago === "BANCOLOMBIA"
-        ? "Bancolombia Transferencia"
-        : (payload.metodoPago === "DAVIPLATA" ? "Daviplata Móvil" : "Nequi");
+      var esEfectivo = payload.metodoPago === "EFECTIVO";
+      var nomMetodo = esEfectivo
+        ? "💵 Efectivo (Pago contra entrega en el punto físico)"
+        : (payload.metodoPago === "BANCOLOMBIA"
+            ? "Bancolombia Transferencia"
+            : (payload.metodoPago === "DAVIPLATA" ? "Daviplata Móvil" : "Nequi"));
+
+      var headerPago = esEfectivo
+        ? "Acabo de realizar mi pedido web para recoger con pago en efectivo:"
+        : "Acabo de realizar mi pedido web y transferir el pago:";
+      var totalLabel = esEfectivo ? "💰 *Total a Cancelar en Caja:* " : "💰 *Total Transferido:* ";
+      var cierreMsg = esEfectivo
+        ? "💵 *PAGO EN EFECTIVO AL RECOGER EN EL LOCAL.* Por favor confirmarme que mi pedido esté recibido para pasar a recogerlo. ¡Muchas gracias! 🚀"
+        : "📎 *ADJUNTO MI COMPROBANTE DE PAGO EN ESTE CHAT* para que rectifiquen mi transferencia e inicien el batido. ¡Muchas gracias! 🚀";
 
       var msgWp = "¡Hola *GRANIFRESH*! 🥤%0A%0A" +
-                  "Acabo de realizar mi pedido web y transferir el pago:%0A" +
+                  headerPago + "%0A" +
                   "📌 *Código de Pedido:* " + cod + "%0A" +
                   "👤 *Cliente:* " + payload.clienteNombre + "%0A" +
                   "📱 *WhatsApp:* " + payload.clienteTelefono + "%0A" +
                   "📍 *Modalidad:* " + entregaTxt + "%0A" +
-                  "💳 *Medio de Transferencia:* " + nomMetodo + "%0A" +
-                  "💰 *Total Transferido:* " + fmt(payload.total) + "%0A%0A" +
+                  "💳 *Método de Pago:* " + nomMetodo + "%0A" +
+                  totalLabel + fmt(payload.total) + "%0A%0A" +
                   "🥤 *Granizados Solicitados:*%0A" + itemsTxt + "%0A%0A" +
-                  "📎 *ADJUNTO MI COMPROBANTE DE PAGO EN ESTE CHAT* para que rectifiquen mi transferencia e inicien el batido. ¡Muchas gracias! 🚀";
+                  cierreMsg;
 
       var wpUrl = "https://wa.me/" + whatsappNum + "?text=" + msgWp;
       var wpBtn = $("#btn-whatsapp-confirmar");
@@ -1131,7 +1192,10 @@
     } finally {
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = "📲 Enviar Comprobante por WhatsApp ➔";
+        btn.innerHTML = checkoutState.metodoPago === "EFECTIVO"
+          ? "📲 Confirmar Pedido para Recogida ➔"
+          : "📲 Enviar Comprobante por WhatsApp ➔";
+      }
       }
     }
   }

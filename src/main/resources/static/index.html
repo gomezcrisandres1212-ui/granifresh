@@ -622,12 +622,25 @@
 
             <!-- CONTENIDO PASO 3: MÉTODO DE PAGO & VALIDACIÓN DE COMPROBANTE -->
             <div class="checkout-step-content" id="chk-pane-3">
-                <!-- 1. Cuentas para Transferencia Directa -->
+                <!-- 1. Cuentas para Transferencia Directa o Efectivo -->
                 <div class="chk-section-eyebrow">
-                    <span>💳</span> 1. TRANSFIERE A CUALQUIERA DE NUESTRAS CUENTAS
+                    <span>💳</span> 1. SELECCIONA TU MÉTODO DE PAGO
                 </div>
 
                 <div class="chk-payments-grid" style="grid-template-columns: 1fr; gap:12px;">
+                    <!-- Efectivo (Disponible en Recogida en Local) -->
+                    <label class="chk-payment-card" id="pay-card-efectivo" onclick="cambiarMetodoPago('EFECTIVO')" style="display:none;">
+                        <input type="radio" name="chk-metodo-pago-radio" value="EFECTIVO">
+                        <div class="chk-radio-indicator"><span class="chk-radio-dot"></span></div>
+                        <div class="chk-pay-info">
+                            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                                <span class="chk-pay-name">💵 Pago en Efectivo</span>
+                                <span style="font-size:11px; color:#34D399; background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.3); padding:2px 8px; border-radius:99px; font-weight:700;">En Punto Físico</span>
+                            </div>
+                            <small class="chk-pay-desc">Pagas en efectivo directamente en caja al retirar tus granizados frescos en el local.</small>
+                        </div>
+                    </label>
+
                     <!-- Nequi -->
                     <label class="chk-payment-card active" id="pay-card-nequi" onclick="cambiarMetodoPago('NEQUI')">
                         <input type="radio" name="chk-metodo-pago-radio" value="NEQUI" checked>
@@ -689,8 +702,8 @@
                     </label>
                 </div>
 
-                <!-- 2. Pasos a Seguir para Validar Comprobante -->
-                <div class="chk-transfer-steps-card">
+                <!-- 2. Pasos a Seguir para Validar Comprobante (Transferencia) -->
+                <div class="chk-transfer-steps-card" id="chk-steps-transferencia">
                     <div class="chk-transfer-steps-header">
                         <span class="chk-steps-badge-icon">📑</span>
                         <div>
@@ -714,6 +727,31 @@
                         <div class="chk-step-row">
                             <span class="chk-step-num">4</span>
                             <div class="chk-step-text">Presiona el botón de abajo <strong>"📲 Enviar Comprobante por WhatsApp"</strong> para abrir el chat con nuestro equipo y adjuntar tu comprobante. ¡Iniciaremos el batido al instante! 🚀</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2B. Pasos para Pago en Efectivo al Recoger -->
+                <div class="chk-transfer-steps-card" id="chk-steps-efectivo" style="display:none; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.05);">
+                    <div class="chk-transfer-steps-header">
+                        <span class="chk-steps-badge-icon" style="background: rgba(52,211,153,0.2); color: #34D399;">💵</span>
+                        <div>
+                            <strong style="color:#fff; font-size:0.92rem;">Pago en Efectivo al Recoger</strong>
+                            <div style="color:var(--mut); font-size:0.78rem;">Instrucciones para retirar tu pedido en el local:</div>
+                        </div>
+                    </div>
+                    <div class="chk-steps-list-guide">
+                        <div class="chk-step-row">
+                            <span class="chk-step-num" style="background:#34D399; color:#0B1F17;">1</span>
+                            <div class="chk-step-text"><strong>Total a cancelar en caja:</strong> <span class="chk-steps-total-pill" id="chk-step3-cash-total-pill">$0 COP</span> (Sin costo de envío).</div>
+                        </div>
+                        <div class="chk-step-row">
+                            <span class="chk-step-num" style="background:#34D399; color:#0B1F17;">2</span>
+                            <div class="chk-step-text">Presiona abajo <strong>"📲 Confirmar Pedido para Recogida"</strong> para avisarnos por WhatsApp y empezar a batir tus granizados frescos.</div>
+                        </div>
+                        <div class="chk-step-row">
+                            <span class="chk-step-num" style="background:#34D399; color:#0B1F17;">3</span>
+                            <div class="chk-step-text">Acércate a nuestro punto físico y paga en caja en efectivo al momento de retirar tu pedido. ¡Estará listo esperándote! 🧊</div>
                         </div>
                     </div>
                 </div>

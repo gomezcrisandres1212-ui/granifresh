@@ -574,7 +574,10 @@ function renderizarPedidosUrgentesDashboard() {
         let telLimpio = (p.clienteTelefono || '').replace(/[^0-9]/g, '');
         if (!telLimpio.startsWith('57') && telLimpio.length === 10) telLimpio = '57' + telLimpio;
 
-        const msgWpValidar = encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu solicitud web ${p.codigoPedido}. ¿Nos puedes compartir tu comprobante de pago por aquí para validar tu pedido e iniciar el batido?`);
+        const esEfectivo = p.metodoPago === 'EFECTIVO';
+        const msgWpValidar = esEfectivo
+            ? encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu pedido ${p.codigoPedido} con pago en efectivo para recoger en el local. ¿Nos confirmas a qué hora pasas por tus granizados para tenerlos listos y recién batidos?`)
+            : encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu solicitud web ${p.codigoPedido}. ¿Nos puedes compartir tu comprobante de pago por aquí para validar tu pedido e iniciar el batido?`);
 
         return `
             <div class="dash-urgent-card">
@@ -590,12 +593,12 @@ function renderizarPedidosUrgentesDashboard() {
                     🥤 ${itemsStr}
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.25); border-radius:8px; padding:6px 10px; margin:4px 0 10px 0;">
-                    <span style="font-size:0.8rem; color:var(--mut);">Transferencia: <strong style="color:#fff;">${p.metodoPago || 'NEQUI'}</strong></span>
+                    <span style="font-size:0.8rem; color:var(--mut);">${esEfectivo ? 'Pago:' : 'Transferencia:'} <strong style="color:${esEfectivo ? '#34D399' : '#fff'};">${p.metodoPago || 'NEQUI'}</strong></span>
                     <strong style="color:var(--li); font-size:1.05rem;">${fmtMoney(p.total)}</strong>
                 </div>
                 <div class="dash-urgent-footer" style="flex-wrap:wrap; gap:8px;">
-                    <a href="https://wa.me/${telLimpio}?text=${msgWpValidar}" target="_blank" title="Abrir Chat de WhatsApp con el Cliente" style="background:#25D366; text-decoration:none; display:inline-flex; align-items:center; gap:5px; color:#fff; border-radius:8px; padding:7px 11px; font-weight:800; font-size:0.8rem;">
-                        💬 Ver Comprobante
+                    <a href="https://wa.me/${telLimpio}?text=${msgWpValidar}" target="_blank" title="${esEfectivo ? 'Abrir Chat de WhatsApp con el Cliente' : 'Abrir Chat de WhatsApp para Comprobante'}" style="background:#25D366; text-decoration:none; display:inline-flex; align-items:center; gap:5px; color:#fff; border-radius:8px; padding:7px 11px; font-weight:800; font-size:0.8rem;">
+                        ${esEfectivo ? '💬 Contactar Cliente' : '💬 Ver Comprobante'}
                     </a>
                     <div style="display:flex; gap:6px; margin-left:auto;">
                         <button onclick="cambiarEstadoPedido('${p.id}', 'RECIBIDO')" class="btn-approve-req" title="Comprobante válido: Aprobar solicitud y enviar a cocina para batido">
