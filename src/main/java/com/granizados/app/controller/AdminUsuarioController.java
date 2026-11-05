@@ -82,3 +82,4 @@ public class AdminUsuarioController {
         }).orElse(ResponseEntity.notFound().build());
     }
 }
+

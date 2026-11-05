@@ -91,6 +91,10 @@ function initAdminEvents() {
             localStorage.removeItem('frost_admin_token');
             AdminState.token = null;
             document.getElementById('admin-view').classList.remove('active');
+            const uInput = document.getElementById('admin-user-input');
+            const pInput = document.getElementById('admin-pass-input');
+            if (uInput) uInput.value = '';
+            if (pInput) pInput.value = '';
             if (window.showToast) window.showToast('Sesión administrativa cerrada', 'info');
         });
     }
@@ -255,11 +259,23 @@ function actualizarSaludoYFechaAdmin() {
     if (dateLabel) dateLabel.textContent = dateFormatted.charAt(0).toUpperCase() + dateFormatted.slice(1);
 }
 
+// Abrir Modal de Login Admin con campos limpios
+function abrirModalLoginAdmin() {
+    const modal = document.getElementById('modal-admin-login');
+    const uInput = document.getElementById('admin-user-input');
+    const pInput = document.getElementById('admin-pass-input');
+    const errorMsg = document.getElementById('admin-login-error');
+    if (uInput) uInput.value = '';
+    if (pInput) pInput.value = '';
+    if (errorMsg) { errorMsg.style.display = 'none'; errorMsg.textContent = ''; }
+    if (modal) modal.classList.add('active');
+}
+window.abrirModalLoginAdmin = abrirModalLoginAdmin;
+
 // Abrir el Panel Administrativo
 window.abrirPanelAdmin = async function () {
     if (!AdminState.token) {
-        const modal = document.getElementById('modal-admin-login');
-        if (modal) modal.classList.add('active');
+        abrirModalLoginAdmin();
         return;
     }
 
@@ -268,8 +284,7 @@ window.abrirPanelAdmin = async function () {
         if (!res.ok) {
             localStorage.removeItem('frost_admin_token');
             AdminState.token = null;
-            const modal = document.getElementById('modal-admin-login');
-            if (modal) modal.classList.add('active');
+            abrirModalLoginAdmin();
             return;
         }
 
@@ -283,8 +298,7 @@ window.abrirPanelAdmin = async function () {
         iniciarAdminPolling();
 
     } catch (e) {
-        const modal = document.getElementById('modal-admin-login');
-        if (modal) modal.classList.add('active');
+        abrirModalLoginAdmin();
     }
 };
 
@@ -570,7 +584,7 @@ function renderizarPedidosUrgentesDashboard() {
                 </div>
                 <div>
                     <div class="dash-urgent-client">${p.clienteNombre}</div>
-                    <div class="dash-urgent-addr">📍 ${p.clienteDireccion} ${p.barrio ? `(${p.barrio})` : ''}</div>
+                    <div class="dash-urgent-addr">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : `📍 ${p.clienteDireccion} ${p.barrio ? `(${p.barrio})` : ''}`}</div>
                 </div>
                 <div class="dash-urgent-items">
                     🥤 ${itemsStr}
@@ -784,7 +798,7 @@ function renderizarTablaPedidos() {
                     </a>
                 </td>
                 <td>
-                    <div style="color:#fff;">${p.clienteDireccion}</div>
+                    <div style="color:#fff;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : p.clienteDireccion}</div>
                     <small style="color:var(--mut);">${p.barrio ? `Barrio: ${p.barrio}` : ''} ${p.indicaciones ? `· ${p.indicaciones}` : ''}</small>
                 </td>
                 <td style="font-size:0.84rem; line-height:1.4;">${itemsResumen}</td>
@@ -910,7 +924,7 @@ window.abrirModalDetallePedido = function (id) {
             </div>
             <div>
                 <small style="color:var(--mut);">Destino de Entrega:</small>
-                <div style="color:#fff; font-weight:700;">${p.clienteDireccion}</div>
+                <div style="color:#fff; font-weight:700;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : p.clienteDireccion}</div>
                 <div style="font-size:0.85rem; color:var(--cy);">${p.barrio ? `Barrio: ${p.barrio}` : ''} ${p.indicaciones ? `· ${p.indicaciones}` : ''}</div>
             </div>
         </div>
@@ -924,7 +938,7 @@ window.abrirModalDetallePedido = function (id) {
             <div>
                 <span style="color:var(--mut); font-size:0.85rem;">Método de Pago:</span>
                 <strong style="color:#fff; display:block; font-size:1.05rem;">${p.metodoPago || 'EFECTIVO'}</strong>
-                <span style="color:var(--mut); font-size:0.8rem;">Subtotal: ${fmtMoney(p.subtotal)} · Envío: ${fmtMoney(p.costoEnvio)}</span>
+                <span style="color:var(--mut); font-size:0.8rem;">Subtotal: ${fmtMoney(p.subtotal)} · Envío: ${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '$0 (Recogida en Local)' : fmtMoney(p.costoEnvio)}</span>
             </div>
             <div style="text-align:right;">
                 <span style="color:var(--mut); font-size:0.85rem;">Total a Cobrar:</span>
@@ -1692,8 +1706,11 @@ async function guardarGranizadoAdmin(e) {
         } else if (res.status === 401 || res.status === 403) {
             if (window.showToast) window.showToast('🔒 Sesión expirada o no autorizada. Inicia sesión nuevamente.', 'error');
             else alert('Sesión de administrador no autorizada. Por favor vuelve a iniciar sesión.');
-            const modalLogin = document.getElementById('modal-admin-login');
-            if (modalLogin) modalLogin.classList.add('active');
+            if (window.abrirModalLoginAdmin) window.abrirModalLoginAdmin();
+            else {
+                const modalLogin = document.getElementById('modal-admin-login');
+                if (modalLogin) modalLogin.classList.add('active');
+            }
         } else {
             const errData = await res.json().catch(() => ({}));
             const msg = errData.error || errData.mensaje || 'Error al guardar el granizado en la base de datos.';

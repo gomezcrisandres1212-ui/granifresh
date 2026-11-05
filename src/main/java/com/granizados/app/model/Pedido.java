@@ -23,6 +23,7 @@ public class Pedido {
     private String barrio;
     private String indicaciones;
     private String metodoPago; // EFECTIVO, NEQUI_DAVIPLATA, BANCOLOMBIA, TARJETA
+    private String tipoEntrega; // DOMICILIO, RECOGIDA
 
     private List<ItemPedido> items = new ArrayList<>();
     private double subtotal;
@@ -93,5 +94,8 @@ public class Pedido {
 
     public String getNotasAdmin() { return notasAdmin; }
     public void setNotasAdmin(String notasAdmin) { this.notasAdmin = notasAdmin; }
+
+    public String getTipoEntrega() { return tipoEntrega; }
+    public void setTipoEntrega(String tipoEntrega) { this.tipoEntrega = tipoEntrega; }
 }
 

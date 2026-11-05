@@ -778,18 +778,24 @@
     checkoutState.costoEnvio = isDom ? baseEnvio : 0;
 
     var badgeStep2 = $("#chk-step2-dest-txt");
-    if (badgeStep2) badgeStep2.textContent = isDom ? "Domicilio" : "Local Físico";
+    if (badgeStep2) badgeStep2.textContent = isDom ? "Domicilio" : "Recogida en Local";
 
     var txtEnvio = $("#chk-resumen-envio-txt");
     if (txtEnvio) {
       txtEnvio.innerHTML = isDom 
         ? fmt(checkoutState.costoEnvio) + " (Domicilio térmico)"
-        : '<span style="color:#34D399; font-weight:800;">¡GRATIS! (Recogida en tienda)</span>';
+        : '<span style="color:#34D399; font-weight:800;">¡GRATIS! (Recogida en local)</span>';
     }
 
     var inputDir = $("#checkout-direccion");
-    if (!isDom && inputDir && (!inputDir.value || inputDir.value.trim() === "")) {
-      inputDir.value = "Recogida en Punto Físico (Calle 45 # 23 - 10 Barrio El Prado)";
+    if (inputDir) {
+      if (isDom) {
+        if (inputDir.value.indexOf("Recogida") !== -1 || inputDir.value.indexOf("Punto Físico") !== -1 || inputDir.value.indexOf("Calle 45") !== -1) {
+          inputDir.value = "";
+        }
+      } else {
+        inputDir.value = "";
+      }
     }
 
     actualizarValoresTotales();
@@ -887,7 +893,7 @@
       if (resDir) {
         resDir.textContent = checkoutState.metodoEntrega === "DOMICILIO"
           ? dir
-          : "Punto físico (Calle 45 # 23-10 Barrio El Prado)";
+          : "Recogida en punto físico del local";
       }
     }
 
@@ -1022,12 +1028,13 @@
 
     var dirFinal = isDom
       ? $("#checkout-direccion").value.trim()
-      : "Recogida en punto físico (Calle 45 # 23 - 10 Barrio El Prado)";
+      : "Recogida en el local";
 
     var payload = {
       clienteNombre: $("#checkout-nombre").value.trim(),
       clienteTelefono: $("#checkout-telefono").value.trim(),
       clienteDireccion: dirFinal,
+      tipoEntrega: isDom ? "DOMICILIO" : "RECOGIDA",
       barrio: isDom ? "Domicilio Express" : "Recogida Local",
       indicaciones: $("#checkout-indicaciones").value.trim() + (!isDom ? " [RECOGIDA EN LOCAL FÍSICO]" : ""),
       metodoPago: checkoutState.metodoPago,
@@ -1371,7 +1378,15 @@
           window.abrirPanelAdmin();
         } else {
           var modal = document.getElementById("modal-admin-login");
-          if (modal) modal.classList.add("active");
+          if (modal) {
+            var uInput = document.getElementById("admin-user-input");
+            var pInput = document.getElementById("admin-pass-input");
+            var errEl = document.getElementById("admin-login-error");
+            if (uInput) uInput.value = "";
+            if (pInput) pInput.value = "";
+            if (errEl) { errEl.style.display = "none"; errEl.textContent = ""; }
+            modal.classList.add("active");
+          }
         }
       } else {
         logoClickTimer = setTimeout(function () {

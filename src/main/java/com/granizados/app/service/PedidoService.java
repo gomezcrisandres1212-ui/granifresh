@@ -51,12 +51,26 @@ public class PedidoService {
         }
         pedido.setSubtotal(subtotal);
 
-        // Configurar costo de envío
-        double costoEnvio = 5000.0;
-        Optional<ConfiguracionNegocio> configOpt = configRepository.findFirstByOrderByIdAsc();
-        if (configOpt.isPresent()) {
-            costoEnvio = configOpt.get().getCostoEnvioBase();
+        // Determinar si es recogida en el local o domicilio express
+        boolean esRecogida = "RECOGIDA".equalsIgnoreCase(pedido.getTipoEntrega())
+                || (pedido.getCostoEnvio() == 0.0 && (pedido.getTipoEntrega() == null || !pedido.getTipoEntrega().equalsIgnoreCase("DOMICILIO")))
+                || (pedido.getBarrio() != null && pedido.getBarrio().toUpperCase().contains("RECOGIDA"))
+                || (pedido.getClienteDireccion() != null && pedido.getClienteDireccion().toUpperCase().contains("RECOGIDA"))
+                || (pedido.getIndicaciones() != null && pedido.getIndicaciones().toUpperCase().contains("RECOGIDA"));
+
+        double costoEnvio = 0.0;
+        if (esRecogida) {
+            pedido.setTipoEntrega("RECOGIDA");
+            costoEnvio = 0.0;
+        } else {
+            pedido.setTipoEntrega("DOMICILIO");
+            costoEnvio = 5000.0;
+            Optional<ConfiguracionNegocio> configOpt = configRepository.findFirstByOrderByIdAsc();
+            if (configOpt.isPresent()) {
+                costoEnvio = configOpt.get().getCostoEnvioBase();
+            }
         }
+
         pedido.setCostoEnvio(costoEnvio);
         pedido.setTotal(subtotal + costoEnvio);
 

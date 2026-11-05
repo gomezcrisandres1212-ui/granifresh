@@ -606,7 +606,7 @@
                         <label for="checkout-direccion">DIRECCIÓN EXACTA DE ENTREGA *</label>
                         <div class="input-with-icon">
                             <span class="field-icon">📍</span>
-                            <input type="text" class="chk-input" id="checkout-direccion" required placeholder="Ej: Calle 45 # 23 – 10 Barrio El Prado">
+                            <input type="text" class="chk-input" id="checkout-direccion" required placeholder="Dirección completa (Calle / Carrera #, Barrio, Apto)">
                         </div>
                     </div>
 
@@ -834,11 +834,11 @@
         <form id="form-admin-login">
             <div class="form-group">
                 <label>Usuario</label>
-                <input type="text" class="form-control" id="admin-user-input" required value="admin">
+                <input type="text" class="form-control" id="admin-user-input" required placeholder="Usuario" autocomplete="username">
             </div>
             <div class="form-group">
                 <label>Contraseña</label>
-                <input type="password" class="form-control" id="admin-pass-input" required value="admin123">
+                <input type="password" class="form-control" id="admin-pass-input" required placeholder="Contraseña" autocomplete="current-password">
             </div>
             <div id="admin-login-error" style="color:var(--mg); font-size:0.85rem; margin-bottom:12px; display:none;"></div>
             <button type="submit" class="cta" style="width: 100%; border:none; cursor:pointer; padding:12px;">
