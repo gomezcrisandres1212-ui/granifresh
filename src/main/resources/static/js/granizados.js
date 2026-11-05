@@ -1196,7 +1196,6 @@
           ? "📲 Confirmar Pedido para Recogida ➔"
           : "📲 Enviar Comprobante por WhatsApp ➔";
       }
-      }
     }
   }
 
