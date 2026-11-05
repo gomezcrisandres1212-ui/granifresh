@@ -163,6 +163,10 @@
     if (dirTitulo && config.direccionSede) {
       dirTitulo.textContent = config.direccionSede;
     }
+    var dirPickupEl = $("#chk-pickup-direccion-desc");
+    if (dirPickupEl && config.direccionSede) {
+      dirPickupEl.textContent = "Recoge inmediatamente sin costo en " + config.direccionSede + ".";
+    }
     var horarioSub = $("#nosotros-horario-sub");
     if (horarioSub && config.horarioAtencion) {
       horarioSub.innerHTML = "🕒 Horario: " + config.horarioAtencion + " &nbsp;·&nbsp; Cobertura en toda la ciudad";
@@ -808,6 +812,11 @@
       cambiarMetodoPago("NEQUI");
     }
 
+    var dirPickupEl = $("#chk-pickup-direccion-desc");
+    if (dirPickupEl && rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) {
+      dirPickupEl.textContent = "Recoge inmediatamente sin costo en " + rawCatalog.configuracion.direccionSede + ".";
+    }
+
     actualizarValoresTotales();
   };
 
@@ -926,9 +935,10 @@
       if (resTel) resTel.textContent = tel;
       var resDir = $("#chk-resumen-destino");
       if (resDir) {
+        var dirSede = (rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) || "nuestro punto físico";
         resDir.textContent = checkoutState.metodoEntrega === "DOMICILIO"
           ? dir
-          : "Recogida en punto físico del local";
+          : ("Recogida en " + dirSede);
       }
     }
 
@@ -1053,6 +1063,10 @@
     if (panel) panel.classList.remove("on");
 
     renderCheckoutItems();
+    var dirPickupEl = $("#chk-pickup-direccion-desc");
+    if (dirPickupEl && rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) {
+      dirPickupEl.textContent = "Recoge inmediatamente sin costo en " + rawCatalog.configuracion.direccionSede + ".";
+    }
     irAPasoCheckout(pasoInicial || 1);
     var modal = $("#modal-checkout");
     if (modal) modal.classList.add("active");
@@ -1076,9 +1090,10 @@
       : 0;
     var total = subtotal + costoEnvio;
 
+    var dirSede = (rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) || "el local comercial";
     var dirFinal = isDom
       ? $("#checkout-direccion").value.trim()
-      : "Recogida en el local";
+      : ("Recogida en " + dirSede);
 
     var payload = {
       clienteNombre: $("#checkout-nombre").value.trim(),
@@ -1147,7 +1162,7 @@
         return "• " + (it.nombreGranizado || it.granizadoNombre || it.n) + cantTxt + " (" + fmt((it.precioUnitario || it.p) * cant) + ")";
       }).join("%0A");
 
-      var entregaTxt = isDom ? "🛵 Domicilio Express a " + payload.clienteDireccion : "🏪 Recogida en el punto físico";
+      var entregaTxt = isDom ? "🛵 Domicilio Express a " + payload.clienteDireccion : ("🏪 Recogida en punto físico (" + dirSede + ")");
 
       var esEfectivo = payload.metodoPago === "EFECTIVO";
       var nomMetodo = esEfectivo

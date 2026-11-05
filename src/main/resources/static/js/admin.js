@@ -58,6 +58,17 @@ function initAdminEvents() {
             const usuario = document.getElementById('admin-user-input').value.trim();
             const contrasena = document.getElementById('admin-pass-input').value;
             const errorMsg = document.getElementById('admin-login-error');
+            const submitBtn = formLogin.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : 'Ingresar al Panel';
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Verificando... ⏳';
+            }
+            if (errorMsg) {
+                errorMsg.style.display = 'none';
+                errorMsg.textContent = '';
+            }
 
             try {
                 const res = await fetch('/api/auth/login', {
@@ -70,15 +81,35 @@ function initAdminEvents() {
                 if (data.autenticado && data.token) {
                     AdminState.token = data.token;
                     localStorage.setItem('frost_admin_token', data.token);
+
+                    const displayUser = document.getElementById('admin-display-username');
+                    if (displayUser) displayUser.textContent = data.nombreCompleto || data.usuario || 'Admin';
+
+                    // 1. Cerrar modal de login instantáneamente
                     if (window.cerrarModales) window.cerrarModales();
-                    abrirPanelAdmin();
+
+                    // 2. Abrir panel admin de inmediato con transición fluida
+                    document.getElementById('admin-view').classList.add('active');
+                    cambiarPestanaAdmin(AdminState.pestañaActiva || 'dashboard');
+                    iniciarAdminPolling();
+
+                    if (window.showToast) window.showToast('¡Bienvenido al Panel de Administración! 🥭', 'success');
                 } else {
-                    errorMsg.style.display = 'block';
-                    errorMsg.textContent = data.mensaje || 'Credenciales incorrectas.';
+                    if (errorMsg) {
+                        errorMsg.style.display = 'block';
+                        errorMsg.textContent = data.mensaje || 'Credenciales incorrectas.';
+                    }
                 }
             } catch (err) {
-                errorMsg.style.display = 'block';
-                errorMsg.textContent = 'Error al conectar con el servidor de autenticación.';
+                if (errorMsg) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.textContent = 'Error al conectar con el servidor de autenticación.';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
             }
         });
     }
@@ -279,11 +310,17 @@ window.abrirPanelAdmin = async function () {
         return;
     }
 
+    // 1. Mostrar de inmediato el panel para respuesta instantánea
+    document.getElementById('admin-view').classList.add('active');
+    cambiarPestanaAdmin(AdminState.pestañaActiva || 'dashboard');
+    iniciarAdminPolling();
+
     try {
         const res = await fetch('/api/auth/me', { headers: getAuthHeaders() });
         if (!res.ok) {
             localStorage.removeItem('frost_admin_token');
             AdminState.token = null;
+            document.getElementById('admin-view').classList.remove('active');
             abrirModalLoginAdmin();
             return;
         }
@@ -292,12 +329,8 @@ window.abrirPanelAdmin = async function () {
         const displayUser = document.getElementById('admin-display-username');
         if (displayUser) displayUser.textContent = user.nombreCompleto || user.usuario || 'Admin';
 
-        document.getElementById('admin-view').classList.add('active');
-        cambiarPestanaAdmin(AdminState.pestañaActiva || 'dashboard');
-        await actualizarDatosAdmin();
-        iniciarAdminPolling();
-
     } catch (e) {
+        document.getElementById('admin-view').classList.remove('active');
         abrirModalLoginAdmin();
     }
 };
@@ -376,11 +409,7 @@ function cambiarPestanaAdmin(tabName) {
 }
 
 async function actualizarDatosAdmin() {
-    await Promise.all([
-        cargarDashboard(),
-        cargarPedidosAdmin(),
-        cargarGranizadosAdmin()
-    ]);
+    await cargarDashboard();
 }
 
 // ==========================================================
