@@ -2286,6 +2286,40 @@
       .replace(/'/g, "&#039;");
   }
 
+  // ==========================================================
+  // 17. VENTANA PROMOCIONAL DE BIENVENIDA / REGISTRO
+  // ==========================================================
+  window.cerrarPromoRegistro = function (motivo) {
+    var modal = document.getElementById("modal-promo-registro");
+    if (modal) modal.classList.remove("active");
+    try {
+      sessionStorage.setItem("grani_promo_vista", "1");
+    } catch (e) {}
+  };
+
+  window.irARegistroDesdePromo = function () {
+    window.cerrarPromoRegistro("registro");
+    abrirModalGraniClub();
+    cambiarAuthTab("registro");
+  };
+
+  function evaluarMostrarPromoBienvenida() {
+    if (GraniClubState.cliente || localStorage.getItem("granifresh_cliente_token")) {
+      return;
+    }
+    try {
+      if (sessionStorage.getItem("grani_promo_vista") === "1") return;
+    } catch (e) {}
+
+    setTimeout(function () {
+      if (GraniClubState.cliente || localStorage.getItem("granifresh_cliente_token")) return;
+      var modal = document.getElementById("modal-promo-registro");
+      if (modal && !modal.classList.contains("active")) {
+        modal.classList.add("active");
+      }
+    }, 1800);
+  }
+
   window.cargarCatalogoPublico = cargarCatalogo;
 
   // Inicializar
@@ -2297,5 +2331,6 @@
     actualizarBotonFlotanteWhatsapp();
     if (window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero();
     if (window.inicializarGraniClub) window.inicializarGraniClub();
+    evaluarMostrarPromoBienvenida();
   });
 })();

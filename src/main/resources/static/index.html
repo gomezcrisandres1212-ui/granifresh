@@ -2127,6 +2127,56 @@
 </div>
 
 <!-- ==========================================================
+     MODAL PROMO BIENVENIDA / INCENTIVO REGISTRO GRANIFRESH
+     ========================================================== -->
+<div class="modal-overlay" id="modal-promo-registro" style="z-index: 9998 !important;">
+    <div class="modal-box club-modal-box promo-modal-card" style="max-width: 440px; text-align: center; position: relative;">
+        <button type="button" class="promo-btn-close" onclick="cerrarPromoRegistro('x')" aria-label="Cerrar ventana">✕</button>
+
+        <!-- LOGO SUPERIOR CENTRADO -->
+        <div class="promo-logo-wrapper">
+            <div class="promo-logo-badge">
+                <img src="/img/granifresh-logo.jpg" alt="Granifresh Logo Oficial" class="promo-logo-img">
+            </div>
+            <div class="promo-tag-glow">🍃 100% FRUTA NATURAL ARTESANAL</div>
+        </div>
+
+        <div class="promo-content-body">
+            <h2 class="promo-headline">
+                ¡Regístrate y obtén premios para <span class="highlight-gold">refrescar tu día</span>!
+            </h2>
+            <p class="promo-description">
+                Únete gratis a <b>Granifresh</b> y recibe <b class="highlight-cyan">+30 GraniPoints de regalo</b>. Gira la <b>Ruleta Glacial</b>, juega <b>Raspa y Gana</b> y acumula puntos para canjear por tus granizados favoritos y toppings gratis.
+            </p>
+
+            <div class="promo-perks-row">
+                <div class="promo-perk-item">
+                    <span>🎁</span>
+                    <small>+30 pts Regalo</small>
+                </div>
+                <div class="promo-perk-item">
+                    <span>🎡</span>
+                    <small>Tiradas Diarias</small>
+                </div>
+                <div class="promo-perk-item">
+                    <span>🍧</span>
+                    <small>Granizados Gratis</small>
+                </div>
+            </div>
+
+            <div class="promo-actions-footer">
+                <button type="button" class="cta promo-btn-register" onclick="irARegistroDesdePromo()">
+                    <span>✨</span> ¡Registrarme y Ganar!
+                </button>
+                <button type="button" class="promo-btn-later" onclick="cerrarPromoRegistro('luego')">
+                    Luego
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
      MODAL CLIENTE: CLUB GRANIFRESH & GRANIPOINTS
      ========================================================== -->
 <div class="modal-overlay" id="modal-graniclub" style="z-index: 9990 !important;">
