@@ -25,6 +25,12 @@ public class Pedido {
     private String metodoPago; // EFECTIVO, NEQUI_DAVIPLATA, BANCOLOMBIA, TARJETA
     private String tipoEntrega; // DOMICILIO, RECOGIDA
 
+    // Fidelización y GraniPoints (opcional)
+    private String clienteId;
+    private int puntosUsados;
+    private double descuentoPuntos;
+    private int puntosGanados;
+
     private List<ItemPedido> items = new ArrayList<>();
     private double subtotal;
     private double costoEnvio;
@@ -97,5 +103,17 @@ public class Pedido {
 
     public String getTipoEntrega() { return tipoEntrega; }
     public void setTipoEntrega(String tipoEntrega) { this.tipoEntrega = tipoEntrega; }
+
+    public String getClienteId() { return clienteId; }
+    public void setClienteId(String clienteId) { this.clienteId = clienteId; }
+
+    public int getPuntosUsados() { return puntosUsados; }
+    public void setPuntosUsados(int puntosUsados) { this.puntosUsados = puntosUsados; }
+
+    public double getDescuentoPuntos() { return descuentoPuntos; }
+    public void setDescuentoPuntos(double descuentoPuntos) { this.descuentoPuntos = descuentoPuntos; }
+
+    public int getPuntosGanados() { return puntosGanados; }
+    public void setPuntosGanados(int puntosGanados) { this.puntosGanados = puntosGanados; }
 }
 

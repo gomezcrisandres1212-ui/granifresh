@@ -29,6 +29,10 @@
     <a href="#menu" class="nav-link-pill"><span>🥭</span> Menú</a>
     <a href="#nosotros" class="nav-link-pill"><span>🍃</span> Nosotros</a>
     <a href="#track" class="nav-link-pill"><span>🛵</span> Rastrear</a>
+    <button type="button" class="nav-club-btn" id="btn-open-graniclub" title="Club GraniPoints & Dinámicas">
+      <span>🎁</span> <span id="nav-club-label">GraniPoints</span>
+      <span class="badge-points" id="nav-points-badge" style="display:none;">0</span>
+    </button>
   </div>
   <button class="cartb" id="cartb" aria-label="Ver mi carrito de granizados">
     <span>🛒 Carrito</span> <i id="cn">0</i>
@@ -73,6 +77,14 @@
     </div>
 
     <div class="stats"><div><b>100%</b><span>FRUTA REAL</span></div><div><b>0%</b><span>QUÍMICOS</span></div><div><b>-4°C</b><span>FRAPPÉ PURO</span></div><div><b>35 min</b><span>ENTREGA EXPRESS</span></div></div>
+
+    <div class="hero-granipoints-banner" id="hero-granipoints-banner">
+      <div class="hgb-sparkle">🎁</div>
+      <div class="hgb-text">
+        <b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.
+      </div>
+      <div class="hgb-action">¡Jugar Ahora! ➔</div>
+    </div>
   </div>
   <div class="stage">
     <div class="stage-aura"></div>
@@ -756,6 +768,34 @@
                     </div>
                 </div>
 
+                <!-- Fidelización con GraniPoints -->
+                <div class="checkout-granipoints-card" id="checkout-granipoints-card">
+                    <div class="cgc-header">
+                        <span>🎁</span> <b>GraniPoints: <span id="co-puntos-disponibles-txt">0</span> pts</b>
+                    </div>
+                    <div id="co-box-cliente-deslogueado">
+                        <small style="color:var(--mut); font-size:0.8rem; display:block; margin-bottom:8px;">
+                            ¿Tienes cuenta en GraniFresh? Inicia sesión para usar tus GraniPoints o acumular puntos con esta orden.
+                        </small>
+                        <button type="button" class="btn-action-small btn-action-historial" onclick="abrirModalGraniClub()">
+                            🔑 Iniciar Sesión / Registrarme
+                        </button>
+                    </div>
+                    <div id="co-box-cliente-logueado" style="display:none;">
+                        <label class="cgc-toggle">
+                            <input type="checkbox" id="co-check-usar-puntos" onchange="toggleUsarPuntosCheckout()">
+                            <span>Canjear GraniPoints en esta orden</span>
+                        </label>
+                        <div id="co-slider-wrap" style="display:none; margin-top:10px;">
+                            <div style="display:flex; justify-content:space-between; font-size:0.82rem; color:var(--mut);">
+                                <span>Puntos a usar: <b id="co-puntos-cant-txt" style="color:var(--li);">0</b></span>
+                                <span>Descuento: <b id="co-descuento-pesos-txt" style="color:#10B981;">-$0</b></span>
+                            </div>
+                            <input type="range" id="co-slider-puntos" min="0" max="100" step="10" value="0" oninput="actualizarSliderPuntosCheckout()" style="width:100%; margin-top:6px;">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 3. Resumen final del pedido -->
                 <div class="chk-section-eyebrow" style="margin-top: 18px;">
                     <span>📋</span> 3. RESUMEN FINAL DE TU PEDIDO
@@ -776,6 +816,10 @@
                         <div class="chk-summary-row">
                             <span style="color:var(--mut);">Método de entrega:</span>
                             <span id="chk-resumen-envio-txt" style="color:var(--li); font-weight:700;">$5.000 (Domicilio térmico)</span>
+                        </div>
+                        <div class="chk-summary-row" id="chk-row-descuento-puntos" style="display:none; color:#10B981;">
+                            <span>Descuento GraniPoints:</span>
+                            <strong id="checkout-descuento-puntos-val">-$0</strong>
                         </div>
                         <div class="chk-summary-row chk-summary-total">
                             <span>TOTAL A PAGAR:</span>
@@ -955,6 +999,17 @@
                     <span class="pill-icon">👥</span>
                     <span class="pill-text">Administradores</span>
                     <span class="nav-badge nav-badge-cyan" id="badge-nav-admins">0</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="clientes" id="adm-nav-clientes">
+                    <span class="pill-icon">🌟</span>
+                    <span class="pill-text">Clientes &amp; Puntos</span>
+                    <span class="nav-badge nav-badge-cyan" id="badge-nav-clientes">0</span>
+                </button>
+
+                <button type="button" class="admin-nav-pill" data-tab="juegos" id="adm-nav-juegos">
+                    <span class="pill-icon">🎮</span>
+                    <span class="pill-text">Ruleta &amp; Raspa</span>
                 </button>
 
                 <div class="admin-nav-divider"></div>
@@ -1810,6 +1865,247 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ==========================================================
+                 PESTAÑA 7: GESTIÓN DE CLIENTES & GRANIPOINTS
+                 ========================================================== -->
+            <div class="admin-tab-pane" id="tab-content-clientes" style="display:none;">
+                <!-- KPIs de Clientes -->
+                <div class="admin-kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrap" style="background:rgba(52,211,153,0.15); color:#34D399;">👥</div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">Clientes Registrados</span>
+                            <h3 class="kpi-value" id="kpi-total-clientes">0</h3>
+                            <small class="kpi-sub">Cuentas con GraniClub</small>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrap" style="background:rgba(255,183,3,0.15); color:#FFB703;">🌟</div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">Puntos en Circulación</span>
+                            <h3 class="kpi-value" id="kpi-total-puntos-circulacion">0</h3>
+                            <small class="kpi-sub">GraniPoints acumulados</small>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrap" style="background:rgba(236,72,153,0.15); color:#EC4899;">🛒</div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">Puntos Canjeados</span>
+                            <h3 class="kpi-value" id="kpi-total-puntos-canjeados">0</h3>
+                            <small class="kpi-sub">Redimidos en compras</small>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrap" style="background:rgba(59,130,246,0.15); color:#3B82F6;">📜</div>
+                        <div class="kpi-info">
+                            <span class="kpi-title">Total Movimientos</span>
+                            <h3 class="kpi-value" id="kpi-total-transacciones">0</h3>
+                            <small class="kpi-sub">Juegos, compras y canjes</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Clientes -->
+                <div class="admin-section-card">
+                    <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.15); padding-bottom:14px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div>
+                            <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                <span>👥</span> Directorio de Clientes &amp; GraniPoints
+                            </h3>
+                            <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                Consulta sus saldos, historial de dinamicas y ajusta puntos de forma manual.
+                            </p>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <input type="text" id="admin-busqueda-clientes" class="form-control" placeholder="🔍 Buscar por nombre o WhatsApp..." style="width:260px; font-size:0.85rem;" oninput="filtrarClientesAdmin()">
+                        </div>
+                    </div>
+
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>WhatsApp / Teléfono</th>
+                                    <th>Saldo GraniPoints</th>
+                                    <th>Giros / Raspas Extras</th>
+                                    <th>Fecha Registro</th>
+                                    <th style="text-align:center;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-clientes-body">
+                                <tr>
+                                    <td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Cargando clientes...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================
+                 PESTAÑA 8: CONFIGURACIÓN DE DINÁMICAS (RULETA & RASPA Y GANA)
+                 ========================================================== -->
+            <div class="admin-tab-pane" id="tab-content-juegos" style="display:none;">
+                <form id="form-config-juegos" onsubmit="guardarConfigJuegosAdmin(event)">
+                    <div class="admin-section-card" style="margin-bottom:24px;">
+                        <div class="admin-section-header" style="border-bottom:1px solid rgba(255,183,3,0.2); padding-bottom:12px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                    <span>🎮</span> Control Maestro de Dinámicas &amp; GraniPoints
+                                </h3>
+                                <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                    Activa o pausa las dinámicas, ajusta las reglas de acumulación y define el valor del canje.
+                                </p>
+                            </div>
+                            <button type="submit" class="cta" style="padding:10px 22px; font-size:0.88rem; font-weight:800; border-radius:10px; cursor:pointer;">
+                                <span>💾</span> Guardar Cambios
+                            </button>
+                        </div>
+
+                        <!-- Switches y Reglas Generales -->
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:20px;">
+                            <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px;">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#FFFFFF; font-weight:700;">
+                                    <input type="checkbox" id="cfg-ruleta-activa" style="width:20px; height:20px; accent-color:#10B981;">
+                                    <span>🎡 Ruleta Glacial Activa</span>
+                                </label>
+                                <small style="display:block; margin-top:6px; color:var(--mut); font-size:0.75rem;">Permite a los clientes girar la ruleta.</small>
+                            </div>
+
+                            <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px;">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#FFFFFF; font-weight:700;">
+                                    <input type="checkbox" id="cfg-raspa-activo" style="width:20px; height:20px; accent-color:#10B981;">
+                                    <span>🎫 Raspa y Gana Activo</span>
+                                </label>
+                                <small style="display:block; margin-top:6px; color:var(--mut); font-size:0.75rem;">Permite raspar tarjetas glaciales.</small>
+                            </div>
+
+                            <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px;">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#FFFFFF; font-weight:700;">
+                                    <input type="checkbox" id="cfg-puntos-por-compra" style="width:20px; height:20px; accent-color:#10B981;">
+                                    <span>🥤 Acumular Puntos por Compra</span>
+                                </label>
+                                <small style="display:block; margin-top:6px; color:var(--mut); font-size:0.75rem;">Otorga puntos según el subtotal del pedido.</small>
+                            </div>
+
+                            <div style="background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:12px;">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#FFFFFF; font-weight:700;">
+                                    <input type="checkbox" id="cfg-giros-por-compra" style="width:20px; height:20px; accent-color:#10B981;">
+                                    <span>🎁 Giros Extra por Cada Compra</span>
+                                </label>
+                                <small style="display:block; margin-top:6px; color:var(--mut); font-size:0.75rem;">Regala 1 tiro y 1 raspa adicional por pedido.</small>
+                            </div>
+                        </div>
+
+                        <!-- Parámetros Numéricos -->
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label>Puntos Regalo de Bienvenida</label>
+                                <input type="number" class="form-control" id="cfg-puntos-bienvenida" min="0" step="5" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Puntos acreditados al crear la cuenta.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Pesos de Compra por 1 Punto</label>
+                                <input type="number" class="form-control" id="cfg-pesos-por-punto" min="100" step="100" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 1000 = 1 punto por cada $1.000 gastados.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor de Canje ($ COP por 1 Punto)</label>
+                                <input type="number" class="form-control" id="cfg-valor-peso-punto" min="1" step="1" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 20 = 100 puntos descuentan $2.000 COP.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Puntos Mínimos para Canjear</label>
+                                <input type="number" class="form-control" id="cfg-puntos-minimos-canje" min="10" step="10" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Mínimo requerido para aplicar descuento en checkout.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Máximo % Descuento por Puntos</label>
+                                <input type="number" class="form-control" id="cfg-max-porcentaje-descuento" min="10" max="100" step="5" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tope máximo del valor de la orden a pagar con puntos.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Intentos Gratis Diarios</label>
+                                <input type="number" class="form-control" id="cfg-intentos-gratis-diarios" min="0" max="5" step="1" required>
+                                <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tiradas gratuitas cada 24 horas por cliente.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuración de Sectores de la Ruleta -->
+                    <div class="admin-section-card" style="margin-bottom:24px;">
+                        <div class="admin-section-header" style="border-bottom:1px solid rgba(255,183,3,0.2); padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                    <span>🎡</span> Premios y Sectores de la Ruleta Glacial
+                                </h3>
+                                <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                    Ajusta los títulos, cantidad de puntos, colores neón y la probabilidad relativa de cada casilla.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-action-small btn-action-adjust" onclick="agregarSectorRuletaAdmin()">
+                                <span>➕</span> Agregar Casilla
+                            </button>
+                        </div>
+
+                        <div class="admin-table-wrap">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título Sector</th>
+                                        <th>Subtítulo</th>
+                                        <th>Tipo Premio</th>
+                                        <th>Puntos</th>
+                                        <th>Color Hex</th>
+                                        <th>Probabilidad (Peso)</th>
+                                        <th style="text-align:center;">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-admin-premios-ruleta">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Configuración de Premios Raspa y Gana -->
+                    <div class="admin-section-card" style="margin-bottom:24px;">
+                        <div class="admin-section-header" style="border-bottom:1px solid rgba(52,211,153,0.2); padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h3 style="font-size:1.15rem; color:#FFFFFF; margin:0; display:flex; align-items:center; gap:8px;">
+                                    <span>🎫</span> Premios de Raspa y Gana Glacial
+                                </h3>
+                                <p class="admin-section-subtitle" style="font-size:0.82rem; color:var(--mut); margin:4px 0 0 0;">
+                                    Premios ocultos que los clientes pueden descubrir raspando la escarcha.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-action-small btn-action-adjust" onclick="agregarPremioRaspaAdmin()">
+                                <span>➕</span> Agregar Premio
+                            </button>
+                        </div>
+
+                        <div class="admin-table-wrap">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Subtítulo</th>
+                                        <th>Icono Emoji</th>
+                                        <th>Puntos</th>
+                                        <th>Probabilidad (Peso)</th>
+                                        <th style="text-align:center;">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-admin-premios-raspa">
+                                    <!-- Dinámico -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </main>
     </div>
 </div>
@@ -1826,6 +2122,283 @@
 
         <div id="modal-ped-body" class="modal-ped-body-content">
             <!-- Inyectado dinámicamente -->
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL CLIENTE: CLUB GRANIFRESH & GRANIPOINTS
+     ========================================================== -->
+<div class="modal-overlay" id="modal-graniclub" style="z-index: 9990 !important;">
+    <div class="modal-box club-modal-box" style="max-width: 480px;">
+        <div class="modal-header">
+            <h3><span>🎁</span> Club <b>GraniPoints</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <!-- VISTA NO LOGUEADO: LOGIN / REGISTRO -->
+        <div id="club-view-auth">
+            <div class="club-tabs-nav">
+                <button type="button" class="club-tab-btn active" id="tab-auth-login" onclick="cambiarAuthTab('login')">
+                    🔑 Iniciar Sesión
+                </button>
+                <button type="button" class="club-tab-btn" id="tab-auth-registro" onclick="cambiarAuthTab('registro')">
+                    ✨ Crear Cuenta (+30 pts)
+                </button>
+            </div>
+
+            <!-- FORMULARIO LOGIN -->
+            <form id="form-cliente-login" onsubmit="loginCliente(event)">
+                <div class="form-group" style="margin-bottom:14px;">
+                    <label style="color:#FFF;">WhatsApp / Teléfono *</label>
+                    <input type="tel" class="form-control" id="cl-login-tel" required placeholder="Ej: 3013557467" autocomplete="tel">
+                </div>
+                <div class="form-group" style="margin-bottom:18px;">
+                    <label style="color:#FFF;">Contraseña *</label>
+                    <input type="password" class="form-control" id="cl-login-pass" required placeholder="Tu contraseña" autocomplete="current-password">
+                </div>
+                <button type="submit" class="cta" style="width:100%; padding:12px; font-weight:800; border-radius:12px; margin-bottom:12px;">
+                    <span>🚀</span> Entrar a Mi Cuenta
+                </button>
+                <p style="text-align:center; font-size:0.8rem; color:var(--mut); margin:0;">
+                    ¿No tienes cuenta? <a href="javascript:void(0)" onclick="cambiarAuthTab('registro')" style="color:#FFB703; font-weight:700;">Regístrate gratis</a> y gana 30 GraniPoints.
+                </p>
+            </form>
+
+            <!-- FORMULARIO REGISTRO -->
+            <form id="form-cliente-registro" style="display:none;" onsubmit="registrarCliente(event)">
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#FFF;">Nombre Completo *</label>
+                    <input type="text" class="form-control" id="cl-reg-nombre" required placeholder="Ej: María Camila" autocomplete="name">
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#FFF;">WhatsApp / Teléfono *</label>
+                    <input type="tel" class="form-control" id="cl-reg-tel" required placeholder="Ej: 3013557467" autocomplete="tel">
+                    <small style="color:var(--mut); font-size:0.75rem;">Para coordinar tus pedidos y premios.</small>
+                </div>
+                <div class="form-group" style="margin-bottom:12px;">
+                    <label style="color:#FFF;">Contraseña *</label>
+                    <input type="password" class="form-control" id="cl-reg-pass" required placeholder="Mínimo 4 caracteres" autocomplete="new-password">
+                </div>
+                <div class="form-group" style="margin-bottom:16px;">
+                    <label style="color:#FFF;">Dirección Predeterminada (Opcional)</label>
+                    <input type="text" class="form-control" id="cl-reg-dir" placeholder="Ej: Calle 45 # 23-10, Barrio Olaya">
+                    <small style="color:var(--mut); font-size:0.75rem;">Se autocompletará en tus futuros pedidos.</small>
+                </div>
+                <button type="submit" class="cta" style="width:100%; padding:12px; font-weight:800; border-radius:12px; background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; margin-bottom:12px;">
+                    <span>🎉</span> ¡Registrarme y Ganar 30 GraniPoints!
+                </button>
+            </form>
+        </div>
+
+        <!-- VISTA LOGUEADO: PERFIL DEL CLIENTE -->
+        <div id="club-view-perfil" style="display:none;">
+            <div class="club-profile-card">
+                <div class="club-avatar" id="cl-perfil-avatar">🥤</div>
+                <h3 class="club-username" id="cl-perfil-nombre">Nombre del Cliente</h3>
+                <p class="club-user-phone" id="cl-perfil-telefono">WhatsApp: +57 300 000 0000</p>
+
+                <div class="club-points-meter">
+                    <span class="meter-label">Saldo Acumulado</span>
+                    <div class="meter-value" id="cl-perfil-puntos">0</div>
+                    <span class="meter-sub" id="cl-perfil-puntos-valor">Equivale a ~$0 COP en pedidos</span>
+                </div>
+            </div>
+
+            <div class="chk-section-eyebrow" style="margin-bottom:10px;">
+                <span>🎮</span> ZONA DE DINÁMICAS &amp; MINIJUEGOS
+            </div>
+
+            <!-- Accesos a los Juegos -->
+            <div class="club-games-grid">
+                <div class="club-game-card card-ruleta" onclick="abrirRuletaGlacial()">
+                    <div class="cgc-icon">🎡</div>
+                    <h4 class="cgc-title">Ruleta Glacial</h4>
+                    <span class="cgc-badge" id="badge-giros-disp">Cargando...</span>
+                </div>
+
+                <div class="club-game-card" onclick="abrirRaspaGlacial()">
+                    <div class="cgc-icon">🎫</div>
+                    <h4 class="cgc-title">Raspa y Gana</h4>
+                    <span class="cgc-badge" id="badge-raspas-disp">Cargando...</span>
+                </div>
+            </div>
+
+            <!-- Historial de Movimientos -->
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px; margin-bottom:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <strong style="font-size:0.88rem; color:#FFF;">📜 Historial de GraniPoints</strong>
+                    <button type="button" class="btn-action-small btn-action-historial" onclick="cargarHistorialCliente()">
+                        🔄 Actualizar
+                    </button>
+                </div>
+                <div id="cl-historial-lista" style="max-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+                    <small style="color:var(--mut); text-align:center;">Cargando movimientos...</small>
+                </div>
+            </div>
+
+            <button type="button" class="btn-action-small" onclick="cerrarSesionCliente()" style="width:100%; padding:10px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; font-weight:700; border-radius:10px; justify-content:center;">
+                🚪 Cerrar Sesión de Mi Cuenta
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL DINÁMICA 1: RULETA GLACIAL INTERACTIVA
+     ========================================================== -->
+<div class="modal-overlay" id="modal-ruleta" style="z-index: 9992 !important;">
+    <div class="modal-box club-modal-box" style="max-width: 440px; text-align:center;">
+        <div class="modal-header">
+            <h3><span>🎡</span> Ruleta <b>Glacial Sub-Cero</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <p style="font-size:0.84rem; color:var(--mut); margin:0 0 14px 0;">
+            ¡Prueba tu suerte! Gira la ruleta y acumula GraniPoints para tus granizados.
+        </p>
+
+        <div class="ruleta-container">
+            <div class="ruleta-wheel-wrap">
+                <div class="ruleta-needle"></div>
+                <canvas id="canvas-ruleta" width="320" height="320"></canvas>
+                <div class="ruleta-center-pin">❄️</div>
+            </div>
+
+            <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:14px 36px; font-size:1.1rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(255,183,3,0.4); background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; cursor:pointer;">
+                🌀 ¡GIRAR RULETA!
+            </button>
+
+            <div style="margin-top:12px; font-size:0.82rem; color:#A7F3D0;" id="ruleta-intentos-txt">
+                Giros disponibles: 1
+            </div>
+
+            <!-- Caja de Resultado -->
+            <div class="game-result-box" id="ruleta-result-box" style="display:none; width:100%; max-width:320px;">
+                <div style="font-size:2.4rem;" id="ruleta-res-icon">🎉</div>
+                <h3 style="color:#FFB703; margin:6px 0;" id="ruleta-res-title">¡+25 GraniPoints!</h3>
+                <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="ruleta-res-desc">¡Sumados a tu cuenta con éxito!</p>
+                <button type="button" class="cta" onclick="continuarDespuesDeRuleta()" style="padding:8px 20px; font-size:0.85rem; border-radius:8px;">
+                    ¡Genial! ➔
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL DINÁMICA 2: RASPA Y GANA GLACIAL INTERACTIVO
+     ========================================================== -->
+<div class="modal-overlay" id="modal-raspa" style="z-index: 9992 !important;">
+    <div class="modal-box club-modal-box" style="max-width: 440px; text-align:center;">
+        <div class="modal-header">
+            <h3><span>🎫</span> Raspa y Gana <b>Glacial</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <p style="font-size:0.84rem; color:var(--mut); margin:0 0 14px 0;">
+            Pasa el dedo o el mouse sobre la capa de escarcha para raspar y descubrir tu premio.
+        </p>
+
+        <div class="raspa-container">
+            <div class="raspa-card-frame" id="raspa-card-frame">
+                <!-- Premio oculto debajo -->
+                <div class="raspa-under-prize" id="raspa-under-prize">
+                    <div class="raspa-under-icon" id="raspa-icon">🍓</div>
+                    <h3 class="raspa-under-title" id="raspa-title">+30 GraniPoints</h3>
+                    <p class="raspa-under-sub" id="raspa-sub">¡Fruta 100% natural!</p>
+                </div>
+                <!-- Lienzo de escarcha para raspar -->
+                <canvas id="canvas-raspa" width="310" height="220"></canvas>
+            </div>
+
+            <div style="font-size:0.82rem; color:#A7F3D0; margin-bottom:12px;" id="raspa-intentos-txt">
+                Raspas disponibles: 1
+            </div>
+
+            <!-- Caja de Resultado Raspa -->
+            <div class="game-result-box" id="raspa-result-box" style="display:none; width:100%; max-width:310px;">
+                <h3 style="color:#FFB703; margin:4px 0;" id="raspa-res-title">¡Premio Descubierto!</h3>
+                <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="raspa-res-desc">Puntos sumados a tu perfil.</p>
+                <button type="button" class="cta" onclick="continuarDespuesDeRaspa()" style="padding:8px 20px; font-size:0.85rem; border-radius:8px;">
+                    Continuar ➔
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL ADMIN: AJUSTAR PUNTOS DE CLIENTE MANUALMENTE
+     ========================================================== -->
+<div class="modal-overlay" id="modal-admin-ajustar-puntos" style="z-index: 9995 !important;">
+    <div class="modal-box" style="max-width: 440px;">
+        <div class="modal-header">
+            <h3><span>⚙️</span> Ajustar <b>GraniPoints</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <form id="form-admin-ajustar-puntos" onsubmit="guardarAjustePuntosAdmin(event)">
+            <input type="hidden" id="adm-ajuste-cliente-id">
+            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:10px; margin-bottom:14px;">
+                <div style="font-size:0.82rem; color:var(--mut);">Cliente Seleccionado:</div>
+                <strong style="font-size:1.05rem; color:#FFF;" id="adm-ajuste-cliente-nombre">Cliente</strong>
+                <div style="font-size:0.85rem; color:#FFB703;" id="adm-ajuste-cliente-saldo">Saldo actual: 0 pts</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+                <label>Tipo de Operación *</label>
+                <select class="form-control" id="adm-ajuste-operacion">
+                    <option value="SUMAR">➕ Sumar GraniPoints (Regalo / Fidelidad)</option>
+                    <option value="RESTAR">➖ Restar GraniPoints (Corrección / Canje manual)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:12px;">
+                <label>Cantidad de Puntos *</label>
+                <input type="number" class="form-control" id="adm-ajuste-cantidad" min="1" step="1" required placeholder="Ej: 50">
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+                <label>Motivo o Nota del Administrador</label>
+                <input type="text" class="form-control" id="adm-ajuste-motivo" placeholder="Ej: Bonificación especial por fidelidad">
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="btn-action-small" onclick="cerrarModales()" style="padding:10px 16px;">Cancelar</button>
+                <button type="submit" class="cta" style="padding:10px 20px; font-weight:800; border-radius:10px;">
+                    <span>💾</span> Guardar Ajuste
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ==========================================================
+     MODAL ADMIN: HISTORIAL DE TRANSACCIONES DE UN CLIENTE
+     ========================================================== -->
+<div class="modal-overlay" id="modal-admin-historial-puntos" style="z-index: 9995 !important;">
+    <div class="modal-box modal-box-large">
+        <div class="modal-header">
+            <h3><span>📜</span> Movimientos de <b id="adm-historial-cliente-nombre" style="color:var(--cy);">Cliente</b></h3>
+            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
+        </div>
+
+        <div class="admin-table-wrap" style="max-height:400px; overflow-y:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo Operación</th>
+                        <th>Puntos</th>
+                        <th>Saldo Posterior</th>
+                        <th>Motivo / Orden</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-admin-historial-body">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

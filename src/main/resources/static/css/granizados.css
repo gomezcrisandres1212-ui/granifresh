@@ -5328,3 +5328,449 @@ footer {
   0% { opacity: 0.7; }
   100% { opacity: 1; }
 }
+
+/* ==========================================================
+   GRANIPOINTS & DINÁMICAS (RULETA & RASPA Y GANA GLACIAL)
+   ========================================================== */
+
+/* Botón Navbar Club GraniPoints */
+.nav-club-btn {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.18), rgba(251, 133, 0, 0.28));
+  border: 1px solid rgba(255, 183, 3, 0.5);
+  color: #FFB703;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 16px rgba(255, 183, 3, 0.2);
+}
+.nav-club-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.3), rgba(251, 133, 0, 0.45));
+  border-color: #FFB703;
+  color: #FFFFFF;
+  box-shadow: 0 0 24px rgba(255, 183, 3, 0.45);
+  transform: translateY(-2px);
+}
+.badge-points {
+  background: #FFB703;
+  color: #051A10;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.5px;
+}
+
+/* Teaser Banner en Hero */
+.hero-granipoints-banner {
+  margin-top: 18px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(255, 183, 3, 0.15));
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  border-radius: 16px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(8px);
+  max-width: 650px;
+}
+.hero-granipoints-banner:hover {
+  border-color: #FFB703;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(255, 183, 3, 0.25));
+  box-shadow: 0 6px 24px rgba(255, 183, 3, 0.25);
+  transform: translateY(-2px);
+}
+.hgb-sparkle {
+  font-size: 1.8rem;
+  animation: floatSparkle 2s ease-in-out infinite alternate;
+}
+.hgb-text {
+  font-size: 0.88rem;
+  color: #E2E8F0;
+  line-height: 1.4;
+  flex: 1;
+}
+.hgb-text b {
+  color: #FFB703;
+}
+.hgb-action {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 6px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+@keyframes floatSparkle {
+  0% { transform: scale(0.9) rotate(0deg); }
+  100% { transform: scale(1.15) rotate(15deg); }
+}
+
+/* Modales Glaciales del Club & Juegos */
+.club-modal-box {
+  background: radial-gradient(circle at 50% 0%, #0F3826, #051A10 80%) !important;
+  border: 1px solid rgba(52, 211, 153, 0.35) !important;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.2) !important;
+  color: #F8FAFC !important;
+}
+
+/* Pestañas de Login / Registro */
+.club-tabs-nav {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.club-tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--mut);
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.club-tab-btn.active {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF;
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+}
+
+/* Tarjeta Perfil GraniClub */
+.club-profile-card {
+  background: rgba(11, 40, 26, 0.6);
+  border: 1px solid rgba(255, 183, 3, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+.club-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFB703, #FB8500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 12px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+}
+.club-username {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+}
+.club-user-phone {
+  font-size: 0.85rem;
+  color: var(--mut);
+  margin: 4px 0 16px;
+}
+.club-points-meter {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 183, 3, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.club-points-meter .meter-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #94BAA5;
+  font-weight: 800;
+}
+.club-points-meter .meter-value {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #FFB703;
+  text-shadow: 0 0 25px rgba(255, 183, 3, 0.5);
+  line-height: 1.1;
+  margin: 4px 0;
+}
+.club-points-meter .meter-sub {
+  font-size: 0.82rem;
+  color: #34D399;
+}
+
+/* Botones de Juegos en Perfil */
+.club-games-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.club-game-card {
+  background: rgba(11, 40, 26, 0.7);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.club-game-card:hover {
+  transform: translateY(-4px);
+  border-color: #34D399;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+}
+.club-game-card.card-ruleta:hover {
+  border-color: #FFB703;
+  box-shadow: 0 8px 24px rgba(255, 183, 3, 0.3);
+}
+.cgc-icon {
+  font-size: 2.4rem;
+  margin-bottom: 8px;
+}
+.cgc-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0 0 4px;
+}
+.cgc-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 99px;
+  display: inline-block;
+  background: rgba(52, 211, 153, 0.2);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+.cgc-badge.available {
+  background: rgba(255, 183, 3, 0.2);
+  color: #FFB703;
+  border-color: rgba(255, 183, 3, 0.4);
+  animation: pulseBadge 1.2s infinite alternate;
+}
+@keyframes pulseBadge {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.04); }
+}
+
+/* Contenedor de la Ruleta */
+.ruleta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 10px 0;
+}
+.ruleta-wheel-wrap {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  max-width: 90vw;
+  max-height: 90vw;
+  margin: 0 auto 20px;
+}
+.ruleta-needle {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 28px solid #FFB703;
+  z-index: 10;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+#canvas-ruleta {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 183, 3, 0.3);
+  border: 4px solid #FFB703;
+  background: #020C07;
+}
+.ruleta-center-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFB703, #FB8500);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Contenedor del Raspa y Gana */
+.raspa-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+}
+.raspa-card-frame {
+  position: relative;
+  width: 310px;
+  height: 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(52, 211, 153, 0.3);
+  border: 3px solid #34D399;
+  background: radial-gradient(circle at center, #0F3826, #051A10);
+  margin-bottom: 16px;
+  user-select: none;
+  touch-action: none;
+}
+.raspa-under-prize {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  z-index: 1;
+}
+.raspa-under-icon {
+  font-size: 3.2rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+.raspa-under-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #FFB703;
+  margin: 0;
+  text-shadow: 0 0 15px rgba(255, 183, 3, 0.5);
+}
+.raspa-under-sub {
+  font-size: 0.85rem;
+  color: #A7F3D0;
+  margin-top: 4px;
+}
+#canvas-raspa {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: crosshair;
+}
+
+/* Modal Resultado Ganador */
+.game-result-box {
+  background: rgba(5, 26, 16, 0.95);
+  border: 2px solid #FFB703;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 16px;
+  animation: popResult 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 30px rgba(255, 183, 3, 0.3);
+}
+@keyframes popResult {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Checkout GraniPoints Card */
+.checkout-granipoints-card {
+  background: rgba(11, 40, 26, 0.7);
+  border: 1px solid rgba(255, 183, 3, 0.4);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.cgc-header {
+  font-size: 0.92rem;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cgc-header b {
+  color: #FFB703;
+}
+.cgc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.86rem;
+  color: #E2E8F0;
+  cursor: pointer;
+  user-select: none;
+}
+.cgc-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #10B981;
+  cursor: pointer;
+}
+
+/* Tablas y Formularios Admin Clientes & Juegos */
+.admin-badge-granipoints {
+  background: rgba(255, 183, 3, 0.15);
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  color: #FFB703;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+}
+.btn-action-small {
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.btn-action-adjust {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.btn-action-adjust:hover {
+  background: #10B981;
+  color: #FFFFFF;
+}
+.btn-action-historial {
+  background: rgba(255, 183, 3, 0.15);
+  color: #FFB703;
+  border: 1px solid rgba(255, 183, 3, 0.35);
+}
+.btn-action-historial:hover {
+  background: #FFB703;
+  color: #051A10;
+}

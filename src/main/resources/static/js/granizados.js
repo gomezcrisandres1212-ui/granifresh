@@ -877,12 +877,25 @@
     var subtotal = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
     var count = cart.reduce(function (a, b) { return a + (b.qty || 1); }, 0);
     var costoEnvio = checkoutState.metodoEntrega === "DOMICILIO" ? checkoutState.costoEnvio : 0;
-    var total = subtotal + costoEnvio;
+
+    var descPuntos = (window.GraniClubState && window.GraniClubState.descuentoCalculado) || 0;
+    var total = Math.max(0, (subtotal - descPuntos) + costoEnvio);
 
     var elSub = $("#checkout-subtotal-val");
     if (elSub) elSub.textContent = fmt(subtotal);
     var elStep1Sub = $("#chk-step1-subtotal");
     if (elStep1Sub) elStep1Sub.textContent = fmt(subtotal);
+
+    var elDescRow = $("#chk-row-descuento-puntos");
+    var elDescVal = $("#checkout-descuento-puntos-val");
+    if (elDescRow && elDescVal) {
+      if (descPuntos > 0) {
+        elDescRow.style.display = "flex";
+        elDescVal.textContent = "-" + fmt(descPuntos);
+      } else {
+        elDescRow.style.display = "none";
+      }
+    }
 
     var elTotal = $("#checkout-total-val");
     if (elTotal) elTotal.textContent = fmt(total);
@@ -958,6 +971,7 @@
 
     // Si entra al paso 3, refrescar cuentas bancarias e importe total en la guía
     if (paso === 3) {
+      if (window.sincronizarCheckoutGraniPoints) window.sincronizarCheckoutGraniPoints();
       var esEfectivo = checkoutState.metodoPago === "EFECTIVO";
       var guideTrans = $("#chk-steps-transferencia");
       var guideCash = $("#chk-steps-efectivo");
@@ -1067,6 +1081,16 @@
     if (dirPickupEl && rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) {
       dirPickupEl.textContent = "Recoge inmediatamente sin costo en " + rawCatalog.configuracion.direccionSede + ".";
     }
+
+    if (window.GraniClubState && window.GraniClubState.cliente) {
+      var cl = window.GraniClubState.cliente;
+      var elN = $("#checkout-nombre"); if (elN && !elN.value) elN.value = cl.nombre || "";
+      var elT = $("#checkout-telefono"); if (elT && !elT.value) elT.value = cl.telefono || "";
+      var elD = $("#checkout-direccion"); if (elD && !elD.value && cl.direccionPredeterminada) elD.value = cl.direccionPredeterminada;
+      var elB = $("#checkout-barrio"); if (elB && !elB.value && cl.barrioPredeterminado) elB.value = cl.barrioPredeterminado;
+      var elI = $("#checkout-indicaciones"); if (elI && !elI.value && cl.indicacionesPredeterminadas) elI.value = cl.indicacionesPredeterminadas;
+    }
+
     irAPasoCheckout(pasoInicial || 1);
     var modal = $("#modal-checkout");
     if (modal) modal.classList.add("active");
@@ -1088,7 +1112,11 @@
     var costoEnvio = isDom
       ? ((rawCatalog.configuracion && rawCatalog.configuracion.costoEnvioBase) || 5000)
       : 0;
-    var total = subtotal + costoEnvio;
+
+    var descPuntos = (window.GraniClubState && window.GraniClubState.descuentoCalculado) || 0;
+    var puntosUsados = (window.GraniClubState && window.GraniClubState.puntosAUsar) || 0;
+    var clienteId = (window.GraniClubState && window.GraniClubState.cliente && window.GraniClubState.cliente.id) || null;
+    var total = Math.max(0, (subtotal - descPuntos) + costoEnvio);
 
     var dirSede = (rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) || "el local comercial";
     var dirFinal = isDom
@@ -1103,6 +1131,9 @@
       barrio: isDom ? "Domicilio Express" : "Recogida Local",
       indicaciones: $("#checkout-indicaciones").value.trim() + (!isDom ? " [RECOGIDA EN LOCAL FÍSICO]" : ""),
       metodoPago: checkoutState.metodoPago,
+      clienteId: clienteId,
+      puntosUsados: puntosUsados,
+      descuentoPuntos: descPuntos,
       subtotal: subtotal,
       costoEnvio: costoEnvio,
       total: total,
@@ -1139,6 +1170,15 @@
       cart = [];
       upd();
       localStorage.removeItem("frost_cart");
+
+      // Resetear canje de puntos
+      if (window.GraniClubState) {
+        window.GraniClubState.puntosAUsar = 0;
+        window.GraniClubState.descuentoCalculado = 0;
+      }
+      if (window.recargarPerfilClienteSiExiste) {
+        window.recargarPerfilClienteSiExiste();
+      }
 
       // Cerrar Checkout
       $("#modal-checkout").classList.remove("active");
@@ -1488,6 +1528,764 @@
     });
   }
 
+  // ==========================================================
+  // 16. CLUB GRANIPOINTS & DINÁMICAS (RULETA & RASPA Y GANA)
+  // ==========================================================
+  var GraniClubState = {
+    token: localStorage.getItem("granifresh_cliente_token") || null,
+    cliente: null,
+    configPublica: null,
+    estadoJuegos: null,
+    puntosAUsar: 0,
+    descuentoCalculado: 0,
+    ruletaGirando: false,
+    ruletaAnguloActual: 0,
+    raspaPremioActual: null,
+    raspaCompletado: false
+  };
+  window.GraniClubState = GraniClubState;
+
+  async function cargarConfigPublicaJuegos() {
+    try {
+      var res = await fetch("/api/cliente/config-publica");
+      if (res.ok) {
+        GraniClubState.configPublica = await res.json();
+      }
+    } catch (e) {
+      console.warn("No se pudo cargar la config pública de juegos:", e);
+    }
+  }
+
+  async function inicializarGraniClub() {
+    await cargarConfigPublicaJuegos();
+
+    // Eventos de botones abrir club
+    var btnClub = document.getElementById("btn-open-graniclub");
+    if (btnClub) btnClub.addEventListener("click", abrirModalGraniClub);
+
+    var bannerHero = document.getElementById("hero-granipoints-banner");
+    if (bannerHero) bannerHero.addEventListener("click", abrirModalGraniClub);
+
+    if (GraniClubState.token) {
+      try {
+        var res = await fetch("/api/cliente/perfil", {
+          headers: { "Authorization": "Bearer " + GraniClubState.token }
+        });
+        if (res.ok) {
+          GraniClubState.cliente = await res.json();
+          actualizarUIPerfilCliente();
+        } else {
+          // Token inválido o expirado
+          GraniClubState.token = null;
+          GraniClubState.cliente = null;
+          localStorage.removeItem("granifresh_cliente_token");
+          actualizarUIPerfilCliente();
+        }
+      } catch (err) {
+        console.warn("Error al verificar perfil cliente:", err);
+      }
+    } else {
+      actualizarUIPerfilCliente();
+    }
+  }
+  window.inicializarGraniClub = inicializarGraniClub;
+  window.recargarPerfilClienteSiExiste = inicializarGraniClub;
+
+  function actualizarUIPerfilCliente() {
+    var cl = GraniClubState.cliente;
+    var badgeNav = document.getElementById("nav-points-badge");
+    var labelNav = document.getElementById("nav-club-label");
+    var viewAuth = document.getElementById("club-view-auth");
+    var viewPerfil = document.getElementById("club-view-perfil");
+
+    if (cl) {
+      if (labelNav) {
+        var primNombre = cl.nombre ? cl.nombre.split(" ")[0] : "Mi Perfil";
+        labelNav.textContent = primNombre;
+      }
+      if (badgeNav) {
+        badgeNav.style.display = "inline-block";
+        badgeNav.textContent = (cl.granipoints || 0).toLocaleString("es-CO") + " pts";
+      }
+
+      if (viewAuth) viewAuth.style.display = "none";
+      if (viewPerfil) viewPerfil.style.display = "block";
+
+      var elNom = document.getElementById("cl-perfil-nombre");
+      if (elNom) elNom.textContent = cl.nombre || "Cliente";
+
+      var elTel = document.getElementById("cl-perfil-telefono");
+      if (elTel) elTel.textContent = "WhatsApp: +57 " + (cl.telefono || "");
+
+      var elPts = document.getElementById("cl-perfil-puntos");
+      if (elPts) elPts.textContent = (cl.granipoints || 0).toLocaleString("es-CO");
+
+      var elPtsVal = document.getElementById("cl-perfil-puntos-valor");
+      if (elPtsVal) {
+        var valPunto = (GraniClubState.configPublica && GraniClubState.configPublica.valorPesosPorPunto) || 20;
+        var equiv = (cl.granipoints || 0) * valPunto;
+        elPtsVal.textContent = "Equivale a ~" + fmt(equiv) + " COP en pedidos";
+      }
+
+      refrescarEstadoJuegosCliente();
+
+    } else {
+      if (labelNav) labelNav.textContent = "GraniPoints";
+      if (badgeNav) badgeNav.style.display = "none";
+      if (viewAuth) viewAuth.style.display = "block";
+      if (viewPerfil) viewPerfil.style.display = "none";
+    }
+  }
+
+  async function refrescarEstadoJuegosCliente() {
+    if (!GraniClubState.token) return;
+    try {
+      var res = await fetch("/api/cliente/juegos/estado", {
+        headers: { "Authorization": "Bearer " + GraniClubState.token }
+      });
+      if (res.ok) {
+        var est = await res.json();
+        GraniClubState.estadoJuegos = est;
+
+        var bRul = document.getElementById("badge-giros-disp");
+        if (bRul) {
+          var totG = est.totalGirosDisponibles || 0;
+          bRul.textContent = totG > 0 ? (totG + " disponible" + (totG > 1 ? "s" : "")) : "0 giros hoy";
+          bRul.className = "cgc-badge" + (totG > 0 ? " available" : "");
+        }
+
+        var bRas = document.getElementById("badge-raspas-disp");
+        if (bRas) {
+          var totR = est.totalRaspasDisponibles || 0;
+          bRas.textContent = totR > 0 ? (totR + " disponible" + (totR > 1 ? "s" : "")) : "0 raspas hoy";
+          bRas.className = "cgc-badge" + (totR > 0 ? " available" : "");
+        }
+      }
+    } catch (e) {
+      console.warn("Error al cargar estado de juegos:", e);
+    }
+  }
+
+  window.abrirModalGraniClub = function () {
+    var modal = document.getElementById("modal-graniclub");
+    if (modal) modal.classList.add("active");
+    if (GraniClubState.cliente) {
+      actualizarUIPerfilCliente();
+      cargarHistorialCliente();
+    }
+  };
+
+  window.cambiarAuthTab = function (tab) {
+    var btnL = document.getElementById("tab-auth-login");
+    var btnR = document.getElementById("tab-auth-registro");
+    var formL = document.getElementById("form-cliente-login");
+    var formR = document.getElementById("form-cliente-registro");
+
+    if (tab === "registro") {
+      if (btnL) btnL.classList.remove("active");
+      if (btnR) btnR.classList.add("active");
+      if (formL) formL.style.display = "none";
+      if (formR) formR.style.display = "block";
+    } else {
+      if (btnR) btnR.classList.remove("active");
+      if (btnL) btnL.classList.add("active");
+      if (formR) formR.style.display = "none";
+      if (formL) formL.style.display = "block";
+    }
+  };
+
+  window.registrarCliente = async function (e) {
+    e.preventDefault();
+    var nombre = document.getElementById("cl-reg-nombre").value.trim();
+    var telefono = document.getElementById("cl-reg-tel").value.trim();
+    var contrasena = document.getElementById("cl-reg-pass").value;
+    var direccion = document.getElementById("cl-reg-dir").value.trim();
+
+    try {
+      var res = await fetch("/api/cliente/auth/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre: nombre, telefono: telefono, contrasena: contrasena, direccion: direccion })
+      });
+      var data = await res.json();
+      if (!res.ok || !data.exito) {
+        window.showToast(data.mensaje || "Error al crear la cuenta", "error");
+        return;
+      }
+
+      GraniClubState.token = data.token;
+      GraniClubState.cliente = data.cliente;
+      localStorage.setItem("granifresh_cliente_token", data.token);
+
+      window.showToast("¡Bienvenido al Club GraniPoints! 🎉 Has recibido 30 puntos de regalo.", "success");
+      lanzarConfetiCelebracion();
+      actualizarUIPerfilCliente();
+
+    } catch (err) {
+      console.error("Error al registrar cliente:", err);
+      window.showToast("Error de conexión al servidor.", "error");
+    }
+  };
+
+  window.loginCliente = async function (e) {
+    e.preventDefault();
+    var telefono = document.getElementById("cl-login-tel").value.trim();
+    var contrasena = document.getElementById("cl-login-pass").value;
+
+    try {
+      var res = await fetch("/api/cliente/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ telefono: telefono, contrasena: contrasena })
+      });
+      var data = await res.json();
+      if (!res.ok || !data.exito) {
+        window.showToast(data.mensaje || "Número o contraseña incorrectos.", "error");
+        return;
+      }
+
+      GraniClubState.token = data.token;
+      GraniClubState.cliente = data.cliente;
+      localStorage.setItem("granifresh_cliente_token", data.token);
+
+      window.showToast("¡Hola de nuevo " + (data.cliente.nombre ? data.cliente.nombre.split(" ")[0] : "") + "! 🥤", "success");
+      actualizarUIPerfilCliente();
+
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err);
+      window.showToast("Error al conectar con el servidor.", "error");
+    }
+  };
+
+  window.cerrarSesionCliente = function () {
+    GraniClubState.token = null;
+    GraniClubState.cliente = null;
+    GraniClubState.puntosAUsar = 0;
+    GraniClubState.descuentoCalculado = 0;
+    localStorage.removeItem("granifresh_cliente_token");
+    actualizarUIPerfilCliente();
+    actualizarValoresTotales();
+    window.showToast("Sesión cerrada correctamente.", "info");
+  };
+
+  window.cargarHistorialCliente = async function () {
+    var cont = document.getElementById("cl-historial-lista");
+    if (!cont || !GraniClubState.token) return;
+
+    try {
+      var res = await fetch("/api/cliente/historial-puntos", {
+        headers: { "Authorization": "Bearer " + GraniClubState.token }
+      });
+      if (!res.ok) return;
+      var lista = await res.json();
+
+      if (!lista || lista.length === 0) {
+        cont.innerHTML = '<small style="color:var(--mut); text-align:center; padding:10px;">Aún no registras movimientos de puntos.</small>';
+        return;
+      }
+
+      cont.innerHTML = lista.map(function (t) {
+        var fechaStr = t.fecha ? new Date(t.fecha).toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) : "";
+        var esPos = t.puntos >= 0;
+        var ptsColor = esPos ? "#10B981" : "#EF4444";
+        var signo = esPos ? "+" : "";
+
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
+            <div>
+              <div style="font-size:0.82rem; font-weight:700; color:#FFF;">${escapeHtmlText(t.motivo || t.tipo)}</div>
+              <small style="color:var(--mut); font-size:0.72rem;">${fechaStr}</small>
+            </div>
+            <strong style="color:${ptsColor}; font-size:0.95rem;">${signo}${t.puntos}</strong>
+          </div>
+        `;
+      }).join("");
+
+    } catch (e) {
+      console.warn("Error cargando historial de puntos:", e);
+    }
+  };
+
+  // ==========================================
+  // RULETA GLACIAL INTERACTIVA
+  // ==========================================
+  window.abrirRuletaGlacial = async function () {
+    if (!GraniClubState.cliente) {
+      abrirModalGraniClub();
+      return;
+    }
+
+    await refrescarEstadoJuegosCliente();
+    var est = GraniClubState.estadoJuegos;
+    var sectores = (est && est.premiosRuleta) || (GraniClubState.configPublica && GraniClubState.configPublica.premiosRuleta) || [];
+
+    dibujarRuletaGlacial(sectores, GraniClubState.ruletaAnguloActual || 0);
+
+    var resBox = document.getElementById("ruleta-result-box");
+    if (resBox) resBox.style.display = "none";
+
+    var txtInt = document.getElementById("ruleta-intentos-txt");
+    var tot = (est && est.totalGirosDisponibles) || 0;
+    if (txtInt) txtInt.textContent = "Giros disponibles: " + tot;
+
+    var btn = document.getElementById("btn-spin-wheel");
+    if (btn) {
+      btn.disabled = tot <= 0;
+      btn.style.opacity = tot <= 0 ? "0.5" : "1";
+    }
+
+    var modal = document.getElementById("modal-ruleta");
+    if (modal) modal.classList.add("active");
+  };
+
+  function dibujarRuletaGlacial(sectores, anguloRad) {
+    var canvas = document.getElementById("canvas-ruleta");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var width = canvas.width;
+    var height = canvas.height;
+    var cx = width / 2;
+    var cy = height / 2;
+    var radius = cx - 10;
+    var numSectores = sectores.length || 8;
+    var arc = (2 * Math.PI) / numSectores;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Fondo y sombra
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(anguloRad);
+
+    for (var i = 0; i < numSectores; i++) {
+      var sAngle = i * arc;
+      var eAngle = sAngle + arc;
+      var sec = sectores[i] || {};
+
+      // Segmento
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, radius, sAngle, eAngle);
+      ctx.closePath();
+      ctx.fillStyle = sec.color || (i % 2 === 0 ? "#FFB703" : "#10B981");
+      ctx.fill();
+
+      // Borde del gajo
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(5, 26, 16, 0.6)";
+      ctx.stroke();
+
+      // Texto e Icono
+      ctx.save();
+      ctx.rotate(sAngle + arc / 2);
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#051A10";
+      ctx.font = "bold 13px sans-serif";
+      ctx.shadowColor = "rgba(255,255,255,0.4)";
+      ctx.shadowBlur = 4;
+      var tit = sec.titulo || ("+" + (sec.puntos || 10));
+      ctx.fillText(tit, radius - 24, 5);
+      ctx.restore();
+    }
+
+    ctx.restore();
+  }
+
+  window.ejecutarGiroRuleta = async function () {
+    if (GraniClubState.ruletaGirando) return;
+    var btn = document.getElementById("btn-spin-wheel");
+    if (btn) btn.disabled = true;
+
+    try {
+      var res = await fetch("/api/cliente/juegos/ruleta/girar", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + GraniClubState.token }
+      });
+      var data = await res.json();
+      if (!res.ok || !data.exito) {
+        window.showToast(data.mensaje || "No tienes más giros disponibles hoy.", "info");
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      GraniClubState.ruletaGirando = true;
+      var sectores = GraniClubState.estadoJuegos ? GraniClubState.estadoJuegos.premiosRuleta : [];
+      var numSectores = sectores.length || 8;
+      var arc = (2 * Math.PI) / numSectores;
+
+      // Calcular ángulo final para que el sector ganador quede en la aguja (arriba = 270 grados = 1.5 * PI)
+      var indiceGanador = data.indiceSector || 0;
+      var anguloSectorCentro = (indiceGanador * arc) + (arc / 2);
+      var anguloAguja = 1.5 * Math.PI;
+      var anguloDestino = (anguloAguja - anguloSectorCentro) + (Math.PI * 2 * 6); // 6 vueltas completas
+
+      var anguloInicial = GraniClubState.ruletaAnguloActual || 0;
+      var distancia = anguloDestino - (anguloInicial % (Math.PI * 2));
+      var duracion = 4200; // 4.2 segundos
+      var inicio = null;
+
+      function animar(timestamp) {
+        if (!inicio) inicio = timestamp;
+        var progreso = (timestamp - inicio) / duracion;
+
+        if (progreso < 1) {
+          // Curva cubic ease-out
+          var t = 1 - Math.pow(1 - progreso, 3);
+          var anguloActual = anguloInicial + (distancia * t);
+          dibujarRuletaGlacial(sectores, anguloActual);
+          requestAnimationFrame(animar);
+        } else {
+          GraniClubState.ruletaAnguloActual = anguloInicial + distancia;
+          dibujarRuletaGlacial(sectores, GraniClubState.ruletaAnguloActual);
+          GraniClubState.ruletaGirando = false;
+
+          // Actualizar puntos
+          if (GraniClubState.cliente) {
+            GraniClubState.cliente.granipoints = data.saldoActual;
+            actualizarUIPerfilCliente();
+          }
+
+          // Mostrar resultado
+          var resBox = document.getElementById("ruleta-result-box");
+          var resIcon = document.getElementById("ruleta-res-icon");
+          var resTitle = document.getElementById("ruleta-res-title");
+          var resDesc = document.getElementById("ruleta-res-desc");
+
+          if (resBox && resTitle && resDesc) {
+            if (resIcon) resIcon.textContent = data.premio ? (data.premio.icono || "🎉") : "🎉";
+            resTitle.textContent = data.premio ? data.premio.titulo : "¡Felicidades!";
+            resDesc.textContent = data.mensaje;
+            resBox.style.display = "block";
+          }
+
+          var txtInt = document.getElementById("ruleta-intentos-txt");
+          if (txtInt) txtInt.textContent = "Giros restantes: " + (data.intentosRestantes || 0);
+
+          if (data.puntosGanados > 0) {
+            lanzarConfetiCelebracion();
+          }
+        }
+      }
+
+      requestAnimationFrame(animar);
+
+    } catch (err) {
+      console.error("Error al girar ruleta:", err);
+      GraniClubState.ruletaGirando = false;
+      if (btn) btn.disabled = false;
+    }
+  };
+
+  window.continuarDespuesDeRuleta = function () {
+    var modal = document.getElementById("modal-ruleta");
+    if (modal) modal.classList.remove("active");
+    abrirModalGraniClub();
+  };
+
+  // ==========================================
+  // RASPA Y GANA GLACIAL INTERACTIVO
+  // ==========================================
+  window.abrirRaspaGlacial = async function () {
+    if (!GraniClubState.cliente) {
+      abrirModalGraniClub();
+      return;
+    }
+
+    await refrescarEstadoJuegosCliente();
+    var est = GraniClubState.estadoJuegos;
+    var tot = (est && est.totalRaspasDisponibles) || 0;
+
+    if (tot <= 0) {
+      window.showToast("No tienes más raspadas hoy. ¡Vuelve mañana por tu raspa gratis!", "info");
+      return;
+    }
+
+    try {
+      var res = await fetch("/api/cliente/juegos/raspa/jugar", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + GraniClubState.token }
+      });
+      var data = await res.json();
+      if (!res.ok || !data.exito) {
+        window.showToast(data.mensaje || "No se pudo iniciar la partida de raspa.", "info");
+        return;
+      }
+
+      GraniClubState.raspaPremioActual = data;
+      GraniClubState.raspaCompletado = false;
+
+      // Inyectar datos del premio debajo de la escarcha
+      var premio = data.premio || {};
+      var elIco = document.getElementById("raspa-icon");
+      if (elIco) elIco.textContent = premio.icono || "🍓";
+      var elTit = document.getElementById("raspa-title");
+      if (elTit) elTit.textContent = premio.titulo || "+25 GraniPoints";
+      var elSub = document.getElementById("raspa-sub");
+      if (elSub) elSub.textContent = premio.subtitulo || "¡Fruta natural artesanal!";
+
+      var resBox = document.getElementById("raspa-result-box");
+      if (resBox) resBox.style.display = "none";
+
+      var txtInt = document.getElementById("raspa-intentos-txt");
+      if (txtInt) txtInt.textContent = "Raspas restantes: " + (data.intentosRestantes || 0);
+
+      prepararCanvasRaspa();
+
+      var modal = document.getElementById("modal-raspa");
+      if (modal) modal.classList.add("active");
+
+    } catch (err) {
+      console.error("Error al preparar raspa:", err);
+      window.showToast("Error de conexión al servidor.", "error");
+    }
+  };
+
+  function prepararCanvasRaspa() {
+    var canvas = document.getElementById("canvas-raspa");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var w = canvas.width;
+    var h = canvas.height;
+
+    ctx.globalCompositeOperation = "source-over";
+
+    // Textura de Escarcha / Hielo Plateado Glacial
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, "#94A3B8");
+    grad.addColorStop(0.3, "#E2E8F0");
+    grad.addColorStop(0.6, "#38BDF8");
+    grad.addColorStop(1, "#0284C7");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Patrón decorativo de escarcha
+    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+    for (var i = 0; i < 200; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 3 + 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "900 18px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("❄️ RASPA Y GANA AQUÍ ❄️", w / 2, h / 2 - 6);
+    ctx.font = "bold 12px sans-serif";
+    ctx.fillStyle = "#1E293B";
+    ctx.fillText("Pasa tu dedo o cursor sobre la escarcha", w / 2, h / 2 + 18);
+
+    // Eventos de raspado
+    var isRaspando = false;
+
+    function raspar(x, y) {
+      if (GraniClubState.raspaCompletado) return;
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.arc(x, y, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Chequear porcentaje raspado cada 10 raspadas
+      if (Math.random() < 0.25) {
+        verificarPorcentajeRaspado(ctx, w, h);
+      }
+    }
+
+    function getCoords(e) {
+      var rect = canvas.getBoundingClientRect();
+      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: (clientX - rect.left) * (w / rect.width),
+        y: (clientY - rect.top) * (h / rect.height)
+      };
+    }
+
+    canvas.onmousedown = function (e) { isRaspando = true; var c = getCoords(e); raspar(c.x, c.y); };
+    canvas.onmousemove = function (e) { if (isRaspando) { var c = getCoords(e); raspar(c.x, c.y); } };
+    window.onmouseup = function () { isRaspando = false; };
+
+    canvas.ontouchstart = function (e) { isRaspando = true; var c = getCoords(e); raspar(c.x, c.y); };
+    canvas.ontouchmove = function (e) { if (isRaspando) { var c = getCoords(e); raspar(c.x, c.y); } };
+    canvas.ontouchend = function () { isRaspando = false; };
+  }
+
+  function verificarPorcentajeRaspado(ctx, w, h) {
+    if (GraniClubState.raspaCompletado) return;
+    try {
+      var imgData = ctx.getImageData(0, 0, w, h);
+      var pix = imgData.data;
+      var total = pix.length / 4;
+      var transparentes = 0;
+
+      // Muestrear cada 16 pixeles para máxima fluidez
+      for (var i = 3; i < pix.length; i += 16) {
+        if (pix[i] === 0) transparentes += 4;
+      }
+
+      var ratio = transparentes / total;
+      if (ratio > 0.40) {
+        completarRaspaGlacial(ctx, w, h);
+      }
+    } catch (e) {}
+  }
+
+  function completarRaspaGlacial(ctx, w, h) {
+    GraniClubState.raspaCompletado = true;
+    ctx.clearRect(0, 0, w, h);
+
+    var data = GraniClubState.raspaPremioActual;
+    if (!data) return;
+
+    if (GraniClubState.cliente) {
+      GraniClubState.cliente.granipoints = data.saldoActual;
+      actualizarUIPerfilCliente();
+    }
+
+    var resBox = document.getElementById("raspa-result-box");
+    var resTitle = document.getElementById("raspa-res-title");
+    var resDesc = document.getElementById("raspa-res-desc");
+
+    if (resBox && resTitle && resDesc) {
+      resTitle.textContent = data.premio ? data.premio.titulo : "¡Premio Revelado!";
+      resDesc.textContent = data.mensaje;
+      resBox.style.display = "block";
+    }
+
+    if (data.puntosGanados > 0) {
+      lanzarConfetiCelebracion();
+    }
+  }
+
+  window.continuarDespuesDeRaspa = function () {
+    var modal = document.getElementById("modal-raspa");
+    if (modal) modal.classList.remove("active");
+    abrirModalGraniClub();
+  };
+
+  // ==========================================
+  // CANJE DE PUNTOS EN EL CHECKOUT
+  // ==========================================
+  window.sincronizarCheckoutGraniPoints = function () {
+    var boxLogueado = document.getElementById("co-box-cliente-logueado");
+    var boxDeslogueado = document.getElementById("co-box-cliente-deslogueado");
+    var elPuntosDisp = document.getElementById("co-puntos-disponibles-txt");
+    var chkUsar = document.getElementById("co-check-usar-puntos");
+    var slider = document.getElementById("co-slider-puntos");
+    var wrapSlider = document.getElementById("co-slider-wrap");
+
+    var cl = GraniClubState.cliente;
+    var subtotal = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
+
+    if (cl) {
+      if (boxLogueado) boxLogueado.style.display = "block";
+      if (boxDeslogueado) boxDeslogueado.style.display = "none";
+      if (elPuntosDisp) elPuntosDisp.textContent = (cl.granipoints || 0).toLocaleString("es-CO");
+
+      var cfg = GraniClubState.configPublica || {};
+      var minPuntos = cfg.puntosMinimosCanje || 50;
+      var valPunto = cfg.valorPesosPorPunto || 20;
+      var maxPorc = (cfg.maximoPorcentajeDescuentoPedido || 50) / 100.0;
+      var maxPesosDesc = subtotal * maxPorc;
+      var maxPuntosUsables = Math.floor(maxPesosDesc / valPunto);
+      var maxFinal = Math.min(cl.granipoints || 0, maxPuntosUsables);
+
+      if (maxFinal < minPuntos) {
+        if (chkUsar) {
+          chkUsar.disabled = true;
+          chkUsar.checked = false;
+        }
+        if (wrapSlider) wrapSlider.style.display = "none";
+        GraniClubState.puntosAUsar = 0;
+        GraniClubState.descuentoCalculado = 0;
+      } else {
+        if (chkUsar) chkUsar.disabled = false;
+        if (slider) {
+          slider.min = minPuntos;
+          slider.max = maxFinal;
+          slider.step = 10;
+          if (!chkUsar.checked) {
+            slider.value = minPuntos;
+          }
+        }
+      }
+    } else {
+      if (boxLogueado) boxLogueado.style.display = "none";
+      if (boxDeslogueado) boxDeslogueado.style.display = "block";
+      if (elPuntosDisp) elPuntosDisp.textContent = "0";
+      GraniClubState.puntosAUsar = 0;
+      GraniClubState.descuentoCalculado = 0;
+    }
+
+    actualizarValoresTotales();
+  };
+
+  window.toggleUsarPuntosCheckout = function () {
+    var chk = document.getElementById("co-check-usar-puntos");
+    var wrap = document.getElementById("co-slider-wrap");
+    var slider = document.getElementById("co-slider-puntos");
+
+    if (chk && chk.checked) {
+      if (wrap) wrap.style.display = "block";
+      actualizarSliderPuntosCheckout();
+    } else {
+      if (wrap) wrap.style.display = "none";
+      GraniClubState.puntosAUsar = 0;
+      GraniClubState.descuentoCalculado = 0;
+      actualizarValoresTotales();
+    }
+  };
+
+  window.actualizarSliderPuntosCheckout = function () {
+    var slider = document.getElementById("co-slider-puntos");
+    var txtPts = document.getElementById("co-puntos-cant-txt");
+    var txtDesc = document.getElementById("co-descuento-pesos-txt");
+
+    if (!slider) return;
+    var puntos = parseInt(slider.value, 10) || 0;
+    var valPunto = (GraniClubState.configPublica && GraniClubState.configPublica.valorPesosPorPunto) || 20;
+    var descPesos = puntos * valPunto;
+
+    GraniClubState.puntosAUsar = puntos;
+    GraniClubState.descuentoCalculado = descPesos;
+
+    if (txtPts) txtPts.textContent = puntos + " pts";
+    if (txtDesc) txtDesc.textContent = "-" + fmt(descPesos);
+
+    actualizarValoresTotales();
+  };
+
+  function lanzarConfetiCelebracion() {
+    var duration = 2500;
+    var end = Date.now() + duration;
+    var colors = ["#FFB703", "#10B981", "#38BDF8", "#EC4899", "#FFFFFF"];
+
+    (function frame() {
+      var canvas = document.getElementById("ambient-canvas");
+      if (canvas) {
+        var ctx = canvas.getContext("2d");
+        for (var i = 0; i < 6; i++) {
+          ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+          ctx.beginPath();
+          ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height * 0.4, Math.random() * 5 + 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  }
+
+  function escapeHtmlText(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   window.cargarCatalogoPublico = cargarCatalogo;
 
   // Inicializar
@@ -1498,5 +2296,6 @@
     loadSavedCart();
     actualizarBotonFlotanteWhatsapp();
     if (window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero();
+    if (window.inicializarGraniClub) window.inicializarGraniClub();
   });
 })();

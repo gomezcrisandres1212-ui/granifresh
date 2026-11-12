@@ -66,14 +66,18 @@ public class SecurityConfig {
                         }))
                 .authorizeHttpRequests(auth -> auth
                         // Archivos estáticos y vistas SPA
-                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**", "/favicon.ico",
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**", "/img/**", "/favicon.ico",
                                 "/error", "/ping", "/health")
                         .permitAll()
                         // APIs públicas para clientes
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Endpoints protegidos para administración
-                        .requestMatchers("/api/admin/**").authenticated()
+                        .requestMatchers("/api/cliente/auth/**").permitAll()
+                        .requestMatchers("/api/cliente/config-publica").permitAll()
+                        // Endpoints para clientes autenticados (juegos, perfil, canjes)
+                        .requestMatchers("/api/cliente/**").authenticated()
+                        // Endpoints protegidos exclusivamente para administradores
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

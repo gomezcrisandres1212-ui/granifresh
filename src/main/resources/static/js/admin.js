@@ -405,6 +405,12 @@ function cambiarPestanaAdmin(tabName) {
     else if (tabName === 'admins') {
         cargarAdministradoresAdmin();
     }
+    else if (tabName === 'clientes') {
+        cargarClientesAdmin();
+    }
+    else if (tabName === 'juegos') {
+        cargarConfigJuegosAdmin();
+    }
 }
 
 async function actualizarDatosAdmin() {
@@ -2320,3 +2326,443 @@ window.eliminarAdministradorAdmin = async function (id, usuario) {
         alert('Error al eliminar el administrador.');
     }
 };
+
+
+// ==========================================================
+// 7. GESTOR DE CLIENTES & GRANIPOINTS (ADMIN)
+// ==========================================================
+AdminState.clientes = [];
+AdminState.configJuegos = null;
+
+async function cargarClientesAdmin() {
+    try {
+        const [resClientes, resResumen] = await Promise.all([
+            fetch('/api/admin/clientes', { headers: getAuthHeaders() }),
+            fetch('/api/admin/clientes/resumen', { headers: getAuthHeaders() })
+        ]);
+
+        if (resClientes.ok) {
+            AdminState.clientes = await resClientes.json();
+            renderizarTablaClientes(AdminState.clientes);
+
+            const badgeClientes = document.getElementById('badge-nav-clientes');
+            if (badgeClientes) badgeClientes.textContent = AdminState.clientes.length;
+        }
+
+        if (resResumen.ok) {
+            const resumen = await resResumen.json();
+            const elTotCl = document.getElementById('kpi-total-clientes');
+            if (elTotCl) elTotCl.textContent = resumen.totalClientes || 0;
+            const elPtsCirc = document.getElementById('kpi-total-puntos-circulacion');
+            if (elPtsCirc) elPtsCirc.textContent = (resumen.totalPuntosCirculacion || 0).toLocaleString('es-CO');
+            const elPtsCanj = document.getElementById('kpi-total-puntos-canjeados');
+            if (elPtsCanj) elPtsCanj.textContent = (resumen.totalPuntosCanjeados || 0).toLocaleString('es-CO');
+            const elTotTrans = document.getElementById('kpi-total-transacciones');
+            if (elTotTrans) elTotTrans.textContent = resumen.totalTransacciones || 0;
+        }
+    } catch (err) {
+        console.error('Error al cargar clientes:', err);
+    }
+}
+
+function renderizarTablaClientes(clientes) {
+    const tbody = document.getElementById('tabla-clientes-body');
+    if (!tbody) return;
+
+    if (!clientes || clientes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--mut);">No se encontraron clientes registrados.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = clientes.map(c => {
+        const fechaReg = c.fechaRegistro ? new Date(c.fechaRegistro).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Reciente';
+        const extras = (c.girosExtrasDisponibles || 0) + ' giros / ' + (c.raspasExtrasDisponibles || 0) + ' raspas';
+        const pts = (c.granipoints || 0).toLocaleString('es-CO');
+
+        return `
+            <tr>
+                <td>
+                    <div style="font-weight:800; color:#FFFFFF;">${escapeHtmlAdmin(c.nombre || 'Sin nombre')}</div>
+                    <small style="color:var(--mut);">${c.direccionPredeterminada ? escapeHtmlAdmin(c.direccionPredeterminada) : 'Sin dirección guardada'}</small>
+                </td>
+                <td>
+                    <a href="https://wa.me/57${c.telefono}" target="_blank" rel="noopener noreferrer" style="color:#10B981; font-weight:700; text-decoration:none;">
+                        📱 +57 ${escapeHtmlAdmin(c.telefono || '')}
+                    </a>
+                </td>
+                <td>
+                    <span class="admin-badge-granipoints">🌟 ${pts} pts</span>
+                </td>
+                <td>
+                    <span style="font-size:0.8rem; color:#A7F3D0;">${extras}</span>
+                </td>
+                <td>
+                    <small style="color:var(--mut);">${fechaReg}</small>
+                </td>
+                <td style="text-align:center;">
+                    <div style="display:inline-flex; gap:6px;">
+                        <button type="button" class="btn-action-small btn-action-adjust" onclick="abrirModalAjustarPuntosAdmin('${c.id}')" title="Sumar o restar GraniPoints">
+                            ⚙️ Ajustar Puntos
+                        </button>
+                        <button type="button" class="btn-action-small btn-action-historial" onclick="abrirModalHistorialClienteAdmin('${c.id}')" title="Ver movimientos">
+                            📜 Historial
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+window.filtrarClientesAdmin = function () {
+    const input = document.getElementById('admin-busqueda-clientes');
+    const q = input ? input.value.trim().toLowerCase() : '';
+    if (!q) {
+        renderizarTablaClientes(AdminState.clientes);
+        return;
+    }
+    const filtrados = (AdminState.clientes || []).filter(c => {
+        const nom = (c.nombre || '').toLowerCase();
+        const tel = (c.telefono || '').toLowerCase();
+        return nom.includes(q) || tel.includes(q);
+    });
+    renderizarTablaClientes(filtrados);
+};
+
+window.abrirModalAjustarPuntosAdmin = function (clienteId) {
+    const cliente = (AdminState.clientes || []).find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    document.getElementById('adm-ajuste-cliente-id').value = cliente.id;
+    document.getElementById('adm-ajuste-cliente-nombre').textContent = cliente.nombre || 'Cliente';
+    document.getElementById('adm-ajuste-cliente-saldo').textContent = 'Saldo actual: ' + (cliente.granipoints || 0).toLocaleString('es-CO') + ' pts';
+    document.getElementById('adm-ajuste-cantidad').value = '';
+    document.getElementById('adm-ajuste-motivo').value = '';
+
+    const modal = document.getElementById('modal-admin-ajustar-puntos');
+    if (modal) modal.classList.add('active');
+};
+
+window.guardarAjustePuntosAdmin = async function (e) {
+    e.preventDefault();
+    const clienteId = document.getElementById('adm-ajuste-cliente-id').value;
+    const operacion = document.getElementById('adm-ajuste-operacion').value;
+    const cantVal = parseInt(document.getElementById('adm-ajuste-cantidad').value, 10);
+    const motivo = document.getElementById('adm-ajuste-motivo').value.trim();
+
+    if (isNaN(cantVal) || cantVal <= 0) {
+        alert('Por favor ingresa una cantidad de puntos válida mayor a cero.');
+        return;
+    }
+
+    const puntosFinales = operacion === 'RESTAR' ? -cantVal : cantVal;
+
+    try {
+        const res = await fetch(`/api/admin/clientes/${clienteId}/puntos`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ puntos: puntosFinales, motivo: motivo })
+        });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            alert(errData.error || 'Error al ajustar los puntos.');
+            return;
+        }
+
+        if (window.showToast) window.showToast('¡GraniPoints actualizados con éxito! 🌟', 'success');
+        if (window.cerrarModales) window.cerrarModales();
+        cargarClientesAdmin();
+
+    } catch (err) {
+        console.error('Error al guardar ajuste:', err);
+        alert('Error de conexión al servidor.');
+    }
+};
+
+window.abrirModalHistorialClienteAdmin = async function (clienteId) {
+    const cliente = (AdminState.clientes || []).find(c => c.id === clienteId);
+    const nom = cliente ? cliente.nombre : 'Cliente';
+    document.getElementById('adm-historial-cliente-nombre').textContent = nom;
+
+    const tbody = document.getElementById('tabla-admin-historial-body');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--mut);">Cargando historial de movimientos...</td></tr>';
+
+    const modal = document.getElementById('modal-admin-historial-puntos');
+    if (modal) modal.classList.add('active');
+
+    try {
+        const res = await fetch(`/api/admin/clientes/${clienteId}/historial`, { headers: getAuthHeaders() });
+        if (!res.ok) return;
+        const transacciones = await res.json();
+
+        if (!transacciones || transacciones.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--mut);">Este cliente no registra movimientos de puntos aún.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = transacciones.map(t => {
+            const fechaStr = t.fecha ? new Date(t.fecha).toLocaleString('es-CO') : '-';
+            const esPositivo = t.puntos >= 0;
+            const ptsColor = esPositivo ? '#10B981' : '#EF4444';
+            const ptsSigno = esPositivo ? '+' : '';
+
+            return `
+                <tr>
+                    <td><small style="color:var(--mut);">${fechaStr}</small></td>
+                    <td><span style="font-weight:700; color:#FFF;">${escapeHtmlAdmin(t.tipo || '')}</span></td>
+                    <td><b style="color:${ptsColor}; font-size:0.95rem;">${ptsSigno}${t.puntos}</b></td>
+                    <td><span class="admin-badge-granipoints">${(t.saldoPosterior || 0).toLocaleString('es-CO')} pts</span></td>
+                    <td><span style="font-size:0.82rem; color:#CBD5E1;">${escapeHtmlAdmin(t.motivo || '')}</span></td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error('Error al cargar historial:', err);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#EF4444;">Error al cargar historial.</td></tr>';
+    }
+};
+
+// ==========================================================
+// 8. CONTROL MAESTRO DE DINÁMICAS (RULETA & RASPA Y GANA)
+// ==========================================================
+async function cargarConfigJuegosAdmin() {
+    try {
+        const res = await fetch('/api/admin/juegos/config', { headers: getAuthHeaders() });
+        if (!res.ok) return;
+        const cfg = await res.json();
+        AdminState.configJuegos = cfg;
+
+        // Llenar switches
+        const chkRul = document.getElementById('cfg-ruleta-activa');
+        if (chkRul) chkRul.checked = !!cfg.ruletaActiva;
+
+        const chkRas = document.getElementById('cfg-raspa-activo');
+        if (chkRas) chkRas.checked = !!cfg.raspaActivo;
+
+        const chkComp = document.getElementById('cfg-puntos-por-compra');
+        if (chkComp) chkComp.checked = !!cfg.acumularPuntosPorCompra;
+
+        const chkGiroComp = document.getElementById('cfg-giros-por-compra');
+        if (chkGiroComp) chkGiroComp.checked = !!cfg.otorgarGirosPorCompra;
+
+        // Llenar campos numéricos
+        const elBienv = document.getElementById('cfg-puntos-bienvenida');
+        if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 30;
+
+        const elPesosPto = document.getElementById('cfg-pesos-por-punto');
+        if (elPesosPto) elPesosPto.value = cfg.pesosPorPuntoAcumulado || 1000;
+
+        const elValCanje = document.getElementById('cfg-valor-peso-punto');
+        if (elValCanje) elValCanje.value = cfg.valorPesosPorPunto || 20;
+
+        const elMinCanje = document.getElementById('cfg-puntos-minimos-canje');
+        if (elMinCanje) elMinCanje.value = cfg.puntosMinimosCanje || 50;
+
+        const elMaxDesc = document.getElementById('cfg-max-porcentaje-descuento');
+        if (elMaxDesc) elMaxDesc.value = cfg.maximoPorcentajeDescuentoPedido || 50;
+
+        const elIntGratis = document.getElementById('cfg-intentos-gratis-diarios');
+        if (elIntGratis) elIntGratis.value = cfg.intentosGratisRuletaDiarios !== undefined ? cfg.intentosGratisRuletaDiarios : 1;
+
+        // Renderizar Tablas de Premios
+        renderizarTablaPremiosRuletaAdmin(cfg.premiosRuleta || []);
+        renderizarTablaPremiosRaspaAdmin(cfg.premiosRaspa || []);
+
+    } catch (err) {
+        console.error('Error al cargar config juegos:', err);
+    }
+}
+
+function renderizarTablaPremiosRuletaAdmin(premios) {
+    const tbody = document.getElementById('tabla-admin-premios-ruleta');
+    if (!tbody) return;
+
+    tbody.innerHTML = (premios || []).map((p, idx) => `
+        <tr data-idx="${idx}">
+            <td><input type="text" class="form-control inp-rul-titulo" value="${escapeHtmlAdmin(p.titulo || '')}" style="font-size:0.85rem;" required></td>
+            <td><input type="text" class="form-control inp-rul-sub" value="${escapeHtmlAdmin(p.subtitulo || '')}" style="font-size:0.85rem;"></td>
+            <td>
+                <select class="form-control inp-rul-tipo" style="font-size:0.85rem;">
+                    <option value="PUNTOS" ${p.tipo === 'PUNTOS' ? 'selected' : ''}>Puntos Directos</option>
+                    <option value="TOPPING_GRATIS" ${p.tipo === 'TOPPING_GRATIS' ? 'selected' : ''}>Topping Gratis</option>
+                    <option value="GRANIZADO_GRATIS" ${p.tipo === 'GRANIZADO_GRATIS' ? 'selected' : ''}>Granizado Gratis</option>
+                    <option value="VACIO" ${p.tipo === 'VACIO' ? 'selected' : ''}>Sin Premio (Vacio)</option>
+                </select>
+            </td>
+            <td><input type="number" class="form-control inp-rul-puntos" value="${p.puntos || 0}" min="0" step="5" style="width:80px; font-size:0.85rem;" required></td>
+            <td><input type="color" class="form-control inp-rul-color" value="${p.color || '#FFB703'}" style="width:60px; height:36px; padding:2px; cursor:pointer;"></td>
+            <td><input type="number" class="form-control inp-rul-peso" value="${p.pesoProbabilidad || 10}" min="1" step="1" style="width:75px; font-size:0.85rem;" title="Mayor peso = mayor probabilidad"></td>
+            <td style="text-align:center;">
+                <button type="button" class="btn-action-small" onclick="quitarSectorRuletaAdmin(${idx})" style="background:rgba(239,68,68,0.2); color:#FCA5A5;">✕</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderizarTablaPremiosRaspaAdmin(premios) {
+    const tbody = document.getElementById('tabla-admin-premios-raspa');
+    if (!tbody) return;
+
+    tbody.innerHTML = (premios || []).map((p, idx) => `
+        <tr data-idx="${idx}">
+            <td><input type="text" class="form-control inp-ras-titulo" value="${escapeHtmlAdmin(p.titulo || '')}" style="font-size:0.85rem;" required></td>
+            <td><input type="text" class="form-control inp-ras-sub" value="${escapeHtmlAdmin(p.subtitulo || '')}" style="font-size:0.85rem;"></td>
+            <td><input type="text" class="form-control inp-ras-icono" value="${escapeHtmlAdmin(p.icono || '🍓')}" style="width:60px; font-size:1.1rem; text-align:center;" required></td>
+            <td><input type="number" class="form-control inp-ras-puntos" value="${p.puntos || 0}" min="0" step="5" style="width:85px; font-size:0.85rem;" required></td>
+            <td><input type="number" class="form-control inp-ras-peso" value="${p.pesoProbabilidad || 10}" min="1" step="1" style="width:80px; font-size:0.85rem;" title="Mayor peso = mayor probabilidad"></td>
+            <td style="text-align:center;">
+                <button type="button" class="btn-action-small" onclick="quitarPremioRaspaAdmin(${idx})" style="background:rgba(239,68,68,0.2); color:#FCA5A5;">✕</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+window.agregarSectorRuletaAdmin = function () {
+    if (!AdminState.configJuegos) AdminState.configJuegos = { premiosRuleta: [] };
+    if (!AdminState.configJuegos.premiosRuleta) AdminState.configJuegos.premiosRuleta = [];
+
+    AdminState.configJuegos.premiosRuleta.push({
+        id: 'rul-' + (Date.now() % 10000),
+        titulo: '+20 GraniPoints',
+        subtitulo: '¡Suma puntos!',
+        tipo: 'PUNTOS',
+        puntos: 20,
+        color: '#10B981',
+        icono: '❄️',
+        pesoProbabilidad: 20
+    });
+    renderizarTablaPremiosRuletaAdmin(AdminState.configJuegos.premiosRuleta);
+};
+
+window.quitarSectorRuletaAdmin = function (idx) {
+    if (!AdminState.configJuegos || !AdminState.configJuegos.premiosRuleta) return;
+    if (AdminState.configJuegos.premiosRuleta.length <= 3) {
+        alert('La ruleta debe tener al menos 3 sectores.');
+        return;
+    }
+    AdminState.configJuegos.premiosRuleta.splice(idx, 1);
+    renderizarTablaPremiosRuletaAdmin(AdminState.configJuegos.premiosRuleta);
+};
+
+window.agregarPremioRaspaAdmin = function () {
+    if (!AdminState.configJuegos) AdminState.configJuegos = { premiosRaspa: [] };
+    if (!AdminState.configJuegos.premiosRaspa) AdminState.configJuegos.premiosRaspa = [];
+
+    AdminState.configJuegos.premiosRaspa.push({
+        id: 'ras-' + (Date.now() % 10000),
+        titulo: '+25 GraniPoints',
+        subtitulo: '¡Fruta Glacial!',
+        tipo: 'PUNTOS',
+        puntos: 25,
+        icono: '🍉',
+        pesoProbabilidad: 20
+    });
+    renderizarTablaPremiosRaspaAdmin(AdminState.configJuegos.premiosRaspa);
+};
+
+window.quitarPremioRaspaAdmin = function (idx) {
+    if (!AdminState.configJuegos || !AdminState.configJuegos.premiosRaspa) return;
+    if (AdminState.configJuegos.premiosRaspa.length <= 2) {
+        alert('Debe haber al menos 2 premios configurados para Raspa y Gana.');
+        return;
+    }
+    AdminState.configJuegos.premiosRaspa.splice(idx, 1);
+    renderizarTablaPremiosRaspaAdmin(AdminState.configJuegos.premiosRaspa);
+};
+
+window.guardarConfigJuegosAdmin = async function (e) {
+    if (e) e.preventDefault();
+
+    // Extraer sectores de la ruleta desde la tabla
+    const filasRuleta = document.querySelectorAll('#tabla-admin-premios-ruleta tr');
+    const nuevosSectores = [];
+    filasRuleta.forEach((row, i) => {
+        const tit = row.querySelector('.inp-rul-titulo').value.trim();
+        const sub = row.querySelector('.inp-rul-sub').value.trim();
+        const tipo = row.querySelector('.inp-rul-tipo').value;
+        const pts = parseInt(row.querySelector('.inp-rul-puntos').value, 10) || 0;
+        const col = row.querySelector('.inp-rul-color').value;
+        const peso = parseInt(row.querySelector('.inp-rul-peso').value, 10) || 10;
+        nuevosSectores.push({
+            id: 'rul-' + (i + 1),
+            titulo: tit,
+            subtitulo: sub,
+            tipo: tipo,
+            puntos: pts,
+            color: col,
+            icono: '❄️',
+            pesoProbabilidad: peso
+        });
+    });
+
+    // Extraer premios de raspa desde la tabla
+    const filasRaspa = document.querySelectorAll('#tabla-admin-premios-raspa tr');
+    const nuevosPremiosRaspa = [];
+    filasRaspa.forEach((row, i) => {
+        const tit = row.querySelector('.inp-ras-titulo').value.trim();
+        const sub = row.querySelector('.inp-ras-sub').value.trim();
+        const ico = row.querySelector('.inp-ras-icono').value.trim() || '🍓';
+        const pts = parseInt(row.querySelector('.inp-ras-puntos').value, 10) || 0;
+        const peso = parseInt(row.querySelector('.inp-ras-peso').value, 10) || 10;
+        nuevosPremiosRaspa.push({
+            id: 'ras-' + (i + 1),
+            titulo: tit,
+            subtitulo: sub,
+            tipo: pts > 0 ? 'PUNTOS' : 'VACIO',
+            puntos: pts,
+            color: '#10B981',
+            icono: ico,
+            pesoProbabilidad: peso
+        });
+    });
+
+    const payload = {
+        ruletaActiva: document.getElementById('cfg-ruleta-activa').checked,
+        raspaActivo: document.getElementById('cfg-raspa-activo').checked,
+        acumularPuntosPorCompra: document.getElementById('cfg-puntos-por-compra').checked,
+        otorgarGirosPorCompra: document.getElementById('cfg-giros-por-compra').checked,
+        puntosBienvenidaRegistro: parseInt(document.getElementById('cfg-puntos-bienvenida').value, 10) || 30,
+        pesosPorPuntoAcumulado: parseInt(document.getElementById('cfg-pesos-por-punto').value, 10) || 1000,
+        valorPesosPorPunto: parseFloat(document.getElementById('cfg-valor-peso-punto').value) || 20,
+        puntosMinimosCanje: parseInt(document.getElementById('cfg-puntos-minimos-canje').value, 10) || 50,
+        maximoPorcentajeDescuentoPedido: parseInt(document.getElementById('cfg-max-porcentaje-descuento').value, 10) || 50,
+        intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios').value, 10) || 1,
+        intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios').value, 10) || 1,
+        canjePuntosHabilitado: true,
+        premiosRuleta: nuevosSectores,
+        premiosRaspa: nuevosPremiosRaspa
+    };
+
+    try {
+        const res = await fetch('/api/admin/juegos/config', {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            alert('Error al guardar configuración de juegos.');
+            return;
+        }
+
+        const guardado = await res.json();
+        AdminState.configJuegos = guardado;
+        if (window.showToast) window.showToast('¡Configuración de GraniPoints y Dinámicas guardada! 🎮', 'success');
+
+    } catch (err) {
+        console.error('Error al guardar config juegos:', err);
+        alert('Error al comunicarse con el servidor.');
+    }
+};
+
+function escapeHtmlAdmin(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}

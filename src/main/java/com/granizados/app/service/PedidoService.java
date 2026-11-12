@@ -1,10 +1,16 @@
 package com.granizados.app.service;
 
+import com.granizados.app.model.Cliente;
+import com.granizados.app.model.ConfiguracionJuegos;
 import com.granizados.app.model.ConfiguracionNegocio;
 import com.granizados.app.model.ItemPedido;
 import com.granizados.app.model.Pedido;
+import com.granizados.app.model.TransaccionPuntos;
+import com.granizados.app.repository.ClienteRepository;
+import com.granizados.app.repository.ConfiguracionJuegosRepository;
 import com.granizados.app.repository.ConfiguracionNegocioRepository;
 import com.granizados.app.repository.PedidoRepository;
+import com.granizados.app.repository.TransaccionPuntosRepository;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -17,11 +23,21 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ConfiguracionNegocioRepository configRepository;
+    private final ClienteRepository clienteRepository;
+    private final ConfiguracionJuegosRepository configJuegosRepository;
+    private final TransaccionPuntosRepository transaccionRepository;
     private final SecureRandom random = new SecureRandom();
 
-    public PedidoService(PedidoRepository pedidoRepository, ConfiguracionNegocioRepository configRepository) {
+    public PedidoService(PedidoRepository pedidoRepository,
+                         ConfiguracionNegocioRepository configRepository,
+                         ClienteRepository clienteRepository,
+                         ConfiguracionJuegosRepository configJuegosRepository,
+                         TransaccionPuntosRepository transaccionRepository) {
         this.pedidoRepository = pedidoRepository;
         this.configRepository = configRepository;
+        this.clienteRepository = clienteRepository;
+        this.configJuegosRepository = configJuegosRepository;
+        this.transaccionRepository = transaccionRepository;
     }
 
     public Pedido crearPedido(Pedido pedido) {
@@ -72,7 +88,90 @@ public class PedidoService {
         }
 
         pedido.setCostoEnvio(costoEnvio);
-        pedido.setTotal(subtotal + costoEnvio);
+
+        // Manejo de GraniPoints para clientes registrados
+        double descuentoPuntos = 0.0;
+        int puntosUsados = Math.max(0, pedido.getPuntosUsados());
+        int puntosGanados = 0;
+
+        ConfiguracionJuegos configJuegos = configJuegosRepository.findFirstByOrderByIdAsc()
+                .orElseGet(() -> configJuegosRepository.save(new ConfiguracionJuegos()));
+
+        Optional<Cliente> clienteOpt = Optional.empty();
+        if (pedido.getClienteId() != null && !pedido.getClienteId().isBlank()) {
+            clienteOpt = clienteRepository.findById(pedido.getClienteId());
+        } else if (pedido.getClienteTelefono() != null) {
+            String telLimpio = pedido.getClienteTelefono().replaceAll("[^0-9]", "").trim();
+            clienteOpt = clienteRepository.findByTelefono(telLimpio);
+        }
+
+        if (clienteOpt.isPresent()) {
+            Cliente cliente = clienteOpt.get();
+            pedido.setClienteId(cliente.getId());
+
+            // 1. Canje de puntos
+            if (configJuegos.isCanjePuntosHabilitado() && puntosUsados >= configJuegos.getPuntosMinimosCanje() && cliente.getGranipoints() >= puntosUsados) {
+                double valCalculado = puntosUsados * configJuegos.getValorPesosPorPunto();
+                double maxDescuento = subtotal * (configJuegos.getMaximoPorcentajeDescuentoPedido() / 100.0);
+                descuentoPuntos = Math.min(valCalculado, maxDescuento);
+
+                cliente.setGranipoints(cliente.getGranipoints() - puntosUsados);
+
+                TransaccionPuntos transGasto = new TransaccionPuntos(
+                        cliente.getId(),
+                        cliente.getTelefono(),
+                        cliente.getNombre(),
+                        "CANJE_CHECKOUT",
+                        -puntosUsados,
+                        cliente.getGranipoints(),
+                        "🛒 Canje de GraniPoints por descuento de $" + String.format("%.0f", descuentoPuntos) + " en pedido " + codigo,
+                        codigo
+                );
+                transaccionRepository.save(transGasto);
+            } else {
+                puntosUsados = 0;
+            }
+
+            // 2. Acumulación por compra
+            if (configJuegos.isAcumularPuntosPorCompra() && configJuegos.getPesosPorPuntoAcumulado() > 0) {
+                double baseParaPuntos = Math.max(0, subtotal - descuentoPuntos);
+                puntosGanados = (int) (baseParaPuntos / configJuegos.getPesosPorPuntoAcumulado());
+
+                if (puntosGanados > 0) {
+                    cliente.setGranipoints(cliente.getGranipoints() + puntosGanados);
+
+                    TransaccionPuntos transGanancia = new TransaccionPuntos(
+                            cliente.getId(),
+                            cliente.getTelefono(),
+                            cliente.getNombre(),
+                            "COMPRA",
+                            puntosGanados,
+                            cliente.getGranipoints(),
+                            "🥤 GraniPoints ganados por tu compra en orden " + codigo,
+                            codigo
+                    );
+                    transaccionRepository.save(transGanancia);
+                }
+            }
+
+            // 3. Giros extras por compra
+            if (configJuegos.isOtorgarGirosPorCompra()) {
+                cliente.setGirosExtrasDisponibles(cliente.getGirosExtrasDisponibles() + 1);
+                cliente.setRaspasExtrasDisponibles(cliente.getRaspasExtrasDisponibles() + 1);
+            }
+
+            clienteRepository.save(cliente);
+        } else {
+            puntosUsados = 0;
+            descuentoPuntos = 0.0;
+        }
+
+        pedido.setPuntosUsados(puntosUsados);
+        pedido.setDescuentoPuntos(descuentoPuntos);
+        pedido.setPuntosGanados(puntosGanados);
+
+        double totalFinal = Math.max(0, (subtotal - descuentoPuntos) + costoEnvio);
+        pedido.setTotal(totalFinal);
 
         return pedidoRepository.save(pedido);
     }

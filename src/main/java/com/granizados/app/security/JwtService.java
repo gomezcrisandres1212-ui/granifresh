@@ -25,12 +25,16 @@ public class JwtService {
     }
 
     public String generarToken(String username) {
+        return generarToken(username, "ROLE_ADMIN");
+    }
+
+    public String generarToken(String username, String role) {
         Date ahora = new Date();
         Date expiracion = new Date(ahora.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
                 .subject(username)
-                .claim("role", "ROLE_ADMIN")
+                .claim("role", role != null ? role : "ROLE_ADMIN")
                 .issuedAt(ahora)
                 .expiration(expiracion)
                 .signWith(getSigningKey())
@@ -56,6 +60,20 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.getSubject();
+    }
+
+    public String extraerRol(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            Object role = claims.get("role");
+            return role != null ? role.toString() : "ROLE_ADMIN";
+        } catch (Exception ex) {
+            return "ROLE_ADMIN";
+        }
     }
 }
 
