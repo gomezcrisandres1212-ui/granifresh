@@ -745,32 +745,7 @@ h2 {
 }
 
 .hero-badge {
-  position: absolute;
-  z-index: 5;
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  background: rgba(7, 30, 20, 0.92);
-  color: #F2FBF6;
-  font-size: 11px;
-  font-weight: 800;
-  border-radius: 99px;
-  padding: 5px 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 12px rgba(52, 211, 153, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  white-space: nowrap;
-  will-change: transform;
-}
-
-.badge-left {
-  top: 16px;
-  left: -8px;
-  animation: floatBadgeLeft 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-}
-
-.badge-right {
-  bottom: 20px;
-  right: -8px;
-  animation: floatBadgeRight 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  display: none !important;
 }
 
 @keyframes floatBadgeLeft {
@@ -802,130 +777,112 @@ h2 {
    ESCENARIO DEL TRÍO DE GRANIZADOS (PORTADA HERO)
    ======================================================== */
 .trio-stage-wrapper {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  position: relative;
-  width: 320px;
-  max-width: 320px;
-  height: 320px;
-  margin: 0 auto;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  position: relative !important;
+  width: auto !important;
+  max-width: 270px !important;
+  height: 270px !important;
+  margin: 0 auto !important;
+  animation: trioFloat 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite !important;
 }
 
 svg.gl-trio {
-  overflow: visible;
-  will-change: transform;
+  overflow: visible !important;
+  will-change: transform !important;
+  flex-shrink: 0 !important;
 }
 
+/* Vaso Central: Fresa / Frutos Rojos (En Primer Plano) */
 svg.gl-center {
-  width: 195px;
-  height: auto;
-  position: relative;
-  z-index: 3;
+  width: 150px !important;
+  height: auto !important;
+  position: relative !important;
+  z-index: 3 !important;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.75)) !important;
 }
 
+/* Vaso Izquierdo: Menta / Lima (Detrás del hombro izquierdo, solapado) */
 svg.gl-left {
-  width: 160px;
-  height: auto;
-  position: absolute;
-  left: 10px;
-  bottom: 8px;
-  z-index: 2;
-  transform: rotate(-6deg);
-  transform-origin: 50% 90%;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
+  width: 125px !important;
+  height: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+  margin-right: -58px !important;
+  margin-bottom: 4px !important;
+  transform: rotate(-2.5deg) !important;
+  transform-origin: 50% 90% !important;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6)) !important;
 }
 
+/* Vaso Derecho: Mango / Maracuyá (Detrás del hombro derecho, solapado) */
 svg.gl-right {
-  width: 160px;
-  height: auto;
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  z-index: 2;
-  transform: rotate(6deg);
-  transform-origin: 50% 90%;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
+  width: 125px !important;
+  height: auto !important;
+  position: relative !important;
+  z-index: 1 !important;
+  margin-left: -58px !important;
+  margin-bottom: 4px !important;
+  transform: rotate(2.5deg) !important;
+  transform-origin: 50% 90% !important;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6)) !important;
 }
 
-.gl-left .bob {
-  animation: cupFloatLeft 6.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-  transform-box: fill-box;
-  transform-origin: 50% 90%;
-}
-
-.gl-center .bob {
-  animation: cupFloatCenter 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-  transform-box: fill-box;
-  transform-origin: 50% 90%;
-}
-
+.gl-left .bob,
+.gl-center .bob,
 .gl-right .bob {
-  animation: cupFloatRight 5.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite 0.7s;
-  transform-box: fill-box;
-  transform-origin: 50% 90%;
+  animation: none !important;
 }
 
-@keyframes cupFloatLeft {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(-6deg); }
-  50% { transform: translate3d(0, -8px, 0) rotate(-4deg); }
+@keyframes trioFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -9px, 0); }
 }
 
-@keyframes cupFloatCenter {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  50% { transform: translate3d(0, -10px, 0) rotate(1deg); }
-}
-
-@keyframes cupFloatRight {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(6deg); }
-  50% { transform: translate3d(0, -8px, 0) rotate(4deg); }
+.hero-badge {
+  display: none !important;
 }
 
 @media (max-width: 768px) {
   .stage {
-    max-width: 300px;
+    max-width: 250px !important;
   }
   .trio-stage-wrapper {
-    width: 270px;
-    max-width: 270px;
-    height: 280px;
+    max-width: 230px !important;
+    height: 240px !important;
   }
   svg.gl-center {
-    width: 165px;
+    width: 130px !important;
   }
   svg.gl-left {
-    width: 135px;
-    left: 8px;
-    bottom: 6px;
+    width: 108px !important;
+    margin-right: -50px !important;
   }
   svg.gl-right {
-    width: 135px;
-    right: 8px;
-    bottom: 6px;
+    width: 108px !important;
+    margin-left: -50px !important;
   }
 }
 
 @media (max-width: 480px) {
   .stage {
-    max-width: 270px;
+    max-width: 220px !important;
   }
   .trio-stage-wrapper {
-    width: 245px;
-    max-width: 245px;
-    height: 255px;
+    max-width: 210px !important;
+    height: 220px !important;
   }
   svg.gl-center {
-    width: 150px;
+    width: 118px !important;
   }
   svg.gl-left {
-    width: 122px;
-    left: 6px;
-    bottom: 4px;
+    width: 96px !important;
+    margin-right: -44px !important;
   }
   svg.gl-right {
-    width: 122px;
-    right: 6px;
-    bottom: 4px;
+    width: 96px !important;
+    margin-left: -44px !important;
   }
 }
 
