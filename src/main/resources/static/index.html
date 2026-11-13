@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=8.1">
+<link rel="stylesheet" href="/css/granizados.css?v=8.2">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -30,7 +30,7 @@
     <a href="#nosotros" class="nav-link-pill"><span>🍃</span> Nosotros</a>
     <a href="#track" class="nav-link-pill"><span>🛵</span> Rastrear</a>
     <button type="button" class="nav-club-btn" id="btn-open-graniclub" title="Club GraniPoints & Dinámicas">
-      <span>🎁</span> <span id="nav-club-label">GraniPoints</span>
+      <span id="nav-club-icon">🎁</span> <span id="nav-club-label">GraniPoints</span>
       <span class="badge-points" id="nav-points-badge" style="display:none;">0</span>
     </button>
   </div>
@@ -79,11 +79,11 @@
     <div class="stats"><div><b>100%</b><span>FRUTA REAL</span></div><div><b>0%</b><span>QUÍMICOS</span></div><div><b>-4°C</b><span>FRAPPÉ PURO</span></div><div><b>35 min</b><span>ENTREGA EXPRESS</span></div></div>
 
     <div class="hero-granipoints-banner" id="hero-granipoints-banner">
-      <div class="hgb-sparkle">🎁</div>
-      <div class="hgb-text">
+      <div class="hgb-sparkle" id="hgb-sparkle">🎁</div>
+      <div class="hgb-text" id="hgb-text">
         <b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.
       </div>
-      <div class="hgb-action">¡Jugar Ahora! ➔</div>
+      <div class="hgb-action" id="hgb-action">¡Jugar Ahora! ➔</div>
     </div>
   </div>
   <div class="stage">
@@ -2834,7 +2834,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=8.1"></script>
+<script src="/js/granizados.js?v=8.2"></script>
 <script src="/js/admin.js"></script>
 </body>
 </html>

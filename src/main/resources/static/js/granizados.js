@@ -1658,12 +1658,23 @@
 
   function actualizarUIPerfilCliente() {
     var cl = GraniClubState.cliente;
-    var badgeNav = document.getElementById("nav-points-badge");
+    var btnClub = document.getElementById("btn-open-graniclub");
+    var iconNav = document.getElementById("nav-club-icon");
     var labelNav = document.getElementById("nav-club-label");
+    var badgeNav = document.getElementById("nav-points-badge");
     var viewAuth = document.getElementById("club-view-auth");
     var viewPerfil = document.getElementById("club-view-perfil");
 
+    var heroBanner = document.getElementById("hero-granipoints-banner");
+    var hgbSparkle = document.getElementById("hgb-sparkle");
+    var hgbText = document.getElementById("hgb-text");
+    var hgbAction = document.getElementById("hgb-action");
+
     if (cl) {
+      document.body.classList.add("cliente-vip-activo");
+
+      if (btnClub) btnClub.classList.add("nav-club-vip");
+      if (iconNav) iconNav.textContent = "👑";
       if (labelNav) {
         var primNombre = cl.nombre ? cl.nombre.split(" ")[0] : "Mi Perfil";
         labelNav.textContent = primNombre;
@@ -1671,6 +1682,29 @@
       if (badgeNav) {
         badgeNav.style.display = "inline-block";
         badgeNav.textContent = (cl.granipoints || 0).toLocaleString("es-CO") + " pts";
+      }
+
+      // Pase VIP personalizado en el Hero
+      if (heroBanner) heroBanner.classList.add("hgb-vip-mode");
+      if (hgbSparkle) hgbSparkle.textContent = "👑";
+      if (hgbText) {
+        var primNombre = cl.nombre ? cl.nombre.split(" ")[0] : "Miembro";
+        var ptsFormatted = (cl.granipoints || 0).toLocaleString("es-CO");
+        hgbText.innerHTML = 
+          '<div class="hgb-vip-content">' +
+            '<div class="hgb-vip-header">' +
+              '<span class="hgb-vip-name">¡Hola, ' + escapeHtmlText(primNombre) + '!</span>' +
+              '<span class="hgb-vip-badge">Socio VIP GraniClub</span>' +
+            '</div>' +
+            '<div class="hgb-vip-details">' +
+              '<span>🪙 Saldo: <b class="hgb-vip-points">' + ptsFormatted + ' GraniPoints</b></span>' +
+              '<span class="hgb-vip-games" id="hgb-vip-games-status">🎮 Ver juegos & dinámicas</span>' +
+            '</div>' +
+          '</div>';
+      }
+      if (hgbAction) {
+        hgbAction.className = "hgb-action hgb-action-vip";
+        hgbAction.textContent = "Jugar & Premios ➔";
       }
 
       if (viewAuth) viewAuth.style.display = "none";
@@ -1695,8 +1729,23 @@
       refrescarEstadoJuegosCliente();
 
     } else {
+      document.body.classList.remove("cliente-vip-activo");
+
+      if (btnClub) btnClub.classList.remove("nav-club-vip");
+      if (iconNav) iconNav.textContent = "🎁";
       if (labelNav) labelNav.textContent = "GraniPoints";
       if (badgeNav) badgeNav.style.display = "none";
+
+      if (heroBanner) heroBanner.classList.remove("hgb-vip-mode");
+      if (hgbSparkle) hgbSparkle.textContent = "🎁";
+      if (hgbText) {
+        hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.';
+      }
+      if (hgbAction) {
+        hgbAction.className = "hgb-action";
+        hgbAction.textContent = "¡Jugar Ahora! ➔";
+      }
+
       if (viewAuth) viewAuth.style.display = "block";
       if (viewPerfil) viewPerfil.style.display = "none";
     }
@@ -1724,6 +1773,20 @@
           var totR = est.totalRaspasDisponibles || 0;
           bRas.textContent = totR > 0 ? (totR + " disponible" + (totR > 1 ? "s" : "")) : "0 raspas hoy";
           bRas.className = "cgc-badge" + (totR > 0 ? " available" : "");
+        }
+
+        var hgbGames = document.getElementById("hgb-vip-games-status");
+        if (hgbGames) {
+          var totG = est.totalGirosDisponibles || 0;
+          var totR = est.totalRaspasDisponibles || 0;
+          var totT = totG + totR;
+          if (totT > 0) {
+            hgbGames.innerHTML = "🎯 <b>" + totT + " tirada" + (totT > 1 ? "s" : "") + " gratis hoy</b>";
+            hgbGames.style.color = "#FFE600";
+          } else {
+            hgbGames.innerHTML = "✨ ¡Pide y acumula más puntos!";
+            hgbGames.style.color = "#34D399";
+          }
         }
       }
     } catch (e) {
@@ -1991,7 +2054,8 @@
       var chkBar = document.getElementById("checkout-barrio");
       if (chkBar && !chkBar.value && data.cliente.barrioPredeterminado) chkBar.value = data.cliente.barrioPredeterminado;
 
-      window.showToast("¡Bienvenido al Club GraniPoints! 🎉 Has recibido 30 puntos de regalo.", "success");
+      var ptsRegalo = (GraniClubState.configPublica && GraniClubState.configPublica.puntosBienvenidaRegistro) || 20;
+      window.showToast("¡Bienvenido al Club GraniPoints! 🎉 Has recibido " + ptsRegalo + " puntos de regalo.", "success");
       lanzarConfetiCelebracion();
       actualizarUIPerfilCliente();
       sincronizarCheckoutGraniPoints();
