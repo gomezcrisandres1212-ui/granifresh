@@ -1384,6 +1384,8 @@
   function initAmbientCanvas() {
     var canvas = document.getElementById("ambient-canvas");
     if (!canvas) return;
+    // En móviles apagamos el canvas de 60fps para 0% de uso de CPU y desplazamiento ultra fluido
+    if (window.innerWidth <= 768) return;
     var ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -1411,6 +1413,16 @@
     var spriteMint = createGlowSprite("rgba(16, 185, 129, 0.18)", "rgba(52, 211, 153, 0.08)");
 
     function resize() {
+      if (window.innerWidth <= 768) {
+        if (animId) cancelAnimationFrame(animId);
+        isRunning = false;
+        return;
+      }
+      if (!isRunning) {
+        isRunning = true;
+        startTime = performance.now();
+        animId = requestAnimationFrame(render);
+      }
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     }
@@ -1591,7 +1603,8 @@
   }
 
   function aplicarTextosPuntosBienvenida(pts) {
-    var num = (pts !== undefined && pts !== null) ? pts : 30;
+    var num = (pts !== undefined && pts !== null) ? pts : 20;
+    try { localStorage.setItem("grani_pts_bienvenida", num); } catch(e){}
     var elPromoTxt = document.getElementById("promo-pts-regalo-txt");
     if (elPromoTxt) elPromoTxt.textContent = "+" + num + " GraniPoints";
     var elPerkTxt = document.getElementById("promo-perk-pts-txt");
@@ -2703,7 +2716,13 @@
       return;
     }
 
-    // Actualizar textos con la cantidad configurada por el admin
+    // Actualizar textos de inmediato con caché si aún no ha llegado la respuesta del servidor
+    try {
+      var cachedPts = localStorage.getItem("grani_pts_bienvenida");
+      if (cachedPts !== null) aplicarTextosPuntosBienvenida(parseInt(cachedPts, 10));
+    } catch(e) {}
+
+    // Actualizar textos con la cantidad configurada por el admin si ya cargó
     if (GraniClubState.configPublica) {
       var pts = (GraniClubState.configPublica.puntosBienvenidaRegistro !== undefined)
         ? GraniClubState.configPublica.puntosBienvenidaRegistro

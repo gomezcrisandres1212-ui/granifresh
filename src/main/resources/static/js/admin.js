@@ -2734,7 +2734,7 @@ async function cargarConfigJuegosAdmin() {
 
         // Intentos y bienvenida
         const elBienv = document.getElementById('cfg-puntos-bienvenida');
-        if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 30;
+        if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 20;
 
         const elIntGratis = document.getElementById('cfg-intentos-gratis-diarios');
         if (elIntGratis) elIntGratis.value = cfg.intentosGratisRuletaDiarios !== undefined ? cfg.intentosGratisRuletaDiarios : 1;
@@ -2986,7 +2986,7 @@ window.guardarConfigJuegosAdmin = async function (e) {
         maximoPorcentajeDescuentoPedido: parseInt(document.getElementById('cfg-max-porcentaje-descuento')?.value, 10) || 50,
         canjePorGranizadoHabilitado: document.getElementById('cfg-canje-granizado-habilitado')?.checked ?? false,
         puntosParaGranizadoGratis: parseInt(document.getElementById('cfg-puntos-para-granizado')?.value, 10) || 120,
-        puntosBienvenidaRegistro: parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) || 30,
+        puntosBienvenidaRegistro: !isNaN(parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10)) ? parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) : 20,
         intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 1,
         intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 1,
         premiosRuleta: nuevosSectores,
