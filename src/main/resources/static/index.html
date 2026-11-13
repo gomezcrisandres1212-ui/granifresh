@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=8.9">
+<link rel="stylesheet" href="/css/granizados.css?v=9.0">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -444,22 +444,28 @@
      Exclusivo para clientes con sesión iniciada
      ========================================================== -->
 <section id="seccion-juegos-vip" class="seccion-juegos-vip" style="display:none;">
-  <div class="vip-games-header">
-    <div class="eyebrow" style="color:#FFB703;">🎮 EXCLUSIVO SOCIOS VIP GRANICLUB</div>
-    <h2 style="font-size:2.2rem; margin:6px 0 10px; color:#FFFFFF;">Minijuegos Glaciales &amp; Premios en Vivo</h2>
-    <p class="sub" style="margin:0 auto; max-width:640px; color:var(--mut); font-size:0.95rem;">
-      ¡Gira la ruleta y raspa tu tarjeta para ganar GraniPoints diarios y canjearlos por granizados 100% fruta natural gratis!
-    </p>
+  <div class="eyebrow">CLUB VIP &amp; DIVERSIÓN</div>
+  <h2>Minijuegos Glaciales en Vivo</h2>
+  <p class="sub">Gira la Ruleta Glacial o raspa tu tarjeta para ganar GraniPoints diarios y canjearlos por granizados gratis.</p>
+
+  <!-- Pestañas interactivas compactas para móvil -->
+  <div class="vip-games-tabs" id="vip-games-tabs">
+    <button type="button" class="vip-tab-btn active" id="tab-btn-ruleta" onclick="cambiarTabJuegoVip('ruleta')">
+      <span>🎡</span> Ruleta <span class="vip-tab-counter" id="tab-counter-ruleta">1</span>
+    </button>
+    <button type="button" class="vip-tab-btn" id="tab-btn-raspa" onclick="cambiarTabJuegoVip('raspa')">
+      <span>🎫</span> Raspa y Gana <span class="vip-tab-counter" id="tab-counter-raspa">1</span>
+    </button>
   </div>
 
-  <div class="vip-games-grid">
+  <div class="vip-games-grid" data-active-tab="ruleta">
     <!-- MINIJUEGO 1: RULETA GLACIAL -->
-    <div class="vip-game-card">
-      <div class="vip-game-badge vip-badge-ruleta">
-        <span>🎡</span> Minijuego 1
+    <div class="vip-game-card" id="card-game-ruleta">
+      <div class="vip-game-badge">
+        <span>🎡</span> Ruleta Glacial
       </div>
-      <h3 class="vip-game-title">Ruleta Glacial Sub-Cero</h3>
-      <p class="vip-game-desc">
+      <h3 style="font-size:18px; margin:0 0 6px; font-weight:800; color:#FFFFFF;">Ruleta Sub-Cero</h3>
+      <p style="margin:0 0 16px; color:var(--mut); font-size:13px; max-width:320px; line-height:1.4;">
         ¡Prueba tu suerte! Gira la ruleta y acumula GraniPoints directos a tu perfil.
       </p>
 
@@ -472,7 +478,7 @@
           </div>
         </div>
 
-        <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:14px 38px; font-size:1.05rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(255,183,3,0.4); background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; cursor:pointer;">
+        <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:12px 34px; font-size:15px; font-weight:900; border-radius:99px; background:linear-gradient(135deg,#FFB703,#FB8500); color:#04140B; cursor:pointer;">
           🌀 ¡GIRAR RULETA!
         </button>
 
@@ -493,12 +499,12 @@
     </div>
 
     <!-- MINIJUEGO 2: RASPA Y GANA GLACIAL -->
-    <div class="vip-game-card">
-      <div class="vip-game-badge vip-badge-raspa">
-        <span>🎫</span> Minijuego 2
+    <div class="vip-game-card" id="card-game-raspa">
+      <div class="vip-game-badge">
+        <span>🎫</span> Raspa y Gana
       </div>
-      <h3 class="vip-game-title">Raspa y Gana Glacial</h3>
-      <p class="vip-game-desc">
+      <h3 style="font-size:18px; margin:0 0 6px; font-weight:800; color:#FFFFFF;">Raspa y Gana Glacial</h3>
+      <p style="margin:0 0 16px; color:var(--mut); font-size:13px; max-width:320px; line-height:1.4;">
         Pasa tu dedo o cursor sobre la escarcha plateada para descubrir tu premio secreto.
       </p>
 
@@ -514,7 +520,7 @@
           <canvas id="canvas-raspa" width="310" height="220"></canvas>
         </div>
 
-        <button type="button" class="cta" id="btn-iniciar-raspa" onclick="iniciarNuevaPartidaRaspa()" style="padding:13px 34px; font-size:1.02rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(56,189,248,0.4); background:linear-gradient(135deg,#38BDF8,#0284C7); color:#FFFFFF; cursor:pointer; margin-top:16px;">
+        <button type="button" class="cta" id="btn-iniciar-raspa" onclick="iniciarNuevaPartidaRaspa()" style="padding:12px 32px; font-size:15px; font-weight:900; border-radius:99px; background:linear-gradient(135deg,#10B981,#059669); color:#FFFFFF; cursor:pointer; margin-top:14px;">
           ❄️ ¡NUEVA TARJETA RASPA!
         </button>
 
@@ -2917,7 +2923,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=8.9"></script>
-<script src="/js/admin.js?v=8.9"></script>
+<script src="/js/granizados.js?v=9.0"></script>
+<script src="/js/admin.js?v=9.0"></script>
 </body>
 </html>

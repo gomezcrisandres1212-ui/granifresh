@@ -1862,6 +1862,11 @@
           txtIntRas.textContent = "Raspas disponibles: " + totR;
         }
 
+        var cntR = document.getElementById("tab-counter-ruleta");
+        if (cntR) cntR.textContent = totG;
+        var cntP = document.getElementById("tab-counter-raspa");
+        if (cntP) cntP.textContent = totR;
+
         var btnRas = document.getElementById("btn-iniciar-raspa");
         if (btnRas && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
           btnRas.disabled = totR <= 0;
@@ -2239,12 +2244,32 @@
   // ==========================================
   // ZONA DE MINIJUEGOS VIP (VISTA PRINCIPAL)
   // ==========================================
+  window.cambiarTabJuegoVip = function (tab) {
+    var grid = document.querySelector(".vip-games-grid");
+    if (grid) {
+      grid.setAttribute("data-active-tab", tab);
+    }
+    var btnR = document.getElementById("tab-btn-ruleta");
+    var btnP = document.getElementById("tab-btn-raspa");
+    if (btnR && btnP) {
+      if (tab === "ruleta") {
+        btnR.classList.add("active");
+        btnP.classList.remove("active");
+      } else {
+        btnR.classList.remove("active");
+        btnP.classList.add("active");
+      }
+    }
+  };
+
   window.abrirRuletaGlacial = function () {
     irAZonaJuegosPrincipal();
+    cambiarTabJuegoVip("ruleta");
   };
 
   window.abrirRaspaGlacial = function () {
     irAZonaJuegosPrincipal();
+    cambiarTabJuegoVip("raspa");
   };
 
   window.inicializarJuegosVistaPrincipal = async function () {
