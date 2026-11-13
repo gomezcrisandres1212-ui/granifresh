@@ -866,10 +866,6 @@ svg.gl-right {
 }
 
 @media (max-width: 768px) {
-  /* En móviles apagamos el canvas de 60fps y usamos gradiente CSS acelerado por GPU */
-  .ambient-canvas {
-    display: none !important;
-  }
   body {
     background: radial-gradient(circle at 80% 15%, rgba(255, 183, 3, 0.12) 0%, transparent 45%),
                 radial-gradient(circle at 20% 85%, rgba(255, 30, 86, 0.10) 0%, transparent 45%),
@@ -5561,37 +5557,41 @@ footer {
 }
 
 /* Teaser Banner en Hero */
+/* Teaser Banner en Hero - Integración Natural y Abierta (Sin Marco Rígido ni Encasillado) */
 .hero-granipoints-banner {
-  margin-top: 18px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(255, 183, 3, 0.15));
-  border: 1px solid rgba(255, 183, 3, 0.35);
-  border-radius: 16px;
-  padding: 14px 20px;
+  margin-top: 16px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 8px 0 !important;
   display: flex;
   align-items: center;
   gap: 14px;
   cursor: pointer;
   transition: all 0.25s ease;
-  backdrop-filter: blur(8px);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
   max-width: 650px;
 }
 .hero-granipoints-banner:hover {
-  border-color: #FFB703;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(255, 183, 3, 0.25));
-  box-shadow: 0 6px 24px rgba(255, 183, 3, 0.25);
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
   transform: translateY(-2px);
 }
-/* Pase VIP Personalizado en el Hero */
+/* Pase VIP Personalizado en el Hero (Sin Marco Rígido ni Encasillado) */
 .hero-granipoints-banner.hgb-vip-mode {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(255, 183, 3, 0.22) 45%, rgba(6, 32, 20, 0.9) 100%) !important;
-  border: 1.5px solid rgba(255, 209, 59, 0.7) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 24px rgba(255, 183, 3, 0.3) !important;
-  padding: 15px 22px !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 0 !important;
 }
 .hero-granipoints-banner.hgb-vip-mode:hover {
-  border-color: #FFF275 !important;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65), 0 0 32px rgba(255, 183, 3, 0.5) !important;
-  transform: translateY(-2px) scale(1.01);
+  border: none !important;
+  box-shadow: none !important;
+  transform: translateY(-2px);
 }
 .hgb-vip-content {
   display: flex;
