@@ -89,7 +89,7 @@
       var zoom = aj.zoom !== undefined && aj.zoom !== null ? aj.zoom : 1.0;
       var posX = aj.posX !== undefined && aj.posX !== null ? aj.posX : 50;
       var posY = aj.posY !== undefined && aj.posY !== null ? aj.posY : 50;
-      var imgStyle = "object-fit:" + fit + "; object-position:" + posX + "% " + posY + "%; transform:scale(" + zoom + ");";
+      var imgStyle = "object-fit:" + fit + "; object-position:" + posX + "% " + posY + "%; transform:scale(" + zoom + ") translateZ(0);";
       return '<img class="pic" src="' + x.img + '" alt="' + x.n + '" style="' + imgStyle + '" loading="lazy" onerror="this.style.display=\'none\'; if(this.nextElementSibling) this.nextElementSibling.style.display=\'block\';">' +
              '<div class="cupw" style="display:none;"><span class="top">' + x.e + '</span><span class="str"></span><div class="cup"></div></div>';
     }

@@ -1546,7 +1546,7 @@ window.actualizarPreviewCliente = function () {
             imgTag.style.display = 'block';
             imgTag.style.objectFit = fitMode;
             imgTag.style.objectPosition = `${posX}% ${posY}%`;
-            imgTag.style.transform = `scale(${zoom})`;
+            imgTag.style.transform = `scale(${zoom}) translateZ(0)`;
         }
         if (cupwFallback) cupwFallback.style.display = 'none';
 
