@@ -2650,7 +2650,10 @@ async function cargarConfigJuegosAdmin() {
         const elModo = document.getElementById('cfg-modo-puntos-compra');
         if (elModo) {
             elModo.value = cfg.modoPuntosCompra || 'POR_VALOR';
-            elModo.onchange = toggleModoPuntosCompraUI;
+            elModo.onchange = function() {
+                toggleModoPuntosCompraUI();
+                actualizarLiveHelpAdmin();
+            };
             toggleModoPuntosCompraUI();
         }
         const elPesosPto = document.getElementById('cfg-pesos-por-punto');
@@ -2664,7 +2667,7 @@ async function cargarConfigJuegosAdmin() {
         if (elCanjeDesc) elCanjeDesc.checked = cfg.canjePuntosHabilitado !== undefined ? !!cfg.canjePuntosHabilitado : true;
 
         const elValCanje = document.getElementById('cfg-valor-peso-punto');
-        if (elValCanje) elValCanje.value = cfg.valorPesosPorPunto || 20;
+        if (elValCanje) elValCanje.value = (cfg.valorPesosPorPunto && cfg.valorPesosPorPunto > 0) ? cfg.valorPesosPorPunto : 20;
 
         const elMinCanje = document.getElementById('cfg-puntos-minimos-canje');
         if (elMinCanje) elMinCanje.value = cfg.puntosMinimosCanje || 50;
@@ -2788,7 +2791,6 @@ function renderizarTablaPremiosRuletaAdmin(premios) {
             <td>
                 <select class="form-control inp-rul-tipo" style="font-size:0.85rem;">
                     <option value="PUNTOS" ${p.tipo === 'PUNTOS' ? 'selected' : ''}>Puntos Directos</option>
-                    <option value="TOPPING_GRATIS" ${p.tipo === 'TOPPING_GRATIS' ? 'selected' : ''}>Topping Gratis</option>
                     <option value="GRANIZADO_GRATIS" ${p.tipo === 'GRANIZADO_GRATIS' ? 'selected' : ''}>Granizado Gratis</option>
                     <option value="VACIO" ${p.tipo === 'VACIO' ? 'selected' : ''}>Sin Premio (Vacio)</option>
                 </select>

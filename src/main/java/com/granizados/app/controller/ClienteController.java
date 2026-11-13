@@ -114,6 +114,7 @@ public class ClienteController {
         resp.put("premiosRuleta", config.getPremiosRuleta());
         resp.put("premiosRaspa", config.getPremiosRaspa());
         resp.put("puntosBienvenida", config.getPuntosBienvenidaRegistro());
+        resp.put("puntosBienvenidaRegistro", config.getPuntosBienvenidaRegistro());
         resp.put("valorPesosPorPunto", config.getValorPesosPorPunto());
         resp.put("puntosMinimosCanje", config.getPuntosMinimosCanje());
         resp.put("maximoPorcentajeDescuentoPedido", config.getMaximoPorcentajeDescuentoPedido());

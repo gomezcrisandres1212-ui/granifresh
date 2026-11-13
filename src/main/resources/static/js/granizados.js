@@ -1550,7 +1550,10 @@
       var res = await fetch("/api/cliente/config-publica");
       if (res.ok) {
         GraniClubState.configPublica = await res.json();
-        aplicarTextosPuntosBienvenida(GraniClubState.configPublica.puntosBienvenidaRegistro);
+        var pts = (GraniClubState.configPublica.puntosBienvenidaRegistro !== undefined)
+          ? GraniClubState.configPublica.puntosBienvenidaRegistro
+          : GraniClubState.configPublica.puntosBienvenida;
+        aplicarTextosPuntosBienvenida(pts);
       }
     } catch (e) {
       console.warn("No se pudo cargar la config pública de juegos:", e);
@@ -1759,6 +1762,7 @@
       var inpDir = document.getElementById("cl-reg-dir");
       var inpBar = document.getElementById("cl-reg-barrio");
       var onDirInput = function () {
+        if (isReverseGeocodingRegistro) return;
         clearTimeout(regGeocodeTimer);
         regGeocodeTimer = setTimeout(function () {
           geocodificarDireccionRegistro();
@@ -1775,6 +1779,8 @@
       if (clienteRegMap) clienteRegMap.invalidateSize();
     }, 250);
   };
+
+  var isReverseGeocodingRegistro = false;
 
   async function geocodificarDireccionRegistro() {
     var dir = document.getElementById("cl-reg-dir") ? document.getElementById("cl-reg-dir").value.trim() : "";
@@ -1812,15 +1818,51 @@
       var res = await fetch(url, { headers: { "Accept-Language": "es" } });
       if (res.ok) {
         var data = await res.json();
-        if (data && data.address) {
-          var barrioDetectado = data.address.suburb || data.address.neighbourhood || data.address.residential;
+        if (data) {
+          var addr = data.address || {};
+          // Extraer la vía principal y número
+          var via = addr.road || addr.pedestrian || addr.footway || addr.street || addr.avenue || "";
+          var num = addr.house_number ? " #" + addr.house_number : "";
+          var dirTexto = "";
+          if (via) {
+            dirTexto = (via + num).trim();
+          } else if (data.display_name) {
+            var partes = data.display_name.split(",");
+            dirTexto = partes[0] ? partes[0].trim() : "";
+          }
+
+          // Extraer el barrio o sector
+          var barrioTexto = addr.suburb || addr.neighbourhood || addr.residential || addr.quarter || addr.city_district || "";
+          if (!barrioTexto && data.display_name) {
+            var partes = data.display_name.split(",");
+            if (partes.length > 1) barrioTexto = partes[1].trim();
+          }
+
+          var inpDir = document.getElementById("cl-reg-dir");
           var inpBar = document.getElementById("cl-reg-barrio");
-          if (inpBar && !inpBar.value && barrioDetectado) {
-            inpBar.value = barrioDetectado;
+
+          isReverseGeocodingRegistro = true;
+          if (inpDir && dirTexto) {
+            inpDir.value = dirTexto;
+          }
+          if (inpBar && barrioTexto) {
+            inpBar.value = barrioTexto;
+          }
+          setTimeout(function () {
+            isReverseGeocodingRegistro = false;
+          }, 350);
+
+          if (clienteRegMarker) {
+            clienteRegMarker.setPopupContent(
+              '<b style="color:#00B4D8;">📍 ' + escapeHtmlText(dirTexto || "Ubicación fijada") + '</b><br>' +
+              '<small style="color:#10B981; font-weight:700;">Barrio: ' + escapeHtmlText(barrioTexto || "Cartagena") + '</small>'
+            ).openPopup();
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Error en reverseGeocodeRegistro:", e);
+    }
   }
 
   window.obtenerUbicacionGPSRegistro = function () {
@@ -2630,17 +2672,28 @@
     if (GraniClubState.cliente || localStorage.getItem("granifresh_cliente_token")) {
       return;
     }
-    try {
-      if (sessionStorage.getItem("grani_promo_vista") === "1") return;
-    } catch (e) {}
+
+    // Actualizar textos con la cantidad configurada por el admin
+    if (GraniClubState.configPublica) {
+      var pts = (GraniClubState.configPublica.puntosBienvenidaRegistro !== undefined)
+        ? GraniClubState.configPublica.puntosBienvenidaRegistro
+        : GraniClubState.configPublica.puntosBienvenida;
+      aplicarTextosPuntosBienvenida(pts);
+    }
 
     setTimeout(function () {
       if (GraniClubState.cliente || localStorage.getItem("granifresh_cliente_token")) return;
+      if (GraniClubState.configPublica) {
+        var pts = (GraniClubState.configPublica.puntosBienvenidaRegistro !== undefined)
+          ? GraniClubState.configPublica.puntosBienvenidaRegistro
+          : GraniClubState.configPublica.puntosBienvenida;
+        aplicarTextosPuntosBienvenida(pts);
+      }
       var modal = document.getElementById("modal-promo-registro");
       if (modal && !modal.classList.contains("active")) {
         modal.classList.add("active");
       }
-    }, 1800);
+    }, 1200);
   }
 
   window.cargarCatalogoPublico = cargarCatalogo;
