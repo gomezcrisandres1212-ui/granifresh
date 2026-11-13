@@ -1999,19 +1999,22 @@
                             <div class="form-grid-3">
                                 <div class="form-group">
                                     <label>Puntos Regalo de Bienvenida</label>
-                                    <input type="number" class="form-control" id="cfg-puntos-bienvenida" min="0" step="5" required>
+                                    <input type="number" class="form-control" id="cfg-puntos-bienvenida" min="0" step="5" required oninput="actualizarLiveHelpAdmin()">
                                     <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Puntos acreditados al crear la cuenta.</small>
                                 </div>
                                 <div class="form-group">
                                     <label>Intentos Gratis Diarios (Ruleta)</label>
-                                    <input type="number" class="form-control" id="cfg-intentos-gratis-diarios" min="0" max="5" step="1" required>
+                                    <input type="number" class="form-control" id="cfg-intentos-gratis-diarios" min="0" max="5" step="1" required oninput="actualizarLiveHelpAdmin()">
                                     <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tiradas gratuitas cada 24 horas por cliente.</small>
                                 </div>
                                 <div class="form-group">
                                     <label>Intentos Gratis Diarios (Raspa y Gana)</label>
-                                    <input type="number" class="form-control" id="cfg-intentos-gratis-raspa" min="0" max="5" step="1" required>
+                                    <input type="number" class="form-control" id="cfg-intentos-gratis-raspa" min="0" max="5" step="1" required oninput="actualizarLiveHelpAdmin()">
                                     <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Raspas gratuitas cada 24 horas por cliente.</small>
                                 </div>
+                            </div>
+                            <div id="live-help-bienvenida" style="margin-top:12px; background:rgba(56,189,248,0.08); border-left:3px solid #38BDF8; padding:10px 14px; border-radius:8px; font-size:0.83rem; color:#BAE6FD; line-height:1.45;">
+                                <!-- Explicación interactiva en vivo -->
                             </div>
                         </div>
 
@@ -2023,7 +2026,7 @@
                             <div class="form-grid-3">
                                 <div class="form-group">
                                     <label>Modo de Asignación *</label>
-                                    <select class="form-control" id="cfg-modo-puntos-compra">
+                                    <select class="form-control" id="cfg-modo-puntos-compra" onchange="toggleModoPuntosCompraUI(); actualizarLiveHelpAdmin();">
                                         <option value="POR_VALOR">📊 Proporcional al valor de la orden</option>
                                         <option value="FIJO">🎯 Puntos fijos por cada orden</option>
                                     </select>
@@ -2031,14 +2034,17 @@
                                 </div>
                                 <div class="form-group" id="grp-pesos-por-punto">
                                     <label>Pesos de Compra por 1 Punto ($ COP)</label>
-                                    <input type="number" class="form-control" id="cfg-pesos-por-punto" min="100" step="100" required>
+                                    <input type="number" class="form-control" id="cfg-pesos-por-punto" min="100" step="100" required oninput="actualizarLiveHelpAdmin()">
                                     <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 1000 = 1 punto por cada $1.000 gastados.</small>
                                 </div>
-                                <div class="form-group" id="grp-puntos-fijos-compra">
+                                <div class="form-group" id="grp-puntos-fijos-compra" style="display:none;">
                                     <label>Puntos Fijos Otorgados por Pedido</label>
-                                    <input type="number" class="form-control" id="cfg-puntos-fijos-compra" min="1" step="1" placeholder="Ej: 15">
+                                    <input type="number" class="form-control" id="cfg-puntos-fijos-compra" min="1" step="1" placeholder="Ej: 15" oninput="actualizarLiveHelpAdmin()">
                                     <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 15 puntos fijos por compra completada.</small>
                                 </div>
+                            </div>
+                            <div id="live-help-compra" style="margin-top:12px; background:rgba(16,185,129,0.08); border-left:3px solid #10B981; padding:10px 14px; border-radius:8px; font-size:0.83rem; color:#A7F3D0; line-height:1.45;">
+                                <!-- Explicación interactiva en vivo -->
                             </div>
                         </div>
 
@@ -2051,53 +2057,43 @@
                             <!-- Canje 1: Descuento en Dinero -->
                             <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); padding:14px; border-radius:10px; margin-bottom:14px;">
                                 <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#FFFFFF; font-weight:700; margin-bottom:10px;">
-                                    <input type="checkbox" id="cfg-canje-descuento-habilitado" style="width:18px; height:18px; accent-color:#FFB703;">
+                                    <input type="checkbox" id="cfg-canje-descuento-habilitado" style="width:18px; height:18px; accent-color:#FFB703;" onchange="actualizarLiveHelpAdmin()">
                                     <span>💰 Permitir Descuento en Dinero ($ COP)</span>
                                 </label>
                                 <div class="form-grid-3">
                                     <div class="form-group">
                                         <label>Valor de Canje ($ COP por 1 Punto)</label>
-                                        <input type="number" class="form-control" id="cfg-valor-peso-punto" min="1" step="1" required>
+                                        <input type="number" class="form-control" id="cfg-valor-peso-punto" min="1" step="1" required oninput="actualizarLiveHelpAdmin()">
                                         <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 20 = 100 puntos descuentan $2.000 COP.</small>
                                     </div>
                                     <div class="form-group">
                                         <label>Puntos Mínimos para Canjear</label>
-                                        <input type="number" class="form-control" id="cfg-puntos-minimos-canje" min="1" step="5" required>
+                                        <input type="number" class="form-control" id="cfg-puntos-minimos-canje" min="1" step="5" required oninput="actualizarLiveHelpAdmin()">
                                         <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Mínimo requerido para aplicar descuento.</small>
                                     </div>
                                     <div class="form-group">
                                         <label>Máximo % Descuento por Puntos</label>
-                                        <input type="number" class="form-control" id="cfg-max-porcentaje-descuento" min="10" max="100" step="5" required>
+                                        <input type="number" class="form-control" id="cfg-max-porcentaje-descuento" min="10" max="100" step="5" required oninput="actualizarLiveHelpAdmin()">
                                         <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tope máximo de la orden a pagar con puntos.</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Canje 2: Granizado Gratis & Topping Gratis -->
-                            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:14px;">
-                                <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(52,211,153,0.25); padding:14px; border-radius:10px;">
-                                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#34D399; font-weight:700; margin-bottom:10px;">
-                                        <input type="checkbox" id="cfg-canje-granizado-habilitado" style="width:18px; height:18px; accent-color:#34D399;">
-                                        <span>🥤 Canjear por 1 Granizado 100% Gratis</span>
-                                    </label>
-                                    <div class="form-group">
-                                        <label>Puntos Necesarios para 1 Granizado Gratis</label>
-                                        <input type="number" class="form-control" id="cfg-puntos-para-granizado" min="10" step="10" required>
-                                        <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 120 puntos = 1 granizado de la orden gratis.</small>
-                                    </div>
+                            <!-- Canje 2: Granizado Gratis (Topping eliminado según instrucción) -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(52,211,153,0.25); padding:14px; border-radius:10px;">
+                                <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#34D399; font-weight:700; margin-bottom:10px;">
+                                    <input type="checkbox" id="cfg-canje-granizado-habilitado" style="width:18px; height:18px; accent-color:#34D399;" onchange="actualizarLiveHelpAdmin()">
+                                    <span>🥤 Canjear por 1 Granizado 100% Gratis</span>
+                                </label>
+                                <div class="form-group" style="max-width:320px;">
+                                    <label>Puntos Necesarios para 1 Granizado Gratis</label>
+                                    <input type="number" class="form-control" id="cfg-puntos-para-granizado" min="10" step="10" required oninput="actualizarLiveHelpAdmin()">
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 120 puntos = 1 granizado gratis en la orden.</small>
                                 </div>
+                            </div>
 
-                                <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(236,72,153,0.25); padding:14px; border-radius:10px;">
-                                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; color:#F472B6; font-weight:700; margin-bottom:10px;">
-                                        <input type="checkbox" id="cfg-canje-topping-habilitado" style="width:18px; height:18px; accent-color:#EC4899;">
-                                        <span>🍒 Canjear por 1 Topping Extra Gratis</span>
-                                    </label>
-                                    <div class="form-group">
-                                        <label>Puntos Necesarios para 1 Topping Gratis</label>
-                                        <input type="number" class="form-control" id="cfg-puntos-para-topping" min="5" step="5" required>
-                                        <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Ej: 30 puntos = 1 topping gratis.</small>
-                                    </div>
-                                </div>
+                            <div id="live-help-canje" style="margin-top:12px; background:rgba(255,183,3,0.08); border-left:3px solid #FFB703; padding:10px 14px; border-radius:8px; font-size:0.83rem; color:#FDE68A; line-height:1.45;">
+                                <!-- Explicación interactiva en vivo -->
                             </div>
                         </div>
                     </div>
@@ -2214,13 +2210,13 @@
                 ¡Regístrate y obtén premios para <span class="highlight-gold">refrescar tu día</span>!
             </h2>
             <p class="promo-description">
-                Únete gratis a <b>Granifresh</b> y recibe <b class="highlight-cyan">+30 GraniPoints de regalo</b>. Gira la <b>Ruleta Glacial</b>, juega <b>Raspa y Gana</b> y acumula puntos para canjear por tus granizados favoritos y toppings gratis.
+                Únete gratis a <b>Granifresh</b> y recibe <b class="highlight-cyan"><span id="promo-pts-regalo-txt">+30 GraniPoints</span> de regalo</b>. Gira la <b>Ruleta Glacial</b>, juega <b>Raspa y Gana</b> y acumula puntos para canjear por tus granizados favoritos.
             </p>
 
             <div class="promo-perks-row">
                 <div class="promo-perk-item">
                     <span>🎁</span>
-                    <small>+30 pts Regalo</small>
+                    <small id="promo-perk-pts-txt">+30 pts Regalo</small>
                 </div>
                 <div class="promo-perk-item">
                     <span>🎡</span>
@@ -2261,7 +2257,7 @@
                     🔑 Iniciar Sesión
                 </button>
                 <button type="button" class="club-tab-btn" id="tab-auth-registro" onclick="cambiarAuthTab('registro')">
-                    ✨ Crear Cuenta (+30 pts)
+                    ✨ Crear Cuenta (<span id="tab-auth-pts-badge">+30 pts</span>)
                 </button>
             </div>
 
@@ -2283,11 +2279,11 @@
                     <span>🚀</span> Iniciar Sesión en Mi Cuenta
                 </button>
                 <p style="text-align:center; font-size:0.82rem; color:var(--mut); margin:0;">
-                    ¿No tienes cuenta? <a href="javascript:void(0)" onclick="cambiarAuthTab('registro')" style="color:#FFB703; font-weight:700; text-decoration:none;">Regístrate aquí</a> y recibe 30 GraniPoints de bienvenida.
+                    ¿No tienes cuenta? <a href="javascript:void(0)" onclick="cambiarAuthTab('registro')" style="color:#FFB703; font-weight:700; text-decoration:none;">Regístrate aquí</a> y recibe GraniPoints de bienvenida.
                 </p>
             </form>
 
-            <!-- FORMULARIO REGISTRO (TODOS LOS CAMPOS OBLIGATORIOS) -->
+            <!-- FORMULARIO REGISTRO (TODOS LOS CAMPOS OBLIGATORIOS + MAPA INTERACTIVO) -->
             <form id="form-cliente-registro" style="display:none; padding:4px 0;" onsubmit="registrarCliente(event)">
                 <input type="hidden" id="cl-reg-lat" value="10.4075">
                 <input type="hidden" id="cl-reg-lng" value="-75.5255">
@@ -2329,6 +2325,22 @@
                     </div>
                 </div>
 
+                <!-- MAPA INTERACTIVO DE REGISTRO CON PIN ARRASTRABLE -->
+                <div class="form-group" style="margin-bottom:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <label style="color:#A7F3D0; font-weight:700; font-size:0.8rem; display:flex; align-items:center; gap:6px; margin:0;">
+                            <span>🗺️</span> Confirma tu Ubicación Exacta
+                        </label>
+                        <button type="button" class="btn-action-small" onclick="obtenerUbicacionGPSRegistro()" style="padding:2px 8px; font-size:0.72rem; background:rgba(16,185,129,0.18); border-color:#10B981; color:#34D399; cursor:pointer;">
+                            📍 Usar mi GPS
+                        </button>
+                    </div>
+                    <div id="mapa-registro-cliente" style="height:190px; width:100%; border-radius:10px; border:1px solid rgba(52,211,153,0.35); background:#0F1F17; position:relative; z-index:1;"></div>
+                    <small style="color:var(--mut); font-size:0.72rem; display:block; margin-top:4px;">
+                        💡 Al escribir tu dirección el mapa se ubica solo. También puedes <b>arrastrar el pin</b> o tocar en el mapa para marcar tu casa.
+                    </small>
+                </div>
+
                 <div class="form-group" style="margin-bottom:14px;">
                     <label style="color:#FFF; font-weight:700; font-size:0.82rem; display:flex; align-items:center; gap:6px;">
                         <span>📝</span> Indicaciones / Referencia de Entrega *
@@ -2337,8 +2349,8 @@
                     <small style="color:var(--mut); font-size:0.72rem;">Indispensable para el repartidor y ubicar tu entrega.</small>
                 </div>
 
-                <button type="submit" class="cta" style="width:100%; padding:13px; font-weight:800; border-radius:12px; background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; margin-bottom:10px; font-size:0.95rem; box-shadow:0 4px 20px rgba(255,183,3,0.35);">
-                    <span>🎉</span> ¡Crear Cuenta y Ganar 30 GraniPoints!
+                <button type="submit" id="btn-submit-registro-cliente" class="cta" style="width:100%; padding:13px; font-weight:800; border-radius:12px; background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; margin-bottom:10px; font-size:0.95rem; box-shadow:0 4px 20px rgba(255,183,3,0.35);">
+                    <span>🎉</span> ¡Crear Cuenta y Ganar <span id="btn-reg-pts-txt">30</span> GraniPoints!
                 </button>
                 <p style="text-align:center; font-size:0.82rem; color:var(--mut); margin:0;">
                     ¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="cambiarAuthTab('login')" style="color:#34D399; font-weight:700; text-decoration:none;">Iniciar Sesión</a>
@@ -2417,7 +2429,9 @@
             <div class="ruleta-wheel-wrap">
                 <div class="ruleta-needle"></div>
                 <canvas id="canvas-ruleta" width="320" height="320"></canvas>
-                <div class="ruleta-center-pin">❄️</div>
+                <div class="ruleta-center-pin" title="Granifresh Oficial">
+                    <img src="/img/granifresh-logo.jpg" alt="Granifresh" class="ruleta-hub-img">
+                </div>
             </div>
 
             <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:14px 36px; font-size:1.1rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(255,183,3,0.4); background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; cursor:pointer;">

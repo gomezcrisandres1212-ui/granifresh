@@ -1550,10 +1550,23 @@
       var res = await fetch("/api/cliente/config-publica");
       if (res.ok) {
         GraniClubState.configPublica = await res.json();
+        aplicarTextosPuntosBienvenida(GraniClubState.configPublica.puntosBienvenidaRegistro);
       }
     } catch (e) {
       console.warn("No se pudo cargar la config pública de juegos:", e);
     }
+  }
+
+  function aplicarTextosPuntosBienvenida(pts) {
+    var num = (pts !== undefined && pts !== null) ? pts : 30;
+    var elPromoTxt = document.getElementById("promo-pts-regalo-txt");
+    if (elPromoTxt) elPromoTxt.textContent = "+" + num + " GraniPoints";
+    var elPerkTxt = document.getElementById("promo-perk-pts-txt");
+    if (elPerkTxt) elPerkTxt.textContent = "+" + num + " pts Regalo";
+    var elTabBadge = document.getElementById("tab-auth-pts-badge");
+    if (elTabBadge) elTabBadge.textContent = "+" + num + " pts";
+    var elBtnRegTxt = document.getElementById("btn-reg-pts-txt");
+    if (elBtnRegTxt) elBtnRegTxt.textContent = num;
   }
 
   async function inicializarGraniClub() {
@@ -1686,12 +1699,152 @@
       if (btnR) btnR.classList.add("active");
       if (formL) formL.style.display = "none";
       if (formR) formR.style.display = "block";
+      setTimeout(function () {
+        if (window.inicializarMapaRegistroCliente) window.inicializarMapaRegistroCliente();
+      }, 150);
     } else {
       if (btnR) btnR.classList.remove("active");
       if (btnL) btnL.classList.add("active");
       if (formR) formR.style.display = "none";
       if (formL) formL.style.display = "block";
     }
+  };
+
+  var clienteRegMap = null;
+  var clienteRegMarker = null;
+  var regGeocodeTimer = null;
+
+  window.inicializarMapaRegistroCliente = function () {
+    var mapContainer = document.getElementById("mapa-registro-cliente");
+    if (!mapContainer || typeof L === "undefined") return;
+
+    var lat = parseFloat(document.getElementById("cl-reg-lat") ? document.getElementById("cl-reg-lat").value : "10.4075") || 10.4075;
+    var lng = parseFloat(document.getElementById("cl-reg-lng") ? document.getElementById("cl-reg-lng").value : "-75.5255") || -75.5255;
+
+    if (!clienteRegMap) {
+      clienteRegMap = L.map("mapa-registro-cliente", {
+        center: [lat, lng],
+        zoom: 15,
+        scrollWheelZoom: true
+      });
+
+      L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+        maxZoom: 20,
+        attribution: "Leaflet | &copy; Google Maps"
+      }).addTo(clienteRegMap);
+
+      clienteRegMarker = L.marker([lat, lng], { draggable: true }).addTo(clienteRegMap);
+
+      clienteRegMarker.bindPopup('<b style="color:#00B4D8;">📍 Tu Ubicación de Entrega</b><br><small>Arrastra este pin para marcar tu casa exacta</small>').openPopup();
+
+      clienteRegMarker.on("dragend", function (e) {
+        var pos = e.target.getLatLng();
+        var elLat = document.getElementById("cl-reg-lat");
+        var elLng = document.getElementById("cl-reg-lng");
+        if (elLat) elLat.value = pos.lat.toFixed(6);
+        if (elLng) elLng.value = pos.lng.toFixed(6);
+        reverseGeocodeRegistro(pos.lat, pos.lng);
+      });
+
+      clienteRegMap.on("click", function (e) {
+        clienteRegMarker.setLatLng(e.latlng);
+        var elLat = document.getElementById("cl-reg-lat");
+        var elLng = document.getElementById("cl-reg-lng");
+        if (elLat) elLat.value = e.latlng.lat.toFixed(6);
+        if (elLng) elLng.value = e.latlng.lng.toFixed(6);
+        reverseGeocodeRegistro(e.latlng.lat, e.latlng.lng);
+      });
+
+      // Escuchar cambios de escritura en los campos de Dirección y Barrio para mover el pin automáticamente
+      var inpDir = document.getElementById("cl-reg-dir");
+      var inpBar = document.getElementById("cl-reg-barrio");
+      var onDirInput = function () {
+        clearTimeout(regGeocodeTimer);
+        regGeocodeTimer = setTimeout(function () {
+          geocodificarDireccionRegistro();
+        }, 550);
+      };
+      if (inpDir) inpDir.addEventListener("input", onDirInput);
+      if (inpBar) inpBar.addEventListener("input", onDirInput);
+    } else {
+      clienteRegMap.setView([lat, lng], 15);
+      clienteRegMarker.setLatLng([lat, lng]);
+    }
+
+    setTimeout(function () {
+      if (clienteRegMap) clienteRegMap.invalidateSize();
+    }, 250);
+  };
+
+  async function geocodificarDireccionRegistro() {
+    var dir = document.getElementById("cl-reg-dir") ? document.getElementById("cl-reg-dir").value.trim() : "";
+    var bar = document.getElementById("cl-reg-barrio") ? document.getElementById("cl-reg-barrio").value.trim() : "";
+    if (!dir && !bar) return;
+
+    var query = dir + (bar ? ", " + bar : "") + ", Cartagena, Colombia";
+    try {
+      var url = "https://nominatim.openstreetmap.org/search?format=json&q=" + encodeURIComponent(query) + "&limit=1";
+      var res = await fetch(url, { headers: { "Accept-Language": "es" } });
+      if (res.ok) {
+        var data = await res.json();
+        if (data && data.length > 0) {
+          var lat = parseFloat(data[0].lat);
+          var lon = parseFloat(data[0].lon);
+          var elLat = document.getElementById("cl-reg-lat");
+          var elLng = document.getElementById("cl-reg-lng");
+          if (elLat) elLat.value = lat.toFixed(6);
+          if (elLng) elLng.value = lon.toFixed(6);
+          if (clienteRegMap && clienteRegMarker) {
+            clienteRegMap.setView([lat, lon], 16);
+            clienteRegMarker.setLatLng([lat, lon]);
+            clienteRegMarker.setPopupContent('<b style="color:#00B4D8;">📍 ' + escapeHtmlText(dir) + '</b><br><small>Barrio: ' + escapeHtmlText(bar) + '</small>').openPopup();
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Geocodificación registro error:", e);
+    }
+  }
+
+  async function reverseGeocodeRegistro(lat, lng) {
+    try {
+      var url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lng;
+      var res = await fetch(url, { headers: { "Accept-Language": "es" } });
+      if (res.ok) {
+        var data = await res.json();
+        if (data && data.address) {
+          var barrioDetectado = data.address.suburb || data.address.neighbourhood || data.address.residential;
+          var inpBar = document.getElementById("cl-reg-barrio");
+          if (inpBar && !inpBar.value && barrioDetectado) {
+            inpBar.value = barrioDetectado;
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  window.obtenerUbicacionGPSRegistro = function () {
+    if (!navigator.geolocation) {
+      alert("Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      var elLat = document.getElementById("cl-reg-lat");
+      var elLng = document.getElementById("cl-reg-lng");
+      if (elLat) elLat.value = lat.toFixed(6);
+      if (elLng) elLng.value = lng.toFixed(6);
+      if (clienteRegMap && clienteRegMarker) {
+        clienteRegMap.setView([lat, lng], 17);
+        clienteRegMarker.setLatLng([lat, lng]);
+        clienteRegMarker.setPopupContent('<b style="color:#10B981;">📍 Tu Ubicación GPS Actual</b>').openPopup();
+      }
+      reverseGeocodeRegistro(lat, lng);
+      if (window.showToast) window.showToast("Ubicación GPS establecida 📍", "success");
+    }, function (err) {
+      alert("No pudimos acceder a tu GPS. Por favor escribe tu dirección.");
+    }, { enableHighAccuracy: true, timeout: 8000 });
   };
 
   window.registrarCliente = async function (e) {
@@ -1881,11 +2034,11 @@
 
     ctx.clearRect(0, 0, width, height);
 
-    // Fondo y sombra
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(anguloRad);
 
+    // Gajos de la ruleta
     for (var i = 0; i < numSectores; i++) {
       var sAngle = i * arc;
       var eAngle = sAngle + arc;
@@ -1899,22 +2052,65 @@
       ctx.fillStyle = sec.color || (i % 2 === 0 ? "#FFB703" : "#10B981");
       ctx.fill();
 
-      // Borde del gajo
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(5, 26, 16, 0.6)";
+      // Borde y separador del gajo
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = "rgba(5, 26, 16, 0.85)";
       ctx.stroke();
 
-      // Texto e Icono
+      // Línea de brillo radial interno
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(sAngle) * radius, Math.sin(sAngle) * radius);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Texto de alta legibilidad con contorno negro
       ctx.save();
       ctx.rotate(sAngle + arc / 2);
       ctx.textAlign = "right";
-      ctx.fillStyle = "#051A10";
-      ctx.font = "bold 13px sans-serif";
-      ctx.shadowColor = "rgba(255,255,255,0.4)";
-      ctx.shadowBlur = 4;
+      ctx.textBaseline = "middle";
+
       var tit = sec.titulo || ("+" + (sec.puntos || 10));
-      ctx.fillText(tit, radius - 24, 5);
+      ctx.font = "800 13px 'Outfit', sans-serif";
+
+      // Contorno oscuro para legibilidad 100% sobre cualquier color
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = "rgba(5, 26, 16, 0.95)";
+      ctx.strokeText(tit, radius - 22, 0);
+
+      // Relleno blanco brillante
+      ctx.fillStyle = (sec.tipo === "VACIO") ? "#E2E8F0" : "#FFFFFF";
+      ctx.fillText(tit, radius - 22, 0);
+
       ctx.restore();
+    }
+
+    // Aro exterior dorado decorativo con remaches
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "#FFB703";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius + 2.5, 0, Math.PI * 2);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = "#051A10";
+    ctx.stroke();
+
+    // Remaches metálicos en el perímetro
+    for (var j = 0; j < numSectores; j++) {
+      var dotAngle = j * arc;
+      var dotX = Math.cos(dotAngle) * radius;
+      var dotY = Math.sin(dotAngle) * radius;
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fill();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "#051A10";
+      ctx.stroke();
     }
 
     ctx.restore();

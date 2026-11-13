@@ -2672,18 +2672,12 @@ async function cargarConfigJuegosAdmin() {
         const elMaxDesc = document.getElementById('cfg-max-porcentaje-descuento');
         if (elMaxDesc) elMaxDesc.value = cfg.maximoPorcentajeDescuentoPedido || 50;
 
-        // Canje por Granizado y Topping Gratis
+        // Canje por Granizado Gratis
         const elCanjeGran = document.getElementById('cfg-canje-granizado-habilitado');
         if (elCanjeGran) elCanjeGran.checked = !!cfg.canjePorGranizadoHabilitado;
 
         const elPtsGran = document.getElementById('cfg-puntos-para-granizado');
         if (elPtsGran) elPtsGran.value = cfg.puntosParaGranizadoGratis || 120;
-
-        const elCanjeTop = document.getElementById('cfg-canje-topping-habilitado');
-        if (elCanjeTop) elCanjeTop.checked = !!cfg.canjePorToppingHabilitado;
-
-        const elPtsTop = document.getElementById('cfg-puntos-para-topping');
-        if (elPtsTop) elPtsTop.value = cfg.puntosParaToppingGratis || 30;
 
         // Intentos y bienvenida
         const elBienv = document.getElementById('cfg-puntos-bienvenida');
@@ -2695,6 +2689,9 @@ async function cargarConfigJuegosAdmin() {
         const elIntRaspa = document.getElementById('cfg-intentos-gratis-raspa');
         if (elIntRaspa) elIntRaspa.value = cfg.intentosGratisRaspaDiarios !== undefined ? cfg.intentosGratisRaspaDiarios : 1;
 
+        // Actualizar explicaciones interactivas
+        actualizarLiveHelpAdmin();
+
         // Renderizar Tablas de Premios
         renderizarTablaPremiosRuletaAdmin(cfg.premiosRuleta || []);
         renderizarTablaPremiosRaspaAdmin(cfg.premiosRaspa || []);
@@ -2703,6 +2700,67 @@ async function cargarConfigJuegosAdmin() {
         console.error('Error al cargar config juegos:', err);
     }
 }
+
+window.actualizarLiveHelpAdmin = function () {
+    // 1. Bienvenida e Intentos
+    const ptsBienv = parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) || 0;
+    const intRul = parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 0;
+    const intRas = parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 0;
+    const elHelpBienv = document.getElementById('live-help-bienvenida');
+    if (elHelpBienv) {
+        elHelpBienv.innerHTML = `
+            <strong>💡 Vista en vivo para el administrador:</strong><br>
+            • Cada nuevo cliente recibirá automáticamente <b style="color:#FFD166;">+${ptsBienv} GraniPoints</b> de regalo al registrarse. Este valor se actualiza en vivo en el anuncio emergente y botones de la tienda.<br>
+            • Cada cliente tendrá <b style="color:#38BDF8;">${intRul} tiro(s) gratis</b> de ruleta y <b style="color:#38BDF8;">${intRas} raspa(s) gratis</b> cada 24 horas.
+        `;
+    }
+
+    // 2. Acumulación por compra
+    const modo = document.getElementById('cfg-modo-puntos-compra')?.value || 'POR_VALOR';
+    const pesosPto = parseInt(document.getElementById('cfg-pesos-por-punto')?.value, 10) || 1000;
+    const ptsFijos = parseInt(document.getElementById('cfg-puntos-fijos-compra')?.value, 10) || 15;
+    const elHelpComp = document.getElementById('live-help-compra');
+    if (elHelpComp) {
+        if (modo === 'POR_VALOR') {
+            const ejPts = Math.floor(25000 / (pesosPto || 1));
+            elHelpComp.innerHTML = `
+                <strong>💡 Modo Proporcional activo:</strong><br>
+                El cliente gana 1 punto por cada <b style="color:#34D399;">$${pesosPto.toLocaleString('es-CO')} COP</b> gastados.<br>
+                <em>Ejemplo en vivo:</em> En un pedido de <b>$25.000 COP</b>, el cliente recibirá automáticamente <b style="color:#FFD166;">${ejPts} GraniPoints</b>.
+            `;
+        } else {
+            elHelpComp.innerHTML = `
+                <strong>💡 Modo Puntos Fijos activo:</strong><br>
+                Sin importar el monto de la orden (sea $12.000 o $50.000), el cliente recibirá exactamente <b style="color:#34D399;">${ptsFijos} GraniPoints</b> fijos al terminar su compra.
+            `;
+        }
+    }
+
+    // 3. Canjes y beneficios
+    const canjeDesc = document.getElementById('cfg-canje-descuento-habilitado')?.checked ?? true;
+    const valPeso = parseFloat(document.getElementById('cfg-valor-peso-punto')?.value) || 20;
+    const minCanje = parseInt(document.getElementById('cfg-puntos-minimos-canje')?.value, 10) || 50;
+    const maxPorc = parseInt(document.getElementById('cfg-max-porcentaje-descuento')?.value, 10) || 50;
+    const canjeGran = document.getElementById('cfg-canje-granizado-habilitado')?.checked ?? false;
+    const ptsGran = parseInt(document.getElementById('cfg-puntos-para-granizado')?.value, 10) || 120;
+    const elHelpCanje = document.getElementById('live-help-canje');
+    if (elHelpCanje) {
+        let txt = `<strong>💡 Resumen en vivo de beneficios para el cliente:</strong><br>`;
+        if (canjeDesc) {
+            const ejDesc100 = 100 * valPeso;
+            const ejMaxDesc = (30000 * maxPorc) / 100;
+            txt += `• <b>Descuento en Dinero:</b> Cada punto descuenta <b style="color:#FFD166;">$${valPeso} COP</b> (100 puntos = <b>-$${ejDesc100.toLocaleString('es-CO')} COP</b>). Requiere mínimo <b>${minCanje} puntos</b> para canjear y puede cubrir hasta el <b>${maxPorc}%</b> de la orden (en un pedido de $30.000 COP descuenta máx <b>$${ejMaxDesc.toLocaleString('es-CO')} COP</b>).<br>`;
+        } else {
+            txt += `• <b>Descuento en Dinero:</b> Desactivado.<br>`;
+        }
+        if (canjeGran) {
+            txt += `• <b>Granizado Gratis:</b> Activo. El cliente puede canjear 1 Granizado gratis en checkout si tiene <b style="color:#34D399;">${ptsGran} GraniPoints</b>.`;
+        } else {
+            txt += `• <b>Granizado Gratis:</b> Desactivado.`;
+        }
+        elHelpCanje.innerHTML = txt;
+    }
+};
 
 function toggleModoPuntosCompraUI() {
     const modo = document.getElementById('cfg-modo-puntos-compra') ? document.getElementById('cfg-modo-puntos-compra').value : 'POR_VALOR';
@@ -2876,8 +2934,6 @@ window.guardarConfigJuegosAdmin = async function (e) {
         maximoPorcentajeDescuentoPedido: parseInt(document.getElementById('cfg-max-porcentaje-descuento')?.value, 10) || 50,
         canjePorGranizadoHabilitado: document.getElementById('cfg-canje-granizado-habilitado')?.checked ?? false,
         puntosParaGranizadoGratis: parseInt(document.getElementById('cfg-puntos-para-granizado')?.value, 10) || 120,
-        canjePorToppingHabilitado: document.getElementById('cfg-canje-topping-habilitado')?.checked ?? false,
-        puntosParaToppingGratis: parseInt(document.getElementById('cfg-puntos-para-topping')?.value, 10) || 30,
         puntosBienvenidaRegistro: parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) || 30,
         intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 1,
         intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 1,
