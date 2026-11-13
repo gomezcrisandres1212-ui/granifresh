@@ -5909,9 +5909,14 @@ footer {
   min-width: 90px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
-.promo-perk-item span {
+.promo-perk-item span,
+.promo-perk-icon {
   font-size: 1.4rem;
   margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
 }
 .promo-perk-item small {
   font-size: 0.74rem;
@@ -6001,8 +6006,13 @@ footer {
     padding: 6px 8px !important;
     min-width: 75px !important;
   }
-  .promo-perk-item span {
+  .promo-perk-item span,
+  .promo-perk-icon {
     font-size: 1.15rem !important;
+    min-height: 24px !important;
+  }
+  .promo-perk-icon svg {
+    transform: scale(0.9);
   }
   .promo-perk-item small {
     font-size: 0.68rem !important;
