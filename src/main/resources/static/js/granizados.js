@@ -1654,11 +1654,7 @@
     var bannerHero = document.getElementById("hero-granipoints-banner");
     if (bannerHero) {
       bannerHero.addEventListener("click", function () {
-        if (GraniClubState.cliente) {
-          irAZonaJuegosPrincipal();
-        } else {
-          abrirModalGraniClub();
-        }
+        abrirModalGraniClub();
       });
     }
 
@@ -1744,13 +1740,13 @@
             '</div>' +
             '<div class="hgb-vip-details">' +
               '<span>🪙 Saldo: <b class="hgb-vip-points">' + ptsFormatted + ' GraniPoints</b></span>' +
-              '<span class="hgb-vip-games" id="hgb-vip-games-status">🎮 Ver juegos & dinámicas</span>' +
+              '<span class="hgb-vip-games" id="hgb-vip-games-status">🎁 Ver premios & historial</span>' +
             '</div>' +
           '</div>';
       }
       if (hgbAction) {
         hgbAction.className = "hgb-action hgb-action-vip";
-        hgbAction.textContent = "Jugar & Premios ➔";
+        hgbAction.textContent = "🎁 Premios & Historial ➔";
       }
 
       if (viewAuth) viewAuth.style.display = "none";
@@ -1765,12 +1761,47 @@
       var elPts = document.getElementById("cl-perfil-puntos");
       if (elPts) elPts.textContent = (cl.granipoints || 0).toLocaleString("es-CO");
 
+      var valPunto = (GraniClubState.configPublica && GraniClubState.configPublica.valorPesosPorPunto) || 20;
+      var equiv = (cl.granipoints || 0) * valPunto;
+
       var elPtsVal = document.getElementById("cl-perfil-puntos-valor");
       if (elPtsVal) {
-        var valPunto = (GraniClubState.configPublica && GraniClubState.configPublica.valorPesosPorPunto) || 20;
-        var equiv = (cl.granipoints || 0) * valPunto;
         elPtsVal.textContent = "Equivale a ~" + fmt(equiv) + " COP en pedidos";
       }
+
+      // Actualizar metas y premios en el modal de perfil
+      var ptsActuales = cl.granipoints || 0;
+      var cfg = GraniClubState.configPublica || {};
+      var ptsParaGranizado = cfg.puntosParaGranizadoGratis || 120;
+      var minPuntos = cfg.puntosMinimosCanje || 20;
+
+      var elPremioGranPts = document.getElementById("cl-premio-granizado-pts");
+      if (elPremioGranPts) elPremioGranPts.textContent = ptsParaGranizado + " pts";
+
+      var elBar = document.getElementById("cl-progreso-granizado-bar");
+      var pct = Math.min(100, Math.round((ptsActuales / ptsParaGranizado) * 100));
+      if (elBar) elBar.style.width = pct + "%";
+
+      var elProgTxt = document.getElementById("cl-progreso-granizado-txt");
+      if (elProgTxt) elProgTxt.textContent = "Tienes " + ptsActuales.toLocaleString("es-CO") + " / " + ptsParaGranizado + " pts (" + pct + "%)";
+
+      var elProgStatus = document.getElementById("cl-progreso-granizado-status");
+      if (elProgStatus) {
+        if (ptsActuales >= ptsParaGranizado) {
+          elProgStatus.textContent = "✨ ¡Listo para reclamar!";
+          elProgStatus.style.color = "#10B981";
+        } else {
+          var faltan = ptsParaGranizado - ptsActuales;
+          elProgStatus.textContent = "Te faltan " + faltan + " pts";
+          elProgStatus.style.color = "#FFB703";
+        }
+      }
+
+      var elDescEquiv = document.getElementById("cl-desc-equiv-txt");
+      if (elDescEquiv) elDescEquiv.textContent = "1 punto = $" + valPunto + " COP (Mínimo " + minPuntos + " pts)";
+
+      var elDescAhorro = document.getElementById("cl-desc-ahorro-txt");
+      if (elDescAhorro) elDescAhorro.textContent = fmt(ptsActuales * valPunto);
 
       refrescarEstadoJuegosCliente();
       inicializarJuegosVistaPrincipal();
@@ -1880,7 +1911,7 @@
             hgbGames.innerHTML = "🎯 <b>" + totT + " tirada" + (totT > 1 ? "s" : "") + " disponible" + (totT > 1 ? "s " : " ") + cicloTxt + "</b>";
             hgbGames.style.color = "#FFE600";
           } else {
-            hgbGames.innerHTML = "✨ ¡Pide y acumula más puntos!";
+            hgbGames.innerHTML = "🎁 Ver premios & historial";
             hgbGames.style.color = "#34D399";
           }
         }
@@ -2506,6 +2537,107 @@
   // ==========================================
   // RASPA Y GANA GLACIAL INTERACTIVO
   // ==========================================
+  var logoRaspaImg = new Image();
+  logoRaspaImg.src = "/img/granifresh-logo.jpg";
+  logoRaspaImg.onload = function () {
+    var canvas = document.getElementById("canvas-raspa");
+    if (canvas && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+      prepararCanvasRaspaInicial();
+    }
+  };
+
+  function renderSuperficieRaspa(ctx, w, h, modo) {
+    ctx.globalCompositeOperation = "source-over";
+
+    // Fondo con los colores oficiales de la marca Granifresh:
+    // Verde esmeralda tropical profundo, verde menta vibrante y amarillo mango cítrico / oro
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, "#033B26");
+    grad.addColorStop(0.28, "#059669");
+    grad.addColorStop(0.68, "#D97706");
+    grad.addColorStop(1, "#FFB703");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Marco interior decorativo tipo billete de lotería / raspa oficial
+    ctx.save();
+    ctx.strokeStyle = "rgba(255, 230, 0, 0.45)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(8, 8, w - 16, h - 16);
+    ctx.restore();
+
+    // Destellos y micro-estrellas doradas y frutales
+    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+    for (var i = 0; i < 90; i++) {
+      ctx.beginPath();
+      var px = ((i * 47) % (w - 24)) + 12;
+      var py = ((i * 31) % (h - 24)) + 12;
+      ctx.arc(px, py, (i % 3) + 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Logo pequeño en la parte superior central
+    var logoSize = 48;
+    var logoX = (w - logoSize) / 2;
+    var logoY = 16;
+    var logoRadius = logoSize / 2;
+
+    ctx.save();
+    // Círculo clip para el logo
+    ctx.beginPath();
+    ctx.arc(w / 2, logoY + logoRadius, logoRadius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.save();
+    ctx.clip();
+    if (logoRaspaImg.complete && logoRaspaImg.naturalWidth > 0) {
+      ctx.drawImage(logoRaspaImg, logoX, logoY, logoSize, logoSize);
+    } else {
+      ctx.fillStyle = "#FFB703";
+      ctx.fillRect(logoX, logoY, logoSize, logoSize);
+      ctx.fillStyle = "#042013";
+      ctx.font = "bold 20px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🍃", w / 2, logoY + logoRadius);
+    }
+    ctx.restore();
+
+    // Borde circular dorado con resplandor
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#FFB703";
+    ctx.shadowColor = "rgba(255, 183, 3, 0.8)";
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.restore();
+
+    // Textos oficiales Granifresh
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+
+    // Marca Granifresh
+    ctx.fillStyle = "#FFE600";
+    ctx.font = "900 12px 'Fredoka', 'Outfit', sans-serif";
+    ctx.fillText("GRANIFRESH OFICIAL", w / 2, logoY + logoSize + 16);
+
+    // Título Raspa y Gana
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "900 19px 'Fredoka', 'Outfit', sans-serif";
+    ctx.fillText("¡RASPA Y GANA!", w / 2, logoY + logoSize + 38);
+
+    // Subtítulo según modo
+    ctx.fillStyle = "#A7F3D0";
+    ctx.font = "bold 11px 'Outfit', sans-serif";
+    if (modo === "activo") {
+      ctx.fillText("✨ ¡Frota con tu dedo o cursor! ✨", w / 2, logoY + logoSize + 56);
+    } else {
+      ctx.fillText("Toca 'NUEVA TARJETA' para raspar", w / 2, logoY + logoSize + 56);
+    }
+    ctx.restore();
+  }
+
   function prepararCanvasRaspaInicial() {
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
@@ -2513,30 +2645,7 @@
     var w = canvas.width;
     var h = canvas.height;
 
-    ctx.globalCompositeOperation = "source-over";
-    var grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#94A3B8");
-    grad.addColorStop(0.3, "#E2E8F0");
-    grad.addColorStop(0.6, "#38BDF8");
-    grad.addColorStop(1, "#0284C7");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-
-    // Escarcha decorativa
-    ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
-    for (var i = 0; i < 180; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 3 + 1, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "900 18px 'Outfit', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("❄️ RASPA Y GANA AQUÍ ❄️", w / 2, h / 2 - 8);
-    ctx.font = "bold 12px 'Outfit', sans-serif";
-    ctx.fillStyle = "#1E293B";
-    ctx.fillText("Presiona 'NUEVA TARJETA' para raspar", w / 2, h / 2 + 16);
+    renderSuperficieRaspa(ctx, w, h, "inicial");
 
     // Si hace clic sobre el canvas sin partida activa, iniciar automáticamente
     canvas.onclick = function () {
@@ -2613,32 +2722,7 @@
     var w = canvas.width;
     var h = canvas.height;
 
-    ctx.globalCompositeOperation = "source-over";
-
-    // Textura de Escarcha / Hielo Plateado Glacial
-    var grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#94A3B8");
-    grad.addColorStop(0.3, "#E2E8F0");
-    grad.addColorStop(0.6, "#38BDF8");
-    grad.addColorStop(1, "#0284C7");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-
-    // Patrón decorativo de escarcha
-    ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-    for (var i = 0; i < 200; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 3 + 1, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    ctx.fillStyle = "#0F172A";
-    ctx.font = "900 18px 'Outfit', sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("❄️ ¡RASPA CON TU DEDO O CURSOR! ❄️", w / 2, h / 2 - 6);
-    ctx.font = "bold 12px 'Outfit', sans-serif";
-    ctx.fillStyle = "#1E293B";
-    ctx.fillText("Frota para revelar tu premio secreto", w / 2, h / 2 + 18);
+    renderSuperficieRaspa(ctx, w, h, "activo");
 
     // Eventos de raspado
     var isRaspando = false;
