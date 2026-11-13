@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=9.1">
+<link rel="stylesheet" href="/css/granizados.css?v=9.2">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -465,7 +465,7 @@
         <span>🎡</span> Ruleta Glacial
       </div>
       <h3 style="font-size:18px; margin:0 0 6px; font-weight:800; color:#FFFFFF;">Ruleta Sub-Cero</h3>
-      <p style="margin:0 0 16px; color:var(--mut); font-size:13px; max-width:320px; line-height:1.4;">
+      <p class="vip-game-sub">
         ¡Prueba tu suerte! Gira la ruleta y acumula GraniPoints directos a tu perfil.
       </p>
 
@@ -504,23 +504,25 @@
         <span>🎫</span> Raspa y Gana
       </div>
       <h3 style="font-size:18px; margin:0 0 6px; font-weight:800; color:#FFFFFF;">Raspa y Gana Glacial</h3>
-      <p style="margin:0 0 16px; color:var(--mut); font-size:13px; max-width:320px; line-height:1.4;">
-        Pasa tu dedo o cursor sobre la escarcha plateada para descubrir tu premio secreto.
+      <p class="vip-game-sub">
+        Pasa tu dedo o cursor sobre la tarjeta para descubrir tu premio secreto.
       </p>
 
       <div class="raspa-container">
-        <div class="raspa-card-frame" id="raspa-card-frame">
-          <!-- Premio oculto debajo -->
-          <div class="raspa-under-prize" id="raspa-under-prize">
-            <div class="raspa-under-icon" id="raspa-icon">🍓</div>
-            <h3 class="raspa-under-title" id="raspa-title">+30 GraniPoints</h3>
-            <p class="raspa-under-sub" id="raspa-sub">¡Fruta 100% natural!</p>
+        <div class="raspa-frame-wrap">
+          <div class="raspa-card-frame" id="raspa-card-frame">
+            <!-- Premio oculto debajo -->
+            <div class="raspa-under-prize" id="raspa-under-prize">
+              <div class="raspa-under-icon" id="raspa-icon">🍓</div>
+              <h3 class="raspa-under-title" id="raspa-title">+30 GraniPoints</h3>
+              <p class="raspa-under-sub" id="raspa-sub">¡Fruta 100% natural!</p>
+            </div>
+            <!-- Lienzo de escarcha para raspar -->
+            <canvas id="canvas-raspa" width="310" height="220"></canvas>
           </div>
-          <!-- Lienzo de escarcha para raspar -->
-          <canvas id="canvas-raspa" width="310" height="220"></canvas>
         </div>
 
-        <button type="button" class="cta" id="btn-iniciar-raspa" onclick="iniciarNuevaPartidaRaspa()" style="padding:12px 32px; font-size:15px; font-weight:900; border-radius:99px; background:linear-gradient(135deg,#10B981,#059669); color:#FFFFFF; cursor:pointer; margin-top:14px;">
+        <button type="button" class="cta" id="btn-iniciar-raspa" onclick="iniciarNuevaPartidaRaspa()" style="padding:12px 34px; font-size:15px; font-weight:900; border-radius:99px; background:linear-gradient(135deg,#10B981,#059669); color:#FFFFFF; cursor:pointer;">
           ❄️ ¡NUEVA TARJETA RASPA!
         </button>
 
@@ -2977,7 +2979,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=9.1"></script>
-<script src="/js/admin.js?v=9.1"></script>
+<script src="/js/granizados.js?v=9.2"></script>
+<script src="/js/admin.js?v=9.2"></script>
 </body>
 </html>

@@ -6131,33 +6131,56 @@ footer {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-  .ruleta-wheel-wrap {
+  .ruleta-wheel-wrap,
+  .raspa-frame-wrap {
     width: 250px !important;
     height: 250px !important;
     margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .raspa-card-frame {
     width: 270px !important;
     height: 185px !important;
-    margin-bottom: 14px;
+    margin: 0 auto;
   }
 }
 
-/* Contenedor de la Ruleta */
-.ruleta-container {
+.vip-game-sub {
+  margin: 0 0 16px;
+  color: var(--mut);
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.4;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Contenedores de Juegos Alineados en el Mismo Eje Horizontal */
+.ruleta-container,
+.raspa-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   position: relative;
-  padding: 10px 0;
+  width: 100%;
 }
-.ruleta-wheel-wrap {
+
+.ruleta-wheel-wrap,
+.raspa-frame-wrap {
   position: relative;
   width: 320px;
   height: 320px;
   max-width: 90vw;
   max-height: 90vw;
   margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .ruleta-needle {
   position: absolute;
@@ -6206,13 +6229,6 @@ footer {
   display: block;
 }
 
-/* Contenedor del Raspa y Gana */
-.raspa-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 0;
-}
 .raspa-card-frame {
   position: relative;
   width: 310px;
@@ -6222,7 +6238,7 @@ footer {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 22px rgba(255, 183, 3, 0.4);
   border: 3px solid #FFB703;
   background: radial-gradient(circle at center, #0F3826 0%, #03140C 100%);
-  margin-bottom: 16px;
+  margin: 0 auto;
   user-select: none;
   touch-action: none;
 }

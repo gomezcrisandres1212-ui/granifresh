@@ -2559,13 +2559,6 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    // Marco interior decorativo tipo billete de lotería / raspa oficial
-    ctx.save();
-    ctx.strokeStyle = "rgba(255, 230, 0, 0.45)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(8, 8, w - 16, h - 16);
-    ctx.restore();
-
     // Destellos y micro-estrellas doradas y frutales
     ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
     for (var i = 0; i < 90; i++) {
