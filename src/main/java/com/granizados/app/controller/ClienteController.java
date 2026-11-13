@@ -108,15 +108,24 @@ public class ClienteController {
     @GetMapping("/config-publica")
     public ResponseEntity<?> obtenerConfigPublica() {
         ConfiguracionJuegos config = juegoService.obtenerConfiguracion();
-        return ResponseEntity.ok(Map.of(
-                "ruletaActiva", config.isRuletaActiva(),
-                "raspaActivo", config.isRaspaActivo(),
-                "premiosRuleta", config.getPremiosRuleta(),
-                "premiosRaspa", config.getPremiosRaspa(),
-                "puntosBienvenida", config.getPuntosBienvenidaRegistro(),
-                "valorPesosPorPunto", config.getValorPesosPorPunto(),
-                "puntosMinimosCanje", config.getPuntosMinimosCanje()
-        ));
+        java.util.Map<String, Object> resp = new java.util.HashMap<>();
+        resp.put("ruletaActiva", config.isRuletaActiva());
+        resp.put("raspaActivo", config.isRaspaActivo());
+        resp.put("premiosRuleta", config.getPremiosRuleta());
+        resp.put("premiosRaspa", config.getPremiosRaspa());
+        resp.put("puntosBienvenida", config.getPuntosBienvenidaRegistro());
+        resp.put("valorPesosPorPunto", config.getValorPesosPorPunto());
+        resp.put("puntosMinimosCanje", config.getPuntosMinimosCanje());
+        resp.put("maximoPorcentajeDescuentoPedido", config.getMaximoPorcentajeDescuentoPedido());
+        resp.put("canjePorGranizadoHabilitado", config.isCanjePorGranizadoHabilitado());
+        resp.put("puntosParaGranizadoGratis", config.getPuntosParaGranizadoGratis());
+        resp.put("canjePorToppingHabilitado", config.isCanjePorToppingHabilitado());
+        resp.put("puntosParaToppingGratis", config.getPuntosParaToppingGratis());
+        resp.put("acumularPuntosPorCompra", config.isAcumularPuntosPorCompra());
+        resp.put("modoPuntosCompra", config.getModoPuntosCompra());
+        resp.put("pesosPorPuntoAcumulado", config.getPesosPorPuntoAcumulado());
+        resp.put("puntosFijosPorCompra", config.getPuntosFijosPorCompra());
+        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/juegos/estado")

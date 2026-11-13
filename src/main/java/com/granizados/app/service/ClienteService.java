@@ -40,14 +40,23 @@ public class ClienteService {
     }
 
     public ClienteResponseDTO registrar(ClienteRegistroDTO dto) {
-        if (dto.getTelefono() == null || dto.getTelefono().trim().length() < 7) {
-            return new ClienteResponseDTO(false, null, "Por favor ingresa un número de WhatsApp / teléfono válido.", null);
-        }
         if (dto.getNombre() == null || dto.getNombre().trim().length() < 2) {
             return new ClienteResponseDTO(false, null, "Por favor ingresa tu nombre completo.", null);
         }
+        if (dto.getTelefono() == null || dto.getTelefono().trim().length() < 7) {
+            return new ClienteResponseDTO(false, null, "Por favor ingresa un número de WhatsApp / teléfono válido.", null);
+        }
         if (dto.getContrasena() == null || dto.getContrasena().trim().length() < 4) {
             return new ClienteResponseDTO(false, null, "La contraseña debe tener al menos 4 caracteres.", null);
+        }
+        if (dto.getDireccion() == null || dto.getDireccion().trim().length() < 4) {
+            return new ClienteResponseDTO(false, null, "La dirección de entrega es obligatoria para tu cuenta.", null);
+        }
+        if (dto.getBarrio() == null || dto.getBarrio().trim().length() < 2) {
+            return new ClienteResponseDTO(false, null, "El barrio es obligatorio.", null);
+        }
+        if (dto.getIndicaciones() == null || dto.getIndicaciones().trim().length() < 2) {
+            return new ClienteResponseDTO(false, null, "Las indicaciones o punto de referencia son obligatorios.", null);
         }
 
         String telLimpio = dto.getTelefono().replaceAll("[^0-9]", "").trim();
@@ -63,9 +72,11 @@ public class ClienteService {
         cliente.setNombre(dto.getNombre().trim());
         cliente.setEmail(dto.getEmail() != null ? dto.getEmail().trim() : null);
         cliente.setContrasenaHash(passwordEncoder.encode(dto.getContrasena().trim()));
-        cliente.setDireccionPredeterminada(dto.getDireccion() != null ? dto.getDireccion().trim() : null);
-        cliente.setBarrioPredeterminado(dto.getBarrio() != null ? dto.getBarrio().trim() : null);
-        cliente.setIndicacionesPredeterminadas(dto.getIndicaciones() != null ? dto.getIndicaciones().trim() : null);
+        cliente.setDireccionPredeterminada(dto.getDireccion().trim());
+        cliente.setBarrioPredeterminado(dto.getBarrio().trim());
+        cliente.setIndicacionesPredeterminadas(dto.getIndicaciones().trim());
+        cliente.setLatitud(dto.getLatitud() != null ? dto.getLatitud() : 10.4075);
+        cliente.setLongitud(dto.getLongitud() != null ? dto.getLongitud() : -75.5255);
 
         int puntosBienvenida = config.getPuntosBienvenidaRegistro();
         cliente.setGranipoints(puntosBienvenida);

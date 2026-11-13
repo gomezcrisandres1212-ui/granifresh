@@ -25,7 +25,9 @@ public class ConfiguracionJuegos {
 
     // Reglas de negocio para compras
     private boolean acumularPuntosPorCompra;
+    private String modoPuntosCompra; // "POR_VALOR" o "FIJO"
     private int pesosPorPuntoAcumulado; // ej: 1 punto por cada $1.000 COP gastados
+    private int puntosFijosPorCompra; // ej: 10 puntos fijos por orden
     private boolean otorgarGirosPorCompra; // ej: 1 giro de ruleta extra por cada pedido
 
     // Canje de puntos en el checkout
@@ -33,6 +35,10 @@ public class ConfiguracionJuegos {
     private double valorPesosPorPunto;  // ej: 1 GraniPoint = $20 COP de descuento (100 pts = $2.000)
     private int puntosMinimosCanje;     // ej: mínimo 50 GraniPoints para poder canjear
     private int maximoPorcentajeDescuentoPedido; // ej: máximo 50% del total puede pagarse con puntos
+    private boolean canjePorGranizadoHabilitado; // ¿Se puede canjear por 1 granizado gratis?
+    private int puntosParaGranizadoGratis;       // ej: 120 GraniPoints = 1 Granizado Gratis
+    private boolean canjePorToppingHabilitado;   // ¿Se puede canjear por topping gratis?
+    private int puntosParaToppingGratis;         // ej: 30 GraniPoints = 1 Topping Gratis
 
     // Catálogo de premios de la Ruleta Glacial
     private List<PremioJuego> premiosRuleta = new ArrayList<>();
@@ -47,12 +53,18 @@ public class ConfiguracionJuegos {
         this.intentosGratisRaspaDiarios = 1;
         this.puntosBienvenidaRegistro = 30; // 30 GraniPoints de bienvenida
         this.acumularPuntosPorCompra = true;
+        this.modoPuntosCompra = "POR_VALOR";
         this.pesosPorPuntoAcumulado = 1000; // 1 punto x $1.000
+        this.puntosFijosPorCompra = 15;
         this.otorgarGirosPorCompra = true;
         this.canjePuntosHabilitado = true;
         this.valorPesosPorPunto = 20.0; // 100 pts = $2.000 COP
         this.puntosMinimosCanje = 50;
         this.maximoPorcentajeDescuentoPedido = 50;
+        this.canjePorGranizadoHabilitado = true;
+        this.puntosParaGranizadoGratis = 120; // 120 pts = 1 granizado
+        this.canjePorToppingHabilitado = true;
+        this.puntosParaToppingGratis = 30; // 30 pts = 1 topping
 
         inicializarPremiosPorDefecto();
     }
@@ -120,5 +132,23 @@ public class ConfiguracionJuegos {
 
     public List<PremioJuego> getPremiosRaspa() { return premiosRaspa; }
     public void setPremiosRaspa(List<PremioJuego> premiosRaspa) { this.premiosRaspa = premiosRaspa; }
+
+    public String getModoPuntosCompra() { return modoPuntosCompra; }
+    public void setModoPuntosCompra(String modoPuntosCompra) { this.modoPuntosCompra = modoPuntosCompra; }
+
+    public int getPuntosFijosPorCompra() { return puntosFijosPorCompra; }
+    public void setPuntosFijosPorCompra(int puntosFijosPorCompra) { this.puntosFijosPorCompra = puntosFijosPorCompra; }
+
+    public boolean isCanjePorGranizadoHabilitado() { return canjePorGranizadoHabilitado; }
+    public void setCanjePorGranizadoHabilitado(boolean canjePorGranizadoHabilitado) { this.canjePorGranizadoHabilitado = canjePorGranizadoHabilitado; }
+
+    public int getPuntosParaGranizadoGratis() { return puntosParaGranizadoGratis; }
+    public void setPuntosParaGranizadoGratis(int puntosParaGranizadoGratis) { this.puntosParaGranizadoGratis = puntosParaGranizadoGratis; }
+
+    public boolean isCanjePorToppingHabilitado() { return canjePorToppingHabilitado; }
+    public void setCanjePorToppingHabilitado(boolean canjePorToppingHabilitado) { this.canjePorToppingHabilitado = canjePorToppingHabilitado; }
+
+    public int getPuntosParaToppingGratis() { return puntosParaToppingGratis; }
+    public void setPuntosParaToppingGratis(int puntosParaToppingGratis) { this.puntosParaToppingGratis = puntosParaToppingGratis; }
 }
 

@@ -5779,43 +5779,70 @@ footer {
    VENTANA PROMOCIONAL DE BIENVENIDA / REGISTRO GRANIFRESH
    ========================================================== */
 .promo-modal-card {
-  border: 1px solid rgba(255, 183, 3, 0.45) !important;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 183, 3, 0.25) !important;
-  padding: 30px 24px 24px !important;
-  animation: popResult 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: radial-gradient(circle at 50% 10%, #0F3826 0%, #03140C 70%, #010804 100%) !important;
+  border: 2px solid #FFB703 !important;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9), 0 0 45px rgba(255, 183, 3, 0.45), inset 0 0 30px rgba(16, 185, 129, 0.2) !important;
+  padding: 34px 26px 26px !important;
+  animation: popResult 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+.promo-modal-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 25%, rgba(255, 183, 3, 0.12), transparent 60%);
+  pointer-events: none;
+  animation: rotateAura 12s linear infinite;
+}
+@keyframes rotateAura {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 .promo-btn-close {
   position: absolute;
   top: 14px;
   right: 14px;
-  background: none;
-  border: none;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: var(--mut);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 50%;
   transition: all 0.2s;
+  z-index: 5;
 }
 .promo-btn-close:hover {
   color: #FFFFFF;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(239, 68, 68, 0.4);
+  border-color: #EF4444;
 }
 .promo-logo-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 2;
 }
 .promo-logo-badge {
-  width: 78px;
-  height: 78px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #FFB703;
-  box-shadow: 0 0 24px rgba(255, 183, 3, 0.45);
-  margin-bottom: 10px;
+  box-shadow: 0 0 30px rgba(255, 183, 3, 0.6), 0 0 15px rgba(16, 185, 129, 0.4);
+  margin-bottom: 12px;
   background: #051A10;
+  animation: pulseLogoGlow 2s infinite alternate;
+}
+@keyframes pulseLogoGlow {
+  0% { transform: scale(0.98); box-shadow: 0 0 20px rgba(255, 183, 3, 0.4); }
+  100% { transform: scale(1.05); box-shadow: 0 0 35px rgba(255, 183, 3, 0.7), 0 0 20px rgba(16, 185, 129, 0.5); }
 }
 .promo-logo-img {
   width: 100%;
@@ -5823,59 +5850,66 @@ footer {
   object-fit: cover;
 }
 .promo-tag-glow {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   color: #34D399;
-  background: rgba(52, 211, 153, 0.15);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  padding: 3px 12px;
+  background: rgba(52, 211, 153, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  padding: 4px 14px;
   border-radius: 99px;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+}
+.promo-content-body {
+  position: relative;
+  z-index: 2;
 }
 .promo-headline {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 900;
   color: #FFFFFF;
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   line-height: 1.25;
 }
 .highlight-gold {
   color: #FFB703;
-  text-shadow: 0 0 15px rgba(255, 183, 3, 0.4);
+  text-shadow: 0 0 20px rgba(255, 183, 3, 0.5);
 }
 .highlight-cyan {
   color: #00E5FF;
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
 }
 .promo-description {
-  font-size: 0.88rem;
-  color: #CBD5E1;
-  line-height: 1.45;
-  margin: 0 0 18px 0;
+  font-size: 0.9rem;
+  color: #E2E8F0;
+  line-height: 1.48;
+  margin: 0 0 20px 0;
 }
 .promo-perks-row {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 .promo-perk-item {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 183, 3, 0.25);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 85px;
+  min-width: 90px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 .promo-perk-item span {
-  font-size: 1.3rem;
-  margin-bottom: 2px;
+  font-size: 1.4rem;
+  margin-bottom: 3px;
 }
 .promo-perk-item small {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #94BAA5;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #FFB703;
 }
 .promo-actions-footer {
   display: flex;
@@ -5884,28 +5918,36 @@ footer {
 }
 .promo-btn-register {
   width: 100%;
-  padding: 13px;
-  font-size: 0.98rem;
+  padding: 15px;
+  font-size: 1.05rem;
   font-weight: 900;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #FFB703, #FB8500);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #FFB703 0%, #FB8500 50%, #FFB703 100%);
+  background-size: 200% auto;
   color: #051A10;
-  box-shadow: 0 0 20px rgba(255, 183, 3, 0.35);
+  box-shadow: 0 0 25px rgba(255, 183, 3, 0.5), 0 4px 15px rgba(0, 0, 0, 0.4);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.3s ease;
   border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: shimmerButton 3s linear infinite;
+}
+@keyframes shimmerButton {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 .promo-btn-register:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 28px rgba(255, 183, 3, 0.55);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 35px rgba(255, 183, 3, 0.7);
 }
 .promo-btn-later {
   background: transparent;
   border: none;
   color: var(--mut);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  padding: 6px;
+  padding: 8px;
   cursor: pointer;
   transition: color 0.2s;
 }

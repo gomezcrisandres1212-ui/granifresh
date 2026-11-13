@@ -2370,7 +2370,7 @@ function renderizarTablaClientes(clientes) {
     if (!tbody) return;
 
     if (!clientes || clientes.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:32px; color:var(--mut);">No se encontraron clientes registrados.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--mut);">No se encontraron clientes registrados.</td></tr>`;
         return;
     }
 
@@ -2378,17 +2378,23 @@ function renderizarTablaClientes(clientes) {
         const fechaReg = c.fechaRegistro ? new Date(c.fechaRegistro).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Reciente';
         const extras = (c.girosExtrasDisponibles || 0) + ' giros / ' + (c.raspasExtrasDisponibles || 0) + ' raspas';
         const pts = (c.granipoints || 0).toLocaleString('es-CO');
+        const dir = c.direccionPredeterminada ? escapeHtmlAdmin(c.direccionPredeterminada) : 'Sin dirección';
+        const barrio = c.barrioPredeterminado ? escapeHtmlAdmin(c.barrioPredeterminado) : '';
 
         return `
             <tr>
                 <td>
                     <div style="font-weight:800; color:#FFFFFF;">${escapeHtmlAdmin(c.nombre || 'Sin nombre')}</div>
-                    <small style="color:var(--mut);">${c.direccionPredeterminada ? escapeHtmlAdmin(c.direccionPredeterminada) : 'Sin dirección guardada'}</small>
+                    <small style="color:var(--mut);">${c.email ? escapeHtmlAdmin(c.email) : 'Cliente Registrado'}</small>
                 </td>
                 <td>
                     <a href="https://wa.me/57${c.telefono}" target="_blank" rel="noopener noreferrer" style="color:#10B981; font-weight:700; text-decoration:none;">
                         📱 +57 ${escapeHtmlAdmin(c.telefono || '')}
                     </a>
+                </td>
+                <td>
+                    <div style="color:#FFFFFF; font-weight:600; font-size:0.85rem;">📍 ${dir}</div>
+                    ${barrio ? `<small style="color:#38BDF8; font-weight:700;">🏘️ ${barrio}</small>` : ''}
                 </td>
                 <td>
                     <span class="admin-badge-granipoints">🌟 ${pts} pts</span>
@@ -2400,9 +2406,12 @@ function renderizarTablaClientes(clientes) {
                     <small style="color:var(--mut);">${fechaReg}</small>
                 </td>
                 <td style="text-align:center;">
-                    <div style="display:inline-flex; gap:6px;">
+                    <div style="display:inline-flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+                        <button type="button" class="btn-action-small" style="background:rgba(14,165,233,0.18); border:1px solid rgba(14,165,233,0.4); color:#38BDF8;" onclick="abrirModalDetalleClienteAdmin('${c.id}')" title="Ver ficha completa y ubicación en mapa">
+                            📍 Ficha &amp; Mapa
+                        </button>
                         <button type="button" class="btn-action-small btn-action-adjust" onclick="abrirModalAjustarPuntosAdmin('${c.id}')" title="Sumar o restar GraniPoints">
-                            ⚙️ Ajustar Puntos
+                            ⚙️ Puntos
                         </button>
                         <button type="button" class="btn-action-small btn-action-historial" onclick="abrirModalHistorialClienteAdmin('${c.id}')" title="Ver movimientos">
                             📜 Historial
@@ -2414,6 +2423,94 @@ function renderizarTablaClientes(clientes) {
     }).join('');
 }
 
+let adminClienteMap = null;
+let adminClienteMarker = null;
+
+window.abrirModalDetalleClienteAdmin = function (clienteId) {
+    const cliente = (AdminState.clientes || []).find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    document.getElementById('adm-det-nombre').textContent = cliente.nombre || 'Cliente';
+    document.getElementById('adm-det-telefono').textContent = '+57 ' + (cliente.telefono || '');
+    
+    const wspLink = document.getElementById('adm-det-wsp-link');
+    if (wspLink) {
+        wspLink.href = 'https://wa.me/57' + (cliente.telefono || '') + '?text=' + encodeURIComponent('¡Hola ' + (cliente.nombre || '') + '! Te saludamos de Granifresh.');
+    }
+
+    document.getElementById('adm-det-puntos').textContent = (cliente.granipoints || 0).toLocaleString('es-CO') + ' pts';
+    document.getElementById('adm-det-extras').textContent = (cliente.girosExtrasDisponibles || 0) + ' giros / ' + (cliente.raspasExtrasDisponibles || 0) + ' raspas';
+
+    const fechaReg = cliente.fechaRegistro ? new Date(cliente.fechaRegistro).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Reciente';
+    document.getElementById('adm-det-fecha').textContent = fechaReg;
+
+    document.getElementById('adm-det-direccion').textContent = cliente.direccionPredeterminada || 'No registrada';
+    document.getElementById('adm-det-barrio').textContent = cliente.barrioPredeterminado || 'No registrado';
+    document.getElementById('adm-det-indicaciones').textContent = cliente.indicacionesPredeterminadas || 'Sin indicaciones registradas';
+
+    // Coordenadas para el mapa (default Cartagena si no hay o son 0)
+    const lat = (cliente.latitud !== null && cliente.latitud !== undefined && Number(cliente.latitud) !== 0) ? Number(cliente.latitud) : 10.4075;
+    const lng = (cliente.longitud !== null && cliente.longitud !== undefined && Number(cliente.longitud) !== 0) ? Number(cliente.longitud) : -75.5255;
+
+    const gmapsLink = document.getElementById('adm-det-gmaps-link');
+    if (gmapsLink) {
+        gmapsLink.href = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+    }
+
+    // Botones de acción rápida
+    const btnAjustar = document.getElementById('adm-det-btn-ajustar');
+    if (btnAjustar) {
+        btnAjustar.onclick = function () {
+            cerrarModales();
+            abrirModalAjustarPuntosAdmin(cliente.id);
+        };
+    }
+    const btnHistorial = document.getElementById('adm-det-btn-historial');
+    if (btnHistorial) {
+        btnHistorial.onclick = function () {
+            cerrarModales();
+            abrirModalHistorialClienteAdmin(cliente.id);
+        };
+    }
+
+    const modal = document.getElementById('modal-admin-detalle-cliente');
+    if (modal) modal.classList.add('active');
+
+    // Inicializar o centrar mapa Leaflet con Google Maps tiles
+    setTimeout(function () {
+        const container = document.getElementById('admin-mapa-cliente');
+        if (!container || typeof L === 'undefined') return;
+
+        if (!adminClienteMap) {
+            adminClienteMap = L.map('admin-mapa-cliente', {
+                center: [lat, lng],
+                zoom: 16,
+                scrollWheelZoom: true
+            });
+
+            L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                attribution: 'Leaflet | &copy; Google Maps'
+            }).addTo(adminClienteMap);
+
+            adminClienteMarker = L.marker([lat, lng]).addTo(adminClienteMap);
+        } else {
+            adminClienteMap.setView([lat, lng], 16);
+            adminClienteMarker.setLatLng([lat, lng]);
+        }
+
+        adminClienteMarker.bindPopup(
+            '<div style="text-align:center; font-family:Outfit,sans-serif; padding:4px;">' +
+            '<b style="color:#00B4D8; font-size:1rem;">👤 ' + escapeHtmlAdmin(cliente.nombre || 'Cliente') + '</b><br>' +
+            '<span style="font-size:0.85rem; color:#222;">' + escapeHtmlAdmin(cliente.direccionPredeterminada || 'Cartagena') + '</span><br>' +
+            '<small style="color:#059669; font-weight:700;">Barrio: ' + escapeHtmlAdmin(cliente.barrioPredeterminado || 'Centro') + '</small>' +
+            '</div>'
+        ).openPopup();
+
+        adminClienteMap.invalidateSize();
+    }, 250);
+};
+
 window.filtrarClientesAdmin = function () {
     const input = document.getElementById('admin-busqueda-clientes');
     const q = input ? input.value.trim().toLowerCase() : '';
@@ -2424,7 +2521,9 @@ window.filtrarClientesAdmin = function () {
     const filtrados = (AdminState.clientes || []).filter(c => {
         const nom = (c.nombre || '').toLowerCase();
         const tel = (c.telefono || '').toLowerCase();
-        return nom.includes(q) || tel.includes(q);
+        const dir = (c.direccionPredeterminada || '').toLowerCase();
+        const bar = (c.barrioPredeterminado || '').toLowerCase();
+        return nom.includes(q) || tel.includes(q) || dir.includes(q) || bar.includes(q);
     });
     renderizarTablaClientes(filtrados);
 };
@@ -2534,7 +2633,7 @@ async function cargarConfigJuegosAdmin() {
         const cfg = await res.json();
         AdminState.configJuegos = cfg;
 
-        // Llenar switches
+        // Llenar switches generales
         const chkRul = document.getElementById('cfg-ruleta-activa');
         if (chkRul) chkRul.checked = !!cfg.ruletaActiva;
 
@@ -2547,12 +2646,22 @@ async function cargarConfigJuegosAdmin() {
         const chkGiroComp = document.getElementById('cfg-giros-por-compra');
         if (chkGiroComp) chkGiroComp.checked = !!cfg.otorgarGirosPorCompra;
 
-        // Llenar campos numéricos
-        const elBienv = document.getElementById('cfg-puntos-bienvenida');
-        if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 30;
-
+        // Modalidad de asignación al comprar
+        const elModo = document.getElementById('cfg-modo-puntos-compra');
+        if (elModo) {
+            elModo.value = cfg.modoPuntosCompra || 'POR_VALOR';
+            elModo.onchange = toggleModoPuntosCompraUI;
+            toggleModoPuntosCompraUI();
+        }
         const elPesosPto = document.getElementById('cfg-pesos-por-punto');
         if (elPesosPto) elPesosPto.value = cfg.pesosPorPuntoAcumulado || 1000;
+
+        const elPtsFijos = document.getElementById('cfg-puntos-fijos-compra');
+        if (elPtsFijos) elPtsFijos.value = cfg.puntosFijosPorCompra || 15;
+
+        // Canje por Descuento en Dinero
+        const elCanjeDesc = document.getElementById('cfg-canje-descuento-habilitado');
+        if (elCanjeDesc) elCanjeDesc.checked = cfg.canjePuntosHabilitado !== undefined ? !!cfg.canjePuntosHabilitado : true;
 
         const elValCanje = document.getElementById('cfg-valor-peso-punto');
         if (elValCanje) elValCanje.value = cfg.valorPesosPorPunto || 20;
@@ -2563,8 +2672,28 @@ async function cargarConfigJuegosAdmin() {
         const elMaxDesc = document.getElementById('cfg-max-porcentaje-descuento');
         if (elMaxDesc) elMaxDesc.value = cfg.maximoPorcentajeDescuentoPedido || 50;
 
+        // Canje por Granizado y Topping Gratis
+        const elCanjeGran = document.getElementById('cfg-canje-granizado-habilitado');
+        if (elCanjeGran) elCanjeGran.checked = !!cfg.canjePorGranizadoHabilitado;
+
+        const elPtsGran = document.getElementById('cfg-puntos-para-granizado');
+        if (elPtsGran) elPtsGran.value = cfg.puntosParaGranizadoGratis || 120;
+
+        const elCanjeTop = document.getElementById('cfg-canje-topping-habilitado');
+        if (elCanjeTop) elCanjeTop.checked = !!cfg.canjePorToppingHabilitado;
+
+        const elPtsTop = document.getElementById('cfg-puntos-para-topping');
+        if (elPtsTop) elPtsTop.value = cfg.puntosParaToppingGratis || 30;
+
+        // Intentos y bienvenida
+        const elBienv = document.getElementById('cfg-puntos-bienvenida');
+        if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 30;
+
         const elIntGratis = document.getElementById('cfg-intentos-gratis-diarios');
         if (elIntGratis) elIntGratis.value = cfg.intentosGratisRuletaDiarios !== undefined ? cfg.intentosGratisRuletaDiarios : 1;
+
+        const elIntRaspa = document.getElementById('cfg-intentos-gratis-raspa');
+        if (elIntRaspa) elIntRaspa.value = cfg.intentosGratisRaspaDiarios !== undefined ? cfg.intentosGratisRaspaDiarios : 1;
 
         // Renderizar Tablas de Premios
         renderizarTablaPremiosRuletaAdmin(cfg.premiosRuleta || []);
@@ -2572,6 +2701,21 @@ async function cargarConfigJuegosAdmin() {
 
     } catch (err) {
         console.error('Error al cargar config juegos:', err);
+    }
+}
+
+function toggleModoPuntosCompraUI() {
+    const modo = document.getElementById('cfg-modo-puntos-compra') ? document.getElementById('cfg-modo-puntos-compra').value : 'POR_VALOR';
+    const grpPesos = document.getElementById('grp-pesos-por-punto');
+    const grpFijos = document.getElementById('grp-puntos-fijos-compra');
+    if (grpPesos && grpFijos) {
+        if (modo === 'FIJO') {
+            grpPesos.style.display = 'none';
+            grpFijos.style.display = 'block';
+        } else {
+            grpPesos.style.display = 'block';
+            grpFijos.style.display = 'none';
+        }
     }
 }
 
@@ -2719,18 +2863,24 @@ window.guardarConfigJuegosAdmin = async function (e) {
     });
 
     const payload = {
-        ruletaActiva: document.getElementById('cfg-ruleta-activa').checked,
-        raspaActivo: document.getElementById('cfg-raspa-activo').checked,
-        acumularPuntosPorCompra: document.getElementById('cfg-puntos-por-compra').checked,
-        otorgarGirosPorCompra: document.getElementById('cfg-giros-por-compra').checked,
-        puntosBienvenidaRegistro: parseInt(document.getElementById('cfg-puntos-bienvenida').value, 10) || 30,
-        pesosPorPuntoAcumulado: parseInt(document.getElementById('cfg-pesos-por-punto').value, 10) || 1000,
-        valorPesosPorPunto: parseFloat(document.getElementById('cfg-valor-peso-punto').value) || 20,
-        puntosMinimosCanje: parseInt(document.getElementById('cfg-puntos-minimos-canje').value, 10) || 50,
-        maximoPorcentajeDescuentoPedido: parseInt(document.getElementById('cfg-max-porcentaje-descuento').value, 10) || 50,
-        intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios').value, 10) || 1,
-        intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios').value, 10) || 1,
-        canjePuntosHabilitado: true,
+        ruletaActiva: document.getElementById('cfg-ruleta-activa')?.checked ?? true,
+        raspaActivo: document.getElementById('cfg-raspa-activo')?.checked ?? true,
+        acumularPuntosPorCompra: document.getElementById('cfg-puntos-por-compra')?.checked ?? true,
+        otorgarGirosPorCompra: document.getElementById('cfg-giros-por-compra')?.checked ?? true,
+        modoPuntosCompra: document.getElementById('cfg-modo-puntos-compra')?.value || 'POR_VALOR',
+        pesosPorPuntoAcumulado: parseInt(document.getElementById('cfg-pesos-por-punto')?.value, 10) || 1000,
+        puntosFijosPorCompra: parseInt(document.getElementById('cfg-puntos-fijos-compra')?.value, 10) || 15,
+        canjePuntosHabilitado: document.getElementById('cfg-canje-descuento-habilitado')?.checked ?? true,
+        valorPesosPorPunto: parseFloat(document.getElementById('cfg-valor-peso-punto')?.value) || 20,
+        puntosMinimosCanje: parseInt(document.getElementById('cfg-puntos-minimos-canje')?.value, 10) || 50,
+        maximoPorcentajeDescuentoPedido: parseInt(document.getElementById('cfg-max-porcentaje-descuento')?.value, 10) || 50,
+        canjePorGranizadoHabilitado: document.getElementById('cfg-canje-granizado-habilitado')?.checked ?? false,
+        puntosParaGranizadoGratis: parseInt(document.getElementById('cfg-puntos-para-granizado')?.value, 10) || 120,
+        canjePorToppingHabilitado: document.getElementById('cfg-canje-topping-habilitado')?.checked ?? false,
+        puntosParaToppingGratis: parseInt(document.getElementById('cfg-puntos-para-topping')?.value, 10) || 30,
+        puntosBienvenidaRegistro: parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) || 30,
+        intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 1,
+        intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 1,
         premiosRuleta: nuevosSectores,
         premiosRaspa: nuevosPremiosRaspa
     };

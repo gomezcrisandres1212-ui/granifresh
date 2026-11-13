@@ -1700,12 +1700,30 @@
     var telefono = document.getElementById("cl-reg-tel").value.trim();
     var contrasena = document.getElementById("cl-reg-pass").value;
     var direccion = document.getElementById("cl-reg-dir").value.trim();
+    var barrio = document.getElementById("cl-reg-barrio") ? document.getElementById("cl-reg-barrio").value.trim() : "";
+    var indicaciones = document.getElementById("cl-reg-indicaciones") ? document.getElementById("cl-reg-indicaciones").value.trim() : "";
+    var latitud = parseFloat(document.getElementById("cl-reg-lat") ? document.getElementById("cl-reg-lat").value : "10.4075") || 10.4075;
+    var longitud = parseFloat(document.getElementById("cl-reg-lng") ? document.getElementById("cl-reg-lng").value : "-75.5255") || -75.5255;
+
+    if (!nombre || !telefono || !contrasena || !direccion || !barrio || !indicaciones) {
+      window.showToast("Por favor completa todos los campos obligatorios.", "error");
+      return;
+    }
 
     try {
       var res = await fetch("/api/cliente/auth/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nombre, telefono: telefono, contrasena: contrasena, direccion: direccion })
+        body: JSON.stringify({
+          nombre: nombre,
+          telefono: telefono,
+          contrasena: contrasena,
+          direccion: direccion,
+          barrio: barrio,
+          indicaciones: indicaciones,
+          latitud: latitud,
+          longitud: longitud
+        })
       });
       var data = await res.json();
       if (!res.ok || !data.exito) {
@@ -1717,9 +1735,20 @@
       GraniClubState.cliente = data.cliente;
       localStorage.setItem("granifresh_cliente_token", data.token);
 
+      // Auto rellenar checkout con los datos del perfil
+      var chkNom = document.getElementById("checkout-nombre");
+      if (chkNom && !chkNom.value) chkNom.value = data.cliente.nombre || "";
+      var chkTel = document.getElementById("checkout-telefono");
+      if (chkTel && !chkTel.value) chkTel.value = data.cliente.telefono || "";
+      var chkDir = document.getElementById("checkout-direccion");
+      if (chkDir && !chkDir.value) chkDir.value = data.cliente.direccionPredeterminada || "";
+      var chkBar = document.getElementById("checkout-barrio");
+      if (chkBar && !chkBar.value && data.cliente.barrioPredeterminado) chkBar.value = data.cliente.barrioPredeterminado;
+
       window.showToast("¡Bienvenido al Club GraniPoints! 🎉 Has recibido 30 puntos de regalo.", "success");
       lanzarConfetiCelebracion();
       actualizarUIPerfilCliente();
+      sincronizarCheckoutGraniPoints();
 
     } catch (err) {
       console.error("Error al registrar cliente:", err);
@@ -2170,44 +2199,76 @@
     var boxDeslogueado = document.getElementById("co-box-cliente-deslogueado");
     var elPuntosDisp = document.getElementById("co-puntos-disponibles-txt");
     var chkUsar = document.getElementById("co-check-usar-puntos");
-    var slider = document.getElementById("co-slider-puntos");
-    var wrapSlider = document.getElementById("co-slider-wrap");
+    var wrapExact = document.getElementById("co-exact-points-wrap");
+    var bloqueGranizado = document.getElementById("co-bloque-granizado-gratis");
+    var chkGranizado = document.getElementById("co-check-granizado-gratis");
 
     var cl = GraniClubState.cliente;
     var subtotal = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
 
-    if (cl) {
+    if (cl && cl.id) {
       if (boxLogueado) boxLogueado.style.display = "block";
       if (boxDeslogueado) boxDeslogueado.style.display = "none";
       if (elPuntosDisp) elPuntosDisp.textContent = (cl.granipoints || 0).toLocaleString("es-CO");
 
       var cfg = GraniClubState.configPublica || {};
-      var minPuntos = cfg.puntosMinimosCanje || 50;
+      var canjeDescHabilitado = cfg.canjePuntosHabilitado !== undefined ? cfg.canjePuntosHabilitado : true;
+      var canjeGranHabilitado = !!cfg.canjePorGranizadoHabilitado;
+      var ptsGranizado = cfg.puntosParaGranizadoGratis || 120;
+      var minPuntos = cfg.puntosMinimosCanje || 20;
       var valPunto = cfg.valorPesosPorPunto || 20;
       var maxPorc = (cfg.maximoPorcentajeDescuentoPedido || 50) / 100.0;
       var maxPesosDesc = subtotal * maxPorc;
       var maxPuntosUsables = Math.floor(maxPesosDesc / valPunto);
       var maxFinal = Math.min(cl.granipoints || 0, maxPuntosUsables);
 
-      if (maxFinal < minPuntos) {
+      // Bloque Descuento en Dinero
+      var bloqueDesc = document.getElementById("co-bloque-canje-descuento");
+      if (bloqueDesc) {
+        bloqueDesc.style.display = canjeDescHabilitado ? "block" : "none";
+      }
+
+      if (maxFinal < minPuntos || !canjeDescHabilitado) {
         if (chkUsar) {
           chkUsar.disabled = true;
           chkUsar.checked = false;
         }
-        if (wrapSlider) wrapSlider.style.display = "none";
-        GraniClubState.puntosAUsar = 0;
-        GraniClubState.descuentoCalculado = 0;
+        if (wrapExact) wrapExact.style.display = "none";
       } else {
         if (chkUsar) chkUsar.disabled = false;
-        if (slider) {
-          slider.min = minPuntos;
-          slider.max = maxFinal;
-          slider.step = 10;
-          if (!chkUsar.checked) {
-            slider.value = minPuntos;
+      }
+
+      // Bloque Granizado Gratis
+      if (bloqueGranizado) {
+        if (canjeGranHabilitado && cart.length > 0) {
+          bloqueGranizado.style.display = "block";
+          var txtPtsGran = document.getElementById("co-txt-granizado-gratis-pts");
+          if (cl.granipoints >= ptsGranizado) {
+            if (chkGranizado) chkGranizado.disabled = false;
+            if (txtPtsGran) txtPtsGran.textContent = "Cuesta " + ptsGranizado + " GraniPoints. Tienes " + cl.granipoints + " pts disponibles.";
+          } else {
+            if (chkGranizado) {
+              chkGranizado.disabled = true;
+              chkGranizado.checked = false;
+            }
+            if (txtPtsGran) txtPtsGran.textContent = "Cuesta " + ptsGranizado + " GraniPoints (Tienes " + cl.granipoints + " pts, te faltan " + (ptsGranizado - cl.granipoints) + " pts).";
           }
+        } else {
+          bloqueGranizado.style.display = "none";
+          if (chkGranizado) chkGranizado.checked = false;
         }
       }
+
+      // Re-evaluar valores actuales
+      if (chkGranizado && chkGranizado.checked) {
+        toggleGranizadoGratisCanjeCheckout();
+      } else if (chkUsar && chkUsar.checked) {
+        actualizarInputPuntosExactosCheckout();
+      } else {
+        GraniClubState.puntosAUsar = 0;
+        GraniClubState.descuentoCalculado = 0;
+      }
+
     } else {
       if (boxLogueado) boxLogueado.style.display = "none";
       if (boxDeslogueado) boxDeslogueado.style.display = "block";
@@ -2221,12 +2282,13 @@
 
   window.toggleUsarPuntosCheckout = function () {
     var chk = document.getElementById("co-check-usar-puntos");
-    var wrap = document.getElementById("co-slider-wrap");
-    var slider = document.getElementById("co-slider-puntos");
+    var wrap = document.getElementById("co-exact-points-wrap");
+    var chkGranizado = document.getElementById("co-check-granizado-gratis");
 
     if (chk && chk.checked) {
+      if (chkGranizado) chkGranizado.checked = false; // Mutuamente excluyentes
       if (wrap) wrap.style.display = "block";
-      actualizarSliderPuntosCheckout();
+      setExactPointsPreset('max');
     } else {
       if (wrap) wrap.style.display = "none";
       GraniClubState.puntosAUsar = 0;
@@ -2235,21 +2297,86 @@
     }
   };
 
-  window.actualizarSliderPuntosCheckout = function () {
-    var slider = document.getElementById("co-slider-puntos");
-    var txtPts = document.getElementById("co-puntos-cant-txt");
+  window.toggleGranizadoGratisCanjeCheckout = function () {
+    var chkGranizado = document.getElementById("co-check-granizado-gratis");
+    var chkUsar = document.getElementById("co-check-usar-puntos");
+    var wrap = document.getElementById("co-exact-points-wrap");
+
+    if (chkGranizado && chkGranizado.checked) {
+      if (chkUsar) chkUsar.checked = false; // Apagar descuento por dinero
+      if (wrap) wrap.style.display = "none";
+
+      var cfg = GraniClubState.configPublica || {};
+      var ptsGranizado = cfg.puntosParaGranizadoGratis || 120;
+      var precio1Granizado = (cart.length > 0 && cart[0].p) ? cart[0].p : 12000;
+
+      GraniClubState.puntosAUsar = ptsGranizado;
+      GraniClubState.descuentoCalculado = precio1Granizado;
+    } else {
+      GraniClubState.puntosAUsar = 0;
+      GraniClubState.descuentoCalculado = 0;
+    }
+    actualizarValoresTotales();
+  };
+
+  window.setExactPointsPreset = function (preset) {
+    var input = document.getElementById("co-input-puntos-exactos");
+    var cl = GraniClubState.cliente;
+    if (!input || !cl) return;
+
+    var subtotal = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
+    var cfg = GraniClubState.configPublica || {};
+    var valPunto = cfg.valorPesosPorPunto || 20;
+    var maxPorc = (cfg.maximoPorcentajeDescuentoPedido || 50) / 100.0;
+    var maxPesosDesc = subtotal * maxPorc;
+    var maxPuntosUsables = Math.floor(maxPesosDesc / valPunto);
+    var maxFinal = Math.min(cl.granipoints || 0, maxPuntosUsables);
+
+    var puntos = 0;
+    if (preset === 'max') {
+      puntos = maxFinal;
+    } else if (preset === 'half') {
+      puntos = Math.floor(maxFinal / 2);
+    } else if (typeof preset === 'number') {
+      puntos = Math.min(preset, maxFinal);
+    }
+
+    input.value = puntos;
+    actualizarInputPuntosExactosCheckout();
+  };
+
+  window.actualizarInputPuntosExactosCheckout = function () {
+    var input = document.getElementById("co-input-puntos-exactos");
     var txtDesc = document.getElementById("co-descuento-pesos-txt");
+    var txtHint = document.getElementById("co-exact-hint");
+    var cl = GraniClubState.cliente;
 
-    if (!slider) return;
-    var puntos = parseInt(slider.value, 10) || 0;
-    var valPunto = (GraniClubState.configPublica && GraniClubState.configPublica.valorPesosPorPunto) || 20;
+    if (!input || !cl) return;
+
+    var subtotal = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
+    var cfg = GraniClubState.configPublica || {};
+    var valPunto = cfg.valorPesosPorPunto || 20;
+    var maxPorc = (cfg.maximoPorcentajeDescuentoPedido || 50) / 100.0;
+    var maxPesosDesc = subtotal * maxPorc;
+    var maxPuntosUsables = Math.floor(maxPesosDesc / valPunto);
+    var maxFinal = Math.min(cl.granipoints || 0, maxPuntosUsables);
+
+    var puntos = parseInt(input.value, 10) || 0;
+    if (puntos < 0) puntos = 0;
+    if (puntos > maxFinal) {
+      puntos = maxFinal;
+      input.value = puntos;
+    }
+
     var descPesos = puntos * valPunto;
-
     GraniClubState.puntosAUsar = puntos;
     GraniClubState.descuentoCalculado = descPesos;
 
-    if (txtPts) txtPts.textContent = puntos + " pts";
     if (txtDesc) txtDesc.textContent = "-" + fmt(descPesos);
+    if (txtHint) {
+      var restantes = Math.max(0, (cl.granipoints || 0) - puntos);
+      txtHint.textContent = "Aplicando " + puntos + " pts (-" + fmt(descPesos) + "). Te quedarán " + restantes + " pts.";
+    }
 
     actualizarValoresTotales();
   };

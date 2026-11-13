@@ -109,8 +109,8 @@ public class PedidoService {
             Cliente cliente = clienteOpt.get();
             pedido.setClienteId(cliente.getId());
 
-            // 1. Canje de puntos
-            if (configJuegos.isCanjePuntosHabilitado() && puntosUsados >= configJuegos.getPuntosMinimosCanje() && cliente.getGranipoints() >= puntosUsados) {
+            // 1. Canje de puntos exactos
+            if (configJuegos.isCanjePuntosHabilitado() && puntosUsados > 0 && cliente.getGranipoints() >= puntosUsados) {
                 double valCalculado = puntosUsados * configJuegos.getValorPesosPorPunto();
                 double maxDescuento = subtotal * (configJuegos.getMaximoPorcentajeDescuentoPedido() / 100.0);
                 descuentoPuntos = Math.min(valCalculado, maxDescuento);
@@ -124,7 +124,7 @@ public class PedidoService {
                         "CANJE_CHECKOUT",
                         -puntosUsados,
                         cliente.getGranipoints(),
-                        "🛒 Canje de GraniPoints por descuento de $" + String.format("%.0f", descuentoPuntos) + " en pedido " + codigo,
+                        "🛒 Canje de " + puntosUsados + " GraniPoints por descuento de $" + String.format("%.0f", descuentoPuntos) + " en pedido " + codigo,
                         codigo
                 );
                 transaccionRepository.save(transGasto);
@@ -132,10 +132,14 @@ public class PedidoService {
                 puntosUsados = 0;
             }
 
-            // 2. Acumulación por compra
-            if (configJuegos.isAcumularPuntosPorCompra() && configJuegos.getPesosPorPuntoAcumulado() > 0) {
-                double baseParaPuntos = Math.max(0, subtotal - descuentoPuntos);
-                puntosGanados = (int) (baseParaPuntos / configJuegos.getPesosPorPuntoAcumulado());
+            // 2. Acumulación por compra (según decida el admin: por valor o puntos fijos)
+            if (configJuegos.isAcumularPuntosPorCompra()) {
+                if ("FIJO".equalsIgnoreCase(configJuegos.getModoPuntosCompra())) {
+                    puntosGanados = Math.max(0, configJuegos.getPuntosFijosPorCompra());
+                } else if (configJuegos.getPesosPorPuntoAcumulado() > 0) {
+                    double baseParaPuntos = Math.max(0, subtotal - descuentoPuntos);
+                    puntosGanados = (int) (baseParaPuntos / configJuegos.getPesosPorPuntoAcumulado());
+                }
 
                 if (puntosGanados > 0) {
                     cliente.setGranipoints(cliente.getGranipoints() + puntosGanados);
@@ -147,7 +151,7 @@ public class PedidoService {
                             "COMPRA",
                             puntosGanados,
                             cliente.getGranipoints(),
-                            "🥤 GraniPoints ganados por tu compra en orden " + codigo,
+                            "🥤 +" + puntosGanados + " GraniPoints ganados por tu compra en orden " + codigo,
                             codigo
                     );
                     transaccionRepository.save(transGanancia);
