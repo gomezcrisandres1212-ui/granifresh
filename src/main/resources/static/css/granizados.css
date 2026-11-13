@@ -716,14 +716,14 @@ h2 {
   justify-content: center;
   position: relative;
   width: 100%;
-  max-width: 360px;
+  max-width: 440px;
   margin: 0 auto;
 }
 
 .stage-aura {
   position: absolute;
-  width: 280px;
-  height: 280px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 183, 3, 0.28) 0%, rgba(16, 185, 129, 0.16) 42%, transparent 72%);
   z-index: 0;
@@ -782,8 +782,8 @@ h2 {
   justify-content: center !important;
   position: relative !important;
   width: auto !important;
-  max-width: 270px !important;
-  height: 270px !important;
+  max-width: 380px !important;
+  height: 340px !important;
   margin: 0 auto !important;
   animation: trioFloat 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite !important;
 }
@@ -796,37 +796,37 @@ svg.gl-trio {
 
 /* Vaso Central: Fresa / Frutos Rojos (En Primer Plano) */
 svg.gl-center {
-  width: 150px !important;
+  width: 205px !important;
   height: auto !important;
   position: relative !important;
   z-index: 3 !important;
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.75)) !important;
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.75)) !important;
 }
 
 /* Vaso Izquierdo: Menta / Lima (Detrás del hombro izquierdo, solapado) */
 svg.gl-left {
-  width: 125px !important;
+  width: 172px !important;
   height: auto !important;
   position: relative !important;
   z-index: 1 !important;
-  margin-right: -58px !important;
-  margin-bottom: 4px !important;
-  transform: rotate(-2.5deg) !important;
+  margin-right: -78px !important;
+  margin-bottom: 6px !important;
+  transform: rotate(-3deg) !important;
   transform-origin: 50% 90% !important;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6)) !important;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6)) !important;
 }
 
 /* Vaso Derecho: Mango / Maracuyá (Detrás del hombro derecho, solapado) */
 svg.gl-right {
-  width: 125px !important;
+  width: 172px !important;
   height: auto !important;
   position: relative !important;
   z-index: 1 !important;
-  margin-left: -58px !important;
-  margin-bottom: 4px !important;
-  transform: rotate(2.5deg) !important;
+  margin-left: -78px !important;
+  margin-bottom: 6px !important;
+  transform: rotate(3deg) !important;
   transform-origin: 50% 90% !important;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.6)) !important;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6)) !important;
 }
 
 .gl-left .bob,
@@ -846,43 +846,47 @@ svg.gl-right {
 
 @media (max-width: 768px) {
   .stage {
-    max-width: 250px !important;
+    max-width: 320px !important;
   }
   .trio-stage-wrapper {
-    max-width: 230px !important;
-    height: 240px !important;
+    max-width: 300px !important;
+    height: 290px !important;
   }
   svg.gl-center {
-    width: 130px !important;
+    width: 175px !important;
   }
   svg.gl-left {
-    width: 108px !important;
-    margin-right: -50px !important;
+    width: 145px !important;
+    margin-right: -66px !important;
+    margin-bottom: 5px !important;
   }
   svg.gl-right {
-    width: 108px !important;
-    margin-left: -50px !important;
+    width: 145px !important;
+    margin-left: -66px !important;
+    margin-bottom: 5px !important;
   }
 }
 
 @media (max-width: 480px) {
   .stage {
-    max-width: 220px !important;
+    max-width: 280px !important;
   }
   .trio-stage-wrapper {
-    max-width: 210px !important;
-    height: 220px !important;
+    max-width: 260px !important;
+    height: 260px !important;
   }
   svg.gl-center {
-    width: 118px !important;
+    width: 155px !important;
   }
   svg.gl-left {
-    width: 96px !important;
-    margin-right: -44px !important;
+    width: 130px !important;
+    margin-right: -58px !important;
+    margin-bottom: 4px !important;
   }
   svg.gl-right {
-    width: 96px !important;
-    margin-left: -44px !important;
+    width: 130px !important;
+    margin-left: -58px !important;
+    margin-bottom: 4px !important;
   }
 }
 
