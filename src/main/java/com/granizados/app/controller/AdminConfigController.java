@@ -50,6 +50,10 @@ public class AdminConfigController {
         if (datos.getHistoriaNosotros() != null) config.setHistoriaNosotros(datos.getHistoriaNosotros());
         if (datos.getColorGranizado1() != null) config.setColorGranizado1(datos.getColorGranizado1());
         if (datos.getColorGranizado2() != null) config.setColorGranizado2(datos.getColorGranizado2());
+        if (datos.getColorGranizado1Izq() != null) config.setColorGranizado1Izq(datos.getColorGranizado1Izq());
+        if (datos.getColorGranizado2Izq() != null) config.setColorGranizado2Izq(datos.getColorGranizado2Izq());
+        if (datos.getColorGranizado1Der() != null) config.setColorGranizado1Der(datos.getColorGranizado1Der());
+        if (datos.getColorGranizado2Der() != null) config.setColorGranizado2Der(datos.getColorGranizado2Der());
 
         ConfiguracionNegocio guardado = configRepository.save(config);
         return ResponseEntity.ok(Map.of("exito", true, "configuracion", guardado));

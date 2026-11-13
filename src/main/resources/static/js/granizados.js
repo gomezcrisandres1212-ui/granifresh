@@ -13,17 +13,38 @@
     return "$" + Number(n).toLocaleString("es-CO");
   };
 
-  // 1. Aplicación de Colores de Marca al Vaso de Granizado (desde Configuración del Negocio)
-  function aplicarColoresGranizadoHero(c1, c2) {
-    var col1 = c1 || "#FFB703";
-    var col2 = c2 || "#FB8500";
+  // 1. Aplicación de Colores de Marca al Trío de Granizados Hero (desde Configuración del Negocio)
+  function aplicarColoresGranizadoHero(c1, c2, c1Izq, c2Izq, c1Der, c2Der) {
+    var col1 = c1 || "#E11D48";
+    var col2 = c2 || "#FF007F";
+    var col1Izq = c1Izq || "#10B981";
+    var col2Izq = c2Izq || "#00E5FF";
+    var col1Der = c1Der || "#FFB703";
+    var col2Der = c2Der || "#FB8500";
     if (R) {
+      // Vaso Central
       R.style.setProperty("--t1", col1);
       R.style.setProperty("--t2", col1);
       R.style.setProperty("--t3", col1);
       R.style.setProperty("--t4", col2);
       R.style.setProperty("--t5", col2);
       R.style.setProperty("--t6", col2);
+
+      // Vaso Izquierdo
+      R.style.setProperty("--t1-izq", col1Izq);
+      R.style.setProperty("--t2-izq", col1Izq);
+      R.style.setProperty("--t3-izq", col1Izq);
+      R.style.setProperty("--t4-izq", col2Izq);
+      R.style.setProperty("--t5-izq", col2Izq);
+      R.style.setProperty("--t6-izq", col2Izq);
+
+      // Vaso Derecho
+      R.style.setProperty("--t1-der", col1Der);
+      R.style.setProperty("--t2-der", col1Der);
+      R.style.setProperty("--t3-der", col1Der);
+      R.style.setProperty("--t4-der", col2Der);
+      R.style.setProperty("--t5-der", col2Der);
+      R.style.setProperty("--t6-der", col2Der);
     }
   }
   window.aplicarColoresGranizadoHero = aplicarColoresGranizadoHero;
@@ -366,8 +387,15 @@
 
       // Configuración de negocio (colores del granizado, marquesina, WhatsApp y costo de envío)
       if (data.configuracion) {
-        if (data.configuracion.colorGranizado1 && data.configuracion.colorGranizado2) {
-          aplicarColoresGranizadoHero(data.configuracion.colorGranizado1, data.configuracion.colorGranizado2);
+        if (data.configuracion) {
+          aplicarColoresGranizadoHero(
+            data.configuracion.colorGranizado1,
+            data.configuracion.colorGranizado2,
+            data.configuracion.colorGranizado1Izq,
+            data.configuracion.colorGranizado2Izq,
+            data.configuracion.colorGranizado1Der,
+            data.configuracion.colorGranizado2Der
+          );
         }
         if (data.configuracion.costoEnvioBase) {
           checkoutState.costoEnvio = data.configuracion.costoEnvioBase;
@@ -1333,21 +1361,23 @@
   window.updateMarquee = updateMarquee;
   updateMarquee();
 
-  // 13. Micro-Burbujas SVG Dinámicas en el Vaso
+  // 13. Micro-Burbujas SVG Dinámicas en el Trío de Vasos
   var NS = "http://www.w3.org/2000/svg";
-  var bu = $("#bubs");
-  if (bu) {
-    for (var i = 0; i < 14; i++) {
-      var c = document.createElementNS(NS, "circle");
-      c.setAttribute("cx", 92 + Math.random() * 136);
-      c.setAttribute("cy", 340);
-      c.setAttribute("r", 2 + Math.random() * 3.5);
-      c.setAttribute("class", "bub");
-      c.style.setProperty("--d", (2.8 + Math.random() * 3) + "s");
-      c.style.setProperty("--l", (-Math.random() * 5) + "s");
-      bu.appendChild(c);
+  ["#bubs", "#bubs-left", "#bubs-right"].forEach(function(sel) {
+    var bu = $(sel);
+    if (bu) {
+      for (var i = 0; i < 10; i++) {
+        var c = document.createElementNS(NS, "circle");
+        c.setAttribute("cx", 92 + Math.random() * 136);
+        c.setAttribute("cy", 340);
+        c.setAttribute("r", 1.8 + Math.random() * 3);
+        c.setAttribute("class", "bub");
+        c.style.setProperty("--d", (2.8 + Math.random() * 3) + "s");
+        c.style.setProperty("--l", (-Math.random() * 5) + "s");
+        bu.appendChild(c);
+      }
     }
-  }
+  });
 
   // 14. Motor Canvas 2D Ultra Ligero y Sedoso: "Aurora Néctar & Hielo Glacial"
   // Optimizado con texturas pre-renderizadas en GPU para flujo continuo a 60 FPS

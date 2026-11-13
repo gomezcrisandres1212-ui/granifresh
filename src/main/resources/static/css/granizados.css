@@ -27,13 +27,27 @@
   --mint: #34D399;            /* Verde lulo & menta */
   --ice: #D8FBFF;             /* Escarcha cristalina */
 
-  /* Recetas de degradados del Vaso de Granizado SVG */
-  --t1: #FFE600;
-  --t2: #FFB703;
-  --t3: #FB8500;
-  --t4: #FF5400;
-  --t5: #FF3E00;
-  --t6: #E60049;
+  /* Recetas de degradados del Trío de Granizados SVG */
+  --t1: #E11D48;
+  --t2: #E11D48;
+  --t3: #E11D48;
+  --t4: #FF007F;
+  --t5: #FF007F;
+  --t6: #FF007F;
+
+  --t1-izq: #10B981;
+  --t2-izq: #10B981;
+  --t3-izq: #10B981;
+  --t4-izq: #00E5FF;
+  --t5-izq: #00E5FF;
+  --t6-izq: #00E5FF;
+
+  --t1-der: #FFB703;
+  --t2-der: #FFB703;
+  --t3-der: #FFB703;
+  --t4-der: #FB8500;
+  --t5-der: #FB8500;
+  --t6-der: #FB8500;
 
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
@@ -779,6 +793,137 @@ h2 {
   z-index: 0;
   background-color: #04120A;
   transform: translateZ(0);
+}
+
+/* ========================================================
+   ESCENARIO DEL TRÍO DE GRANIZADOS (PORTADA HERO)
+   ======================================================== */
+.trio-stage-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 430px;
+  margin: 0 auto;
+}
+
+svg.gl-trio {
+  overflow: visible;
+  will-change: transform;
+}
+
+svg.gl-center {
+  width: 290px;
+  height: auto;
+  position: relative;
+  z-index: 3;
+}
+
+svg.gl-left {
+  width: 235px;
+  height: auto;
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  z-index: 2;
+  transform: rotate(-4.5deg);
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
+}
+
+svg.gl-right {
+  width: 235px;
+  height: auto;
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 2;
+  transform: rotate(4.5deg);
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
+}
+
+.gl-left .bob {
+  animation: cupFloatLeft 6.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+}
+
+.gl-center .bob {
+  animation: cupFloatCenter 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+}
+
+.gl-right .bob {
+  animation: cupFloatRight 5.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite 0.7s;
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+}
+
+@keyframes cupFloatLeft {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-4.5deg); }
+  50% { transform: translate3d(0, -9px, 0) rotate(-2deg); }
+}
+
+@keyframes cupFloatCenter {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -12px, 0) rotate(1deg); }
+}
+
+@keyframes cupFloatRight {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(4.5deg); }
+  50% { transform: translate3d(0, -9px, 0) rotate(2deg); }
+}
+
+@media (max-width: 768px) {
+  .trio-stage-wrapper {
+    max-width: 380px;
+    height: 330px;
+  }
+  svg.gl-center {
+    width: 200px;
+  }
+  svg.gl-left {
+    width: 155px;
+    left: 4px;
+    bottom: 6px;
+  }
+  svg.gl-right {
+    width: 155px;
+    right: 4px;
+    bottom: 6px;
+  }
+  .badge-left {
+    left: -8px !important;
+    top: 10% !important;
+  }
+  .badge-right {
+    right: -8px !important;
+    bottom: 12% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .trio-stage-wrapper {
+    max-width: 330px;
+    height: 290px;
+  }
+  svg.gl-center {
+    width: 170px;
+  }
+  svg.gl-left {
+    width: 130px;
+    left: -4px;
+    bottom: 4px;
+  }
+  svg.gl-right {
+    width: 130px;
+    right: -4px;
+    bottom: 4px;
+  }
 }
 
 /* Vaso SVG con atmósfera de Selva Tropical y Hielo Puro */

@@ -29,6 +29,10 @@ public class ConfiguracionNegocio {
     private String historiaNosotros;
     private String colorGranizado1;
     private String colorGranizado2;
+    private String colorGranizado1Izq;
+    private String colorGranizado2Izq;
+    private String colorGranizado1Der;
+    private String colorGranizado2Der;
 
     public ConfiguracionNegocio() {
         this.nombreNegocio = "GRANIFRESH";
@@ -50,8 +54,12 @@ public class ConfiguracionNegocio {
         this.longitud = -75.5255;
         this.zoomMapa = 16;
         this.historiaNosotros = "En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable. Cero concentrados artificiales, puro sabor y frescura en cada vaso.";
-        this.colorGranizado1 = "#FFB703";
-        this.colorGranizado2 = "#FB8500";
+        this.colorGranizado1 = "#E11D48";
+        this.colorGranizado2 = "#FF007F";
+        this.colorGranizado1Izq = "#10B981";
+        this.colorGranizado2Izq = "#00E5FF";
+        this.colorGranizado1Der = "#FFB703";
+        this.colorGranizado2Der = "#FB8500";
     }
 
     public String getId() { return id; }
@@ -119,5 +127,17 @@ public class ConfiguracionNegocio {
 
     public String getColorGranizado2() { return colorGranizado2; }
     public void setColorGranizado2(String colorGranizado2) { this.colorGranizado2 = colorGranizado2; }
+
+    public String getColorGranizado1Izq() { return colorGranizado1Izq; }
+    public void setColorGranizado1Izq(String colorGranizado1Izq) { this.colorGranizado1Izq = colorGranizado1Izq; }
+
+    public String getColorGranizado2Izq() { return colorGranizado2Izq; }
+    public void setColorGranizado2Izq(String colorGranizado2Izq) { this.colorGranizado2Izq = colorGranizado2Izq; }
+
+    public String getColorGranizado1Der() { return colorGranizado1Der; }
+    public void setColorGranizado1Der(String colorGranizado1Der) { this.colorGranizado1Der = colorGranizado1Der; }
+
+    public String getColorGranizado2Der() { return colorGranizado2Der; }
+    public void setColorGranizado2Der(String colorGranizado2Der) { this.colorGranizado2Der = colorGranizado2Der; }
 }
 

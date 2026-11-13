@@ -90,205 +90,268 @@
     <div class="stage-aura"></div>
     <div class="hero-badge badge-left">🍃 100% Fruta Cosechada</div>
     <div class="hero-badge badge-right">🧊 Hielo Frappé -4°C</div>
-<svg class="gl" viewBox="0 -35 320 440" role="img" aria-label="Vaso de granizado artesanal con textura cristalina de hielo molido frappé y pitillo">
-<defs>
-  <!-- Contorno interior del vaso de granizado -->
-  <clipPath id="cupClip">
-    <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
-  </clipPath>
 
-  <!-- Degradados de color dinámicos según el sabor (Neón / Berry / Tropical) -->
-  <linearGradient id="gT" x2="0" y2="1"><stop style="stop-color:var(--t1)"/><stop offset="1" style="stop-color:var(--t2)"/></linearGradient>
-  <linearGradient id="gM" x2="0" y2="1"><stop style="stop-color:var(--t3)"/><stop offset="1" style="stop-color:var(--t4)"/></linearGradient>
-  <linearGradient id="gB" x2="0" y2="1"><stop style="stop-color:var(--t5)"/><stop offset="1" style="stop-color:var(--t6)"/></linearGradient>
+    <div class="trio-stage-wrapper">
 
-  <!-- PATRÓN VECTORIAL DE HIELO MOLIDO (CRUSHED ICE CRYSTALS)
-       Textura de micro-facetas cristalinas geométricas que refractan luz
-       sin ensuciar ni opacar los colores vivos del sabor -->
-  <pattern id="iceCrystals" width="36" height="36" patternUnits="userSpaceOnUse">
-    <!-- Micro-esquirla 1 (romboide con destello) -->
-    <polygon points="6,4 12,2 14,8 8,10" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
-    <line x1="8" y1="4" x2="12" y2="8" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
+      <!-- ==============================================
+           1. VASO IZQUIERDO: MENTA / LIMA GLACIAL
+           ============================================== -->
+      <svg class="gl gl-trio gl-left" viewBox="0 -35 320 440" role="img" aria-label="Granizado Menta Lima Artesanal">
+        <defs>
+          <clipPath id="cupClipIzq">
+            <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
+          </clipPath>
+          <linearGradient id="gT_izq" x2="0" y2="1"><stop style="stop-color:var(--t1-izq)"/><stop offset="1" style="stop-color:var(--t2-izq)"/></linearGradient>
+          <linearGradient id="gM_izq" x2="0" y2="1"><stop style="stop-color:var(--t3-izq)"/><stop offset="1" style="stop-color:var(--t4-izq)"/></linearGradient>
+          <linearGradient id="gB_izq" x2="0" y2="1"><stop style="stop-color:var(--t5-izq)"/><stop offset="1" style="stop-color:var(--t6-izq)"/></linearGradient>
+          <linearGradient id="strawGradIzq" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#059669"/>
+            <stop offset="35%" stop-color="#34D399"/>
+            <stop offset="70%" stop-color="#10B981"/>
+            <stop offset="100%" stop-color="#064E3B"/>
+          </linearGradient>
+        </defs>
 
-    <!-- Micro-esquirla 2 (prisma triangular de hielo) -->
-    <polygon points="22,5 30,7 26,14" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.25"/>
+        <!-- Sombra en la base -->
+        <ellipse class="ground-shadow" cx="160" cy="358" rx="90" ry="13" fill="#10B981" opacity=".4" filter="url(#bl)"/>
 
-    <!-- Micro-faceta 3 (diamante refractante) -->
-    <polygon points="16,18 20,15 24,19 20,23" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
-    <circle cx="20" cy="19" r="0.8" fill="#ffffff" fill-opacity="0.7"/>
+        <!-- Cama de hielo molido en la base -->
+        <g class="crushed-base" opacity="0.8">
+          <polygon points="76,354 84,348 92,352 86,358" fill="#d8fbff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="96,356 104,350 110,355 102,360" fill="#ffffff" fill-opacity="0.55" stroke="#d8fbff" stroke-width="0.8"/>
+          <polygon points="120,358 130,353 138,357 128,362" fill="#d8fbff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.7"/>
+          <polygon points="182,358 192,352 200,356 190,361" fill="#ffffff" fill-opacity="0.5" stroke="#d8fbff" stroke-width="0.7"/>
+          <polygon points="212,356 220,349 228,354 220,359" fill="#d8fbff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="234,352 242,347 248,353 240,357" fill="#ffffff" fill-opacity="0.4" stroke="#d8fbff" stroke-width="0.8"/>
+        </g>
 
-    <!-- Micro-esquirla 4 (gránulo de hielo picado lateral) -->
-    <polygon points="3,22 9,20 11,27 5,28" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.3"/>
+        <!-- Grupo principal con balanceo -->
+        <g class="bob">
+          <!-- Pitillo Verde Lulo/Menta -->
+          <g transform="translate(178, -22) rotate(4)">
+            <rect x="-8" y="0" width="16" height="150" rx="3" fill="url(#strawGradIzq)"/>
+            <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#064E3B" stroke="#34D399" stroke-width="1"/>
+          </g>
 
-    <!-- Micro-esquirla 5 (pequeño cristal trapezoidal) -->
-    <polygon points="28,24 34,22 35,28 30,31" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+          <!-- Contenido y texturas -->
+          <g clip-path="url(#cupClipIzq)">
+            <rect x="40" y="10" width="240" height="340" fill="url(#gT_izq)"/>
+            <path class="wave" fill="url(#gM_izq)" d="M-120 150 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 V400 H-120 Z"/>
+            <path class="wave2" fill="url(#gB_izq)" d="M-120 240 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 V400 H-120 Z"/>
+            <rect x="40" y="10" width="240" height="340" fill="url(#iceCrystals)"/>
+            <polygon points="110,130 115,124 122,128 116,134" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="200,165 208,160 214,166 206,171" fill="#ffffff" fill-opacity="0.28" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="90,210 98,204 104,210 96,216" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="175,225 183,218 190,224 182,230" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+            <g id="bubs-left" fill="none" stroke="#fff" stroke-width="1.5"></g>
+          </g>
 
-    <!-- Micro-esquirla 6 (prisma inferior) -->
-    <polygon points="12,30 18,28 16,35 10,34" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+          <!-- Cúpula de hielo molido -->
+          <g class="slush-dome">
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#gT_izq)"/>
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#iceCrystals)"/>
+            <path d="M82 54 Q100 42 124 45 T168 38 T212 44 T238 58" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M102 38 Q128 26 156 27 T204 32" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+            <polygon points="120,32 126,27 132,31 126,36" fill="#ffffff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="186,30 192,25 198,29 192,34" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.5"/>
+          </g>
 
-    <!-- Micro-destellos puntuales de escarcha -->
-    <circle cx="4" cy="14" r="0.7" fill="#ffffff" fill-opacity="0.5"/>
-    <circle cx="28" cy="17" r="0.9" fill="#ffffff" fill-opacity="0.6"/>
-    <circle cx="15" cy="8" r="0.6" fill="#ffffff" fill-opacity="0.5"/>
-    <circle cx="22" cy="33" r="0.8" fill="#ffffff" fill-opacity="0.6"/>
-  </pattern>
+          <!-- Vaso de plástico transparente -->
+          <path d="M58 70 L86 332 Q88 350 108 350 H212 Q232 350 234 332 L262 70 Z" fill="url(#plasticCupGrad)" stroke="rgba(216, 251, 255, 0.75)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M74 88 L98 325" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity=".4"/>
+          <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity=".25"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+        </g>
+      </svg>
 
-  <!-- Gradiente plástico transparente hiperrealista del vaso -->
-  <linearGradient id="plasticCupGrad" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="#ffffff" stop-opacity=".42"/>
-    <stop offset="10%" stop-color="#ffffff" stop-opacity=".08"/>
-    <stop offset="78%" stop-color="#ffffff" stop-opacity=".04"/>
-    <stop offset="90%" stop-color="#ffffff" stop-opacity=".15"/>
-    <stop offset="100%" stop-color="#ffffff" stop-opacity=".38"/>
-  </linearGradient>
 
-  <!-- Gradiente cilíndrico 3D para el pitillo recto -->
-  <linearGradient id="strawGrad" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="#00b4d8"/>
-    <stop offset="35%" stop-color="#90e0ef"/>
-    <stop offset="70%" stop-color="#0077b6"/>
-    <stop offset="100%" stop-color="#03045e"/>
-  </linearGradient>
+      <!-- ==============================================
+           2. VASO CENTRAL (HERO DESTACADO): FRESA / FRUTOS ROJOS
+           ============================================== -->
+      <svg class="gl gl-trio gl-center" viewBox="0 -35 320 440" role="img" aria-label="Vaso principal de granizado artesanal Granifresh">
+        <defs>
+          <clipPath id="cupClip">
+            <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
+          </clipPath>
+          <linearGradient id="gT" x2="0" y2="1"><stop style="stop-color:var(--t1)"/><stop offset="1" style="stop-color:var(--t2)"/></linearGradient>
+          <linearGradient id="gM" x2="0" y2="1"><stop style="stop-color:var(--t3)"/><stop offset="1" style="stop-color:var(--t4)"/></linearGradient>
+          <linearGradient id="gB" x2="0" y2="1"><stop style="stop-color:var(--t5)"/><stop offset="1" style="stop-color:var(--t6)"/></linearGradient>
 
-  <!-- Destello estrellado de escarcha -->
-  <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
-  <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
-</defs>
+          <pattern id="iceCrystals" width="36" height="36" patternUnits="userSpaceOnUse">
+            <polygon points="6,4 12,2 14,8 8,10" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+            <line x1="8" y1="4" x2="12" y2="8" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
+            <polygon points="22,5 30,7 26,14" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.25"/>
+            <polygon points="16,18 20,15 24,19 20,23" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="0.6" stroke-opacity="0.4"/>
+            <circle cx="20" cy="19" r="0.8" fill="#ffffff" fill-opacity="0.7"/>
+            <polygon points="3,22 9,20 11,27 5,28" fill="#ffffff" fill-opacity="0.16" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.3"/>
+            <polygon points="28,24 34,22 35,28 30,31" fill="#ffffff" fill-opacity="0.18" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+            <polygon points="12,30 18,28 16,35 10,34" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.35"/>
+            <circle cx="4" cy="14" r="0.7" fill="#ffffff" fill-opacity="0.5"/>
+            <circle cx="28" cy="17" r="0.9" fill="#ffffff" fill-opacity="0.6"/>
+            <circle cx="15" cy="8" r="0.6" fill="#ffffff" fill-opacity="0.5"/>
+            <circle cx="22" cy="33" r="0.8" fill="#ffffff" fill-opacity="0.6"/>
+          </pattern>
 
-<!-- Resplandor luminoso en la base del vaso -->
-<ellipse class="ground-shadow" cx="160" cy="358" rx="95" ry="14" fill="#ff2d9b" opacity=".45" filter="url(#bl)"/>
+          <linearGradient id="plasticCupGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity=".42"/>
+            <stop offset="10%" stop-color="#ffffff" stop-opacity=".08"/>
+            <stop offset="78%" stop-color="#ffffff" stop-opacity=".04"/>
+            <stop offset="90%" stop-color="#ffffff" stop-opacity=".15"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity=".38"/>
+          </linearGradient>
 
-<!-- ==============================================
-     CAMA DE HIELO MOLIDO EN LA BASE (REFERENCIA FOTO)
-     Esquirlas de hielo picado cristalino descansando en la base
-     ============================================== -->
-<g class="crushed-base" opacity="0.85">
-  <!-- Cristal 1 izquierda -->
-  <polygon points="76,354 84,348 92,352 86,358" fill="#d8fbff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.8"/>
-  <!-- Cristal 2 -->
-  <polygon points="96,356 104,350 110,355 102,360" fill="#ffffff" fill-opacity="0.55" stroke="#d8fbff" stroke-width="0.8"/>
-  <!-- Cristal 3 centro-izq -->
-  <polygon points="120,358 130,353 138,357 128,362" fill="#d8fbff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.7"/>
-  <!-- Cristal 4 centro-der -->
-  <polygon points="182,358 192,352 200,356 190,361" fill="#ffffff" fill-opacity="0.5" stroke="#d8fbff" stroke-width="0.7"/>
-  <!-- Cristal 5 derecha -->
-  <polygon points="212,356 220,349 228,354 220,359" fill="#d8fbff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.8"/>
-  <!-- Cristal 6 extrema derecha -->
-  <polygon points="234,352 242,347 248,353 240,357" fill="#ffffff" fill-opacity="0.4" stroke="#d8fbff" stroke-width="0.8"/>
-</g>
+          <linearGradient id="strawGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#00b4d8"/>
+            <stop offset="35%" stop-color="#90e0ef"/>
+            <stop offset="70%" stop-color="#0077b6"/>
+            <stop offset="100%" stop-color="#03045e"/>
+          </linearGradient>
 
-<!-- GRUPO PRINCIPAL CON BALANCEO SUAVE (.bob) -->
-<g class="bob">
+          <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
+          <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
+        </defs>
 
-  <!-- ==============================================
-       1. PITILLO RECTO CLÁSICO (Insertado en el frappé)
-       ============================================== -->
-  <g transform="translate(182, -22) rotate(6)">
-    <!-- Cuerpo cilíndrico del pitillo -->
-    <rect x="-8" y="0" width="16" height="150" rx="3" fill="url(#strawGrad)"/>
-    <!-- Orificio superior del pitillo -->
-    <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#03045e" stroke="#90e0ef" stroke-width="1"/>
-  </g>
+        <ellipse class="ground-shadow" cx="160" cy="358" rx="98" ry="15" fill="#ff2d9b" opacity=".48" filter="url(#bl)"/>
 
-  <!-- ==============================================
-       2. CONTENIDO DEL VASO: CAPAS DE SABOR Y HIELO MOLIDO
-       ============================================== -->
-  <g clip-path="url(#cupClip)">
-    <!-- Capa 1: Sabor y pulpa superior de granizado -->
-    <rect x="40" y="10" width="240" height="340" fill="url(#gT)"/>
+        <g class="crushed-base" opacity="0.9">
+          <polygon points="76,354 84,348 92,352 86,358" fill="#d8fbff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="96,356 104,350 110,355 102,360" fill="#ffffff" fill-opacity="0.55" stroke="#d8fbff" stroke-width="0.8"/>
+          <polygon points="120,358 130,353 138,357 128,362" fill="#d8fbff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.7"/>
+          <polygon points="182,358 192,352 200,356 190,361" fill="#ffffff" fill-opacity="0.5" stroke="#d8fbff" stroke-width="0.7"/>
+          <polygon points="212,356 220,349 228,354 220,359" fill="#d8fbff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="234,352 242,347 248,353 240,357" fill="#ffffff" fill-opacity="0.4" stroke="#d8fbff" stroke-width="0.8"/>
+        </g>
 
-    <!-- Capa 2: Ondas de sabor medio con textura frappé -->
-    <path class="wave" fill="url(#gM)" d="M-120 150 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 V400 H-120 Z"/>
+        <g class="bob">
+          <g transform="translate(182, -22) rotate(6)">
+            <rect x="-8" y="0" width="16" height="150" rx="3" fill="url(#strawGrad)"/>
+            <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#03045e" stroke="#90e0ef" stroke-width="1"/>
+          </g>
 
-    <!-- Capa 3: Ondas de sabor base con textura frappé -->
-    <path class="wave2" fill="url(#gB)" d="M-120 240 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 V400 H-120 Z"/>
+          <g clip-path="url(#cupClip)">
+            <rect x="40" y="10" width="240" height="340" fill="url(#gT)"/>
+            <path class="wave" fill="url(#gM)" d="M-120 150 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 V400 H-120 Z"/>
+            <path class="wave2" fill="url(#gB)" d="M-120 240 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 V400 H-120 Z"/>
+            <rect x="40" y="10" width="240" height="340" fill="url(#iceCrystals)"/>
+            <polygon points="110,130 115,124 122,128 116,134" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="200,165 208,160 214,166 206,171" fill="#ffffff" fill-opacity="0.28" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="90,210 98,204 104,210 96,216" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="175,225 183,218 190,224 182,230" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="130,285 138,278 145,284 137,290" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="190,305 197,299 203,305 196,310" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+            <g id="bubs" fill="none" stroke="#fff" stroke-width="1.5"></g>
+          </g>
 
-    <!-- MICRO-TEXTURA CRISTALINA INTEGRADA:
-         Esquirlas y facetas de hielo molido refractando directamente
-         los colores del granizado -->
-    <rect x="40" y="10" width="240" height="340" fill="url(#iceCrystals)"/>
+          <g class="slush-dome">
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#gT)"/>
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#iceCrystals)"/>
+            <path d="M82 54 Q100 42 124 45 T168 38 T212 44 T238 58" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M102 38 Q128 26 156 27 T204 32" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+            <path d="M136 22 Q160 16 184 20" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+            <polygon points="120,32 126,27 132,31 126,36" fill="#ffffff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="152,24 158,19 164,23 158,28" fill="#ffffff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="186,30 192,25 198,29 192,34" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="98,46 104,41 110,45 104,50" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="218,48 224,43 230,47 224,52" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+          </g>
 
-    <!-- Destellos internos de cristales de hielo en el líquido -->
-    <polygon points="110,130 115,124 122,128 116,134" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="200,165 208,160 214,166 206,171" fill="#ffffff" fill-opacity="0.28" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="90,210 98,204 104,210 96,216" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="175,225 183,218 190,224 182,230" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="130,285 138,278 145,284 137,290" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="190,305 197,299 203,305 196,310" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+          <path d="M58 70 L86 332 Q88 350 108 350 H212 Q232 350 234 332 L262 70 Z" fill="url(#plasticCupGrad)" stroke="rgba(216, 251, 255, 0.75)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M74 88 L98 325" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".4"/>
+          <path d="M84 94 L104 320" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+          <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+        </g>
 
-    <!-- Burbujas y efervescencia criogénica en ascenso -->
-    <g id="bubs" fill="none" stroke="#fff" stroke-width="1.5"></g>
-  </g>
+        <!-- Bruma fría y destellos -->
+        <g filter="url(#bl)" fill="#d8fbff">
+          <ellipse class="mist" cx="120" cy="22" rx="24" ry="8" style="--l:0s"/>
+          <ellipse class="mist" cx="170" cy="12" rx="28" ry="9" style="--l:1.6s"/>
+          <ellipse class="mist" cx="215" cy="24" rx="22" ry="7" style="--l:3.2s"/>
+        </g>
+        <g fill="#fff">
+          <use href="#st" x="42" y="58" class="tw" style="--l:0s" fill="#FFB703"/>
+          <use href="#st" x="282" y="130" class="tw" style="--l:.6s" fill="#10B981"/>
+          <use href="#st" x="38" y="250" class="tw" style="--l:1.1s" fill="#FF1E56"/>
+          <use href="#st" x="286" y="295" class="tw" style="--l:.3s" fill="#FF7A00"/>
+        </g>
+      </svg>
 
-  <!-- ==============================================
-       3. CÚPULA DE HIELO MOLIDO COLOREADO EN LA CIMA
-       (Montaña de hielo triturado artesanal con pulpa, rebosando el vaso)
-       ============================================== -->
-  <g class="slush-dome">
-    <!-- Masa principal de hielo molido con relieve orgánico -->
-    <path d="M58 70 
-             C65 52, 85 36, 110 28 
-             C126 22, 142 16, 160 16 
-             C180 16, 196 22, 212 28 
-             C236 37, 255 52, 262 70 
-             Z" 
-          fill="url(#gT)"/>
 
-    <!-- Textura de cristales en la cúpula -->
-    <path d="M58 70 
-             C65 52, 85 36, 110 28 
-             C126 22, 142 16, 160 16 
-             C180 16, 196 22, 212 28 
-             C236 37, 255 52, 262 70 
-             Z" 
-          fill="url(#iceCrystals)"/>
+      <!-- ==============================================
+           3. VASO DERECHO: MANGO / MARACUYÁ SOLAR
+           ============================================== -->
+      <svg class="gl gl-trio gl-right" viewBox="0 -35 320 440" role="img" aria-label="Granizado Mango Maracuyá Artesanal">
+        <defs>
+          <clipPath id="cupClipDer">
+            <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
+          </clipPath>
+          <linearGradient id="gT_der" x2="0" y2="1"><stop style="stop-color:var(--t1-der)"/><stop offset="1" style="stop-color:var(--t2-der)"/></linearGradient>
+          <linearGradient id="gM_der" x2="0" y2="1"><stop style="stop-color:var(--t3-der)"/><stop offset="1" style="stop-color:var(--t4-der)"/></linearGradient>
+          <linearGradient id="gB_der" x2="0" y2="1"><stop style="stop-color:var(--t5-der)"/><stop offset="1" style="stop-color:var(--t6-der)"/></linearGradient>
+          <linearGradient id="strawGradDer" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#FFB703"/>
+            <stop offset="35%" stop-color="#FFE600"/>
+            <stop offset="70%" stop-color="#FB8500"/>
+            <stop offset="100%" stop-color="#C2410C"/>
+          </linearGradient>
+        </defs>
 
-    <!-- Relieves y crestas de hielo molido escarchado en la cima -->
-    <path d="M82 54 Q100 42 124 45 T168 38 T212 44 T238 58" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
-    <path d="M102 38 Q128 26 156 27 T204 32" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
-    <path d="M136 22 Q160 16 184 20" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+        <!-- Sombra en la base -->
+        <ellipse class="ground-shadow" cx="160" cy="358" rx="90" ry="13" fill="#FFB703" opacity=".4" filter="url(#bl)"/>
 
-    <!-- Esquirlas y micro-facetas brillantes en la superficie del hielo -->
-    <polygon points="120,32 126,27 132,31 126,36" fill="#ffffff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="152,24 158,19 164,23 158,28" fill="#ffffff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="186,30 192,25 198,29 192,34" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="98,46 104,41 110,45 104,50" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
-    <polygon points="218,48 224,43 230,47 224,52" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
-  </g>
+        <!-- Cama de hielo molido en la base -->
+        <g class="crushed-base" opacity="0.8">
+          <polygon points="76,354 84,348 92,352 86,358" fill="#d8fbff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="96,356 104,350 110,355 102,360" fill="#ffffff" fill-opacity="0.55" stroke="#d8fbff" stroke-width="0.8"/>
+          <polygon points="120,358 130,353 138,357 128,362" fill="#d8fbff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.7"/>
+          <polygon points="182,358 192,352 200,356 190,361" fill="#ffffff" fill-opacity="0.5" stroke="#d8fbff" stroke-width="0.7"/>
+          <polygon points="212,356 220,349 228,354 220,359" fill="#d8fbff" fill-opacity="0.5" stroke="#ffffff" stroke-width="0.8"/>
+          <polygon points="234,352 242,347 248,353 240,357" fill="#ffffff" fill-opacity="0.4" stroke="#d8fbff" stroke-width="0.8"/>
+        </g>
 
-  <!-- ==============================================
-       4. VASO PLÁSTICO TRANSPARENTE
-       ============================================== -->
-  <!-- Paredes del vaso con transparencia y contorno -->
-  <path d="M58 70 L86 332 Q88 350 108 350 H212 Q232 350 234 332 L262 70 Z" fill="url(#plasticCupGrad)" stroke="rgba(216, 251, 255, 0.75)" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Grupo principal con balanceo -->
+        <g class="bob">
+          <!-- Pitillo Naranja Solar -->
+          <g transform="translate(186, -22) rotate(8)">
+            <rect x="-8" y="0" width="16" height="150" rx="3" fill="url(#strawGradDer)"/>
+            <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#C2410C" stroke="#FFE600" stroke-width="1"/>
+          </g>
 
-  <!-- Reflejos verticales brillantes del vaso de plástico -->
-  <path d="M74 88 L98 325" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".4"/>
-  <path d="M84 94 L104 320" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
-  <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
+          <!-- Contenido y texturas -->
+          <g clip-path="url(#cupClipDer)">
+            <rect x="40" y="10" width="240" height="340" fill="url(#gT_der)"/>
+            <path class="wave" fill="url(#gM_der)" d="M-120 150 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 q15 -7 30 -2 t30 8 t30 -12 t30 6 V400 H-120 Z"/>
+            <path class="wave2" fill="url(#gB_der)" d="M-120 240 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 q15 7 30 2 t30 -8 t30 10 t30 -4 V400 H-120 Z"/>
+            <rect x="40" y="10" width="240" height="340" fill="url(#iceCrystals)"/>
+            <polygon points="110,130 115,124 122,128 116,134" fill="#ffffff" fill-opacity="0.32" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="200,165 208,160 214,166 206,171" fill="#ffffff" fill-opacity="0.28" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="90,210 98,204 104,210 96,216" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="175,225 183,218 190,224 182,230" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="0.5"/>
+            <g id="bubs-right" fill="none" stroke="#fff" stroke-width="1.5"></g>
+          </g>
 
-  <!-- Borde plástico enrollado superior del vaso (Rim) -->
-  <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
-  <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+          <!-- Cúpula de hielo molido -->
+          <g class="slush-dome">
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#gT_der)"/>
+            <path d="M58 70 C65 52, 85 36, 110 28 C126 22, 142 16, 160 16 C180 16, 196 22, 212 28 C236 37, 255 52, 262 70 Z" fill="url(#iceCrystals)"/>
+            <path d="M82 54 Q100 42 124 45 T168 38 T212 44 T238 58" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M102 38 Q128 26 156 27 T204 32" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+            <polygon points="120,32 126,27 132,31 126,36" fill="#ffffff" fill-opacity="0.45" stroke="#ffffff" stroke-width="0.5"/>
+            <polygon points="186,30 192,25 198,29 192,34" fill="#ffffff" fill-opacity="0.4" stroke="#ffffff" stroke-width="0.5"/>
+          </g>
 
-</g>
+          <!-- Vaso de plástico transparente -->
+          <path d="M58 70 L86 332 Q88 350 108 350 H212 Q232 350 234 332 L262 70 Z" fill="url(#plasticCupGrad)" stroke="rgba(216, 251, 255, 0.75)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M74 88 L98 325" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" opacity=".4"/>
+          <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity=".25"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
+          <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+        </g>
+      </svg>
 
-<!-- ==============================================
-     5. BRUMA FRÍA Y DESTELLOS GLACIALES
-     ============================================== -->
-<g filter="url(#bl)" fill="#d8fbff">
-  <ellipse class="mist" cx="120" cy="22" rx="24" ry="8" style="--l:0s"/>
-  <ellipse class="mist" cx="170" cy="12" rx="28" ry="9" style="--l:1.6s"/>
-  <ellipse class="mist" cx="215" cy="24" rx="22" ry="7" style="--l:3.2s"/>
-</g>
-
-<g fill="#fff">
-  <use href="#st" x="42" y="58" class="tw" style="--l:0s" fill="#FFB703"/>
-  <use href="#st" x="282" y="130" class="tw" style="--l:.6s" fill="#10B981"/>
-  <use href="#st" x="38" y="250" class="tw" style="--l:1.1s" fill="#FF1E56"/>
-  <use href="#st" x="286" y="295" class="tw" style="--l:.3s" fill="#FF7A00"/>
-</g>
-</svg>
+    </div>
   </div>
 </div></section>
 
@@ -1732,23 +1795,71 @@
                             <small class="form-hint">Aparece en la marquesina superior de toda la tienda web.</small>
                         </div>
 
-                        <div class="form-section-title">🎨 Colores Principales del Granizado (Vaso de Portada)</div>
-                        <div class="form-grid-2">
-                            <div class="form-group">
-                                <label>Color Superior del Degradado</label>
-                                <div style="display:flex; gap:10px; align-items:center;">
-                                    <input type="color" id="cfg-color1-picker" value="#FFB703" oninput="document.getElementById('cfg-color1').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(this.value, document.getElementById('cfg-color2').value);" style="width:44px; height:38px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
-                                    <input type="text" class="form-control" id="cfg-color1" value="#FFB703" style="width:120px;" oninput="document.getElementById('cfg-color1-picker').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(this.value, document.getElementById('cfg-color2').value);">
+                        <div class="form-section-title">🎨 Colores del Trío de Granizados (Portadas Interactivas)</div>
+                        <p style="font-size:0.83rem; color:var(--mut); margin:-10px 0 16px 0;">Personaliza de forma independiente los tonos degradados de cada uno de los 3 granizados del escenario principal.</p>
+
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin-bottom:20px;">
+                            <!-- Vaso 1: Izquierdo -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px;">
+                                <h4 style="color:#10B981; font-size:0.9rem; margin:0 0 12px 0; display:flex; align-items:center; gap:6px;">
+                                    <span>🍃</span> Vaso Izquierdo (Menta / Lima)
+                                </h4>
+                                <div class="form-group" style="margin-bottom:10px;">
+                                    <label style="font-size:0.8rem;">Color Superior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color1-izq-picker" value="#10B981" oninput="sincronizarColorAdmin('cfg-color1-izq', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color1-izq" value="#10B981" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color1-izq-picker', this.value)">
+                                    </div>
                                 </div>
-                                <small class="form-hint">Color superior del vaso principal interactivo.</small>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.8rem;">Color Inferior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color2-izq-picker" value="#00E5FF" oninput="sincronizarColorAdmin('cfg-color2-izq', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color2-izq" value="#00E5FF" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color2-izq-picker', this.value)">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Color Inferior del Degradado</label>
-                                <div style="display:flex; gap:10px; align-items:center;">
-                                    <input type="color" id="cfg-color2-picker" value="#FB8500" oninput="document.getElementById('cfg-color2').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(document.getElementById('cfg-color1').value, this.value);" style="width:44px; height:38px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
-                                    <input type="text" class="form-control" id="cfg-color2" value="#FB8500" style="width:120px;" oninput="document.getElementById('cfg-color2-picker').value = this.value; if(window.aplicarColoresGranizadoHero) window.aplicarColoresGranizadoHero(document.getElementById('cfg-color1').value, this.value);">
+
+                            <!-- Vaso 2: Central (Destacado) -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,0,127,0.35); border-radius:12px; padding:14px;">
+                                <h4 style="color:#FF007F; font-size:0.9rem; margin:0 0 12px 0; display:flex; align-items:center; gap:6px;">
+                                    <span>🍓</span> Vaso Central (Fresa / Principal)
+                                </h4>
+                                <div class="form-group" style="margin-bottom:10px;">
+                                    <label style="font-size:0.8rem;">Color Superior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color1-picker" value="#E11D48" oninput="sincronizarColorAdmin('cfg-color1', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color1" value="#E11D48" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color1-picker', this.value)">
+                                    </div>
                                 </div>
-                                <small class="form-hint">Color inferior del vaso principal interactivo.</small>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.8rem;">Color Inferior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color2-picker" value="#FF007F" oninput="sincronizarColorAdmin('cfg-color2', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color2" value="#FF007F" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color2-picker', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vaso 3: Derecho -->
+                            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,183,3,0.3); border-radius:12px; padding:14px;">
+                                <h4 style="color:#FFB703; font-size:0.9rem; margin:0 0 12px 0; display:flex; align-items:center; gap:6px;">
+                                    <span>🥭</span> Vaso Derecho (Mango / Maracuyá)
+                                </h4>
+                                <div class="form-group" style="margin-bottom:10px;">
+                                    <label style="font-size:0.8rem;">Color Superior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color1-der-picker" value="#FFB703" oninput="sincronizarColorAdmin('cfg-color1-der', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color1-der" value="#FFB703" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color1-der-picker', this.value)">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label style="font-size:0.8rem;">Color Inferior</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input type="color" id="cfg-color2-der-picker" value="#FB8500" oninput="sincronizarColorAdmin('cfg-color2-der', this.value)" style="width:40px; height:34px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:none; cursor:pointer;">
+                                        <input type="text" class="form-control" id="cfg-color2-der" value="#FB8500" style="font-size:0.82rem;" oninput="sincronizarColorAdminPicker('cfg-color2-der-picker', this.value)">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

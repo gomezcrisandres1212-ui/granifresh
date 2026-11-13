@@ -2133,12 +2133,28 @@ async function cargarConfiguracionAdmin() {
         const elHist = document.getElementById('cfg-historia');
         if (elHist) elHist.value = cfg.historiaNosotros || 'En Granifresh transformamos la mejor fruta 100% natural en una experiencia glacial inolvidable. Cero concentrados artificiales, puro sabor y frescura en cada vaso.';
 
-        const col1 = cfg.colorGranizado1 || '#FFB703';
-        const col2 = cfg.colorGranizado2 || '#FB8500';
+        // Colores del Trío de Granizados
+        const col1 = cfg.colorGranizado1 || '#E11D48';
+        const col2 = cfg.colorGranizado2 || '#FF007F';
+        const col1Izq = cfg.colorGranizado1Izq || '#10B981';
+        const col2Izq = cfg.colorGranizado2Izq || '#00E5FF';
+        const col1Der = cfg.colorGranizado1Der || '#FFB703';
+        const col2Der = cfg.colorGranizado2Der || '#FB8500';
+
         if (document.getElementById('cfg-color1')) document.getElementById('cfg-color1').value = col1;
         if (document.getElementById('cfg-color1-picker')) document.getElementById('cfg-color1-picker').value = col1;
         if (document.getElementById('cfg-color2')) document.getElementById('cfg-color2').value = col2;
         if (document.getElementById('cfg-color2-picker')) document.getElementById('cfg-color2-picker').value = col2;
+
+        if (document.getElementById('cfg-color1-izq')) document.getElementById('cfg-color1-izq').value = col1Izq;
+        if (document.getElementById('cfg-color1-izq-picker')) document.getElementById('cfg-color1-izq-picker').value = col1Izq;
+        if (document.getElementById('cfg-color2-izq')) document.getElementById('cfg-color2-izq').value = col2Izq;
+        if (document.getElementById('cfg-color2-izq-picker')) document.getElementById('cfg-color2-izq-picker').value = col2Izq;
+
+        if (document.getElementById('cfg-color1-der')) document.getElementById('cfg-color1-der').value = col1Der;
+        if (document.getElementById('cfg-color1-der-picker')) document.getElementById('cfg-color1-der-picker').value = col1Der;
+        if (document.getElementById('cfg-color2-der')) document.getElementById('cfg-color2-der').value = col2Der;
+        if (document.getElementById('cfg-color2-der-picker')) document.getElementById('cfg-color2-der-picker').value = col2Der;
 
         inicializarMapaAdminConfig(cfg.latitud, cfg.longitud);
 
@@ -2146,6 +2162,36 @@ async function cargarConfiguracionAdmin() {
         console.error('Error al cargar configuración:', e);
     }
 }
+
+window.sincronizarColorAdmin = function(targetId, value) {
+    const el = document.getElementById(targetId);
+    if (el) el.value = value;
+    if (window.aplicarColoresGranizadoHero) {
+        window.aplicarColoresGranizadoHero(
+            document.getElementById('cfg-color1')?.value,
+            document.getElementById('cfg-color2')?.value,
+            document.getElementById('cfg-color1-izq')?.value,
+            document.getElementById('cfg-color2-izq')?.value,
+            document.getElementById('cfg-color1-der')?.value,
+            document.getElementById('cfg-color2-der')?.value
+        );
+    }
+};
+
+window.sincronizarColorAdminPicker = function(pickerId, value) {
+    const el = document.getElementById(pickerId);
+    if (el && /^#[0-9A-Fa-f]{6}$/.test(value)) el.value = value;
+    if (window.aplicarColoresGranizadoHero) {
+        window.aplicarColoresGranizadoHero(
+            document.getElementById('cfg-color1')?.value,
+            document.getElementById('cfg-color2')?.value,
+            document.getElementById('cfg-color1-izq')?.value,
+            document.getElementById('cfg-color2-izq')?.value,
+            document.getElementById('cfg-color1-der')?.value,
+            document.getElementById('cfg-color2-der')?.value
+        );
+    }
+};
 
 async function guardarConfiguracionAdmin(e) {
     e.preventDefault();
@@ -2168,8 +2214,12 @@ async function guardarConfiguracionAdmin(e) {
         latitud: parseFloat(document.getElementById('cfg-lat').value) || 10.4075,
         longitud: parseFloat(document.getElementById('cfg-lng').value) || -75.5255,
         historiaNosotros: document.getElementById('cfg-historia').value.trim(),
-        colorGranizado1: document.getElementById('cfg-color1') ? document.getElementById('cfg-color1').value.trim() : '#FFB703',
-        colorGranizado2: document.getElementById('cfg-color2') ? document.getElementById('cfg-color2').value.trim() : '#FB8500'
+        colorGranizado1: document.getElementById('cfg-color1') ? document.getElementById('cfg-color1').value.trim() : '#E11D48',
+        colorGranizado2: document.getElementById('cfg-color2') ? document.getElementById('cfg-color2').value.trim() : '#FF007F',
+        colorGranizado1Izq: document.getElementById('cfg-color1-izq') ? document.getElementById('cfg-color1-izq').value.trim() : '#10B981',
+        colorGranizado2Izq: document.getElementById('cfg-color2-izq') ? document.getElementById('cfg-color2-izq').value.trim() : '#00E5FF',
+        colorGranizado1Der: document.getElementById('cfg-color1-der') ? document.getElementById('cfg-color1-der').value.trim() : '#FFB703',
+        colorGranizado2Der: document.getElementById('cfg-color2-der') ? document.getElementById('cfg-color2-der').value.trim() : '#FB8500'
     };
 
     try {
