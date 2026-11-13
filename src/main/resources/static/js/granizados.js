@@ -1616,6 +1616,12 @@
   }
 
   async function inicializarGraniClub() {
+    try {
+      var cachedPts = localStorage.getItem("grani_pts_bienvenida");
+      aplicarTextosPuntosBienvenida(cachedPts !== null ? parseInt(cachedPts, 10) : 20);
+    } catch (e) {
+      aplicarTextosPuntosBienvenida(20);
+    }
     await cargarConfigPublicaJuegos();
 
     // Eventos de botones abrir club
@@ -1887,9 +1893,11 @@
           isReverseGeocodingRegistro = true;
           if (inpDir && dirTexto) {
             inpDir.value = dirTexto;
+            inpDir.dispatchEvent(new Event('input', { bubbles: true }));
           }
           if (inpBar && barrioTexto) {
             inpBar.value = barrioTexto;
+            inpBar.dispatchEvent(new Event('input', { bubbles: true }));
           }
           setTimeout(function () {
             isReverseGeocodingRegistro = false;

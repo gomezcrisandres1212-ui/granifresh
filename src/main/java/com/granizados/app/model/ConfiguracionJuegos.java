@@ -51,7 +51,7 @@ public class ConfiguracionJuegos {
         this.raspaActivo = true;
         this.intentosGratisRuletaDiarios = 1;
         this.intentosGratisRaspaDiarios = 1;
-        this.puntosBienvenidaRegistro = 30; // 30 GraniPoints de bienvenida
+        this.puntosBienvenidaRegistro = 20; // 20 GraniPoints de bienvenida por defecto
         this.acumularPuntosPorCompra = true;
         this.modoPuntosCompra = "POR_VALOR";
         this.pesosPorPuntoAcumulado = 1000; // 1 punto x $1.000
