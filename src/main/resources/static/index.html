@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=8.4">
+<link rel="stylesheet" href="/css/granizados.css?v=8.5">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -135,6 +135,12 @@
 
           <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
           <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
+          <filter id="stickerShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.38"/>
+          </filter>
+          <clipPath id="stickerClipIzq">
+            <circle cx="160" cy="195" r="39"/>
+          </clipPath>
         </defs>
 
         <!-- Sombra en la base -->
@@ -187,6 +193,14 @@
           <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity=".25"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+
+          <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
+          <g class="cup-sticker" filter="url(#stickerShadow)">
+            <circle cx="160" cy="195" r="41" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.5"/>
+            <image href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipIzq)"/>
+            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.3"/>
+            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+          </g>
         </g>
       </svg>
 
@@ -235,6 +249,9 @@
 
           <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
           <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
+          <clipPath id="stickerClipCenter">
+            <circle cx="160" cy="195" r="41"/>
+          </clipPath>
         </defs>
 
         <ellipse class="ground-shadow" cx="160" cy="358" rx="98" ry="15" fill="#ff2d9b" opacity=".48" filter="url(#bl)"/>
@@ -287,6 +304,14 @@
           <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".25"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+
+          <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
+          <g class="cup-sticker" filter="url(#stickerShadow)">
+            <circle cx="160" cy="195" r="43" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.6"/>
+            <image href="/img/granifresh-logo.jpg" x="118" y="153" width="84" height="84" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipCenter)"/>
+            <path d="M122 182 C128 162, 150 156, 174 156 C190 156, 196 162, 198 172 C178 168, 146 172, 122 182 Z" fill="#ffffff" opacity="0.32"/>
+            <circle cx="160" cy="195" r="41" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
+          </g>
         </g>
 
         <!-- Bruma fría y destellos -->
@@ -321,6 +346,9 @@
             <stop offset="70%" stop-color="#FB8500"/>
             <stop offset="100%" stop-color="#C2410C"/>
           </linearGradient>
+          <clipPath id="stickerClipDer">
+            <circle cx="160" cy="195" r="39"/>
+          </clipPath>
         </defs>
 
         <!-- Sombra en la base -->
@@ -373,6 +401,14 @@
           <path d="M246 88 L224 325" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity=".25"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#ffffff" stroke-width="4.5" opacity=".85"/>
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
+
+          <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
+          <g class="cup-sticker" filter="url(#stickerShadow)">
+            <circle cx="160" cy="195" r="41" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.5"/>
+            <image href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipDer)"/>
+            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.3"/>
+            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+          </g>
         </g>
       </svg>
 
@@ -2866,7 +2902,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=8.4"></script>
+<script src="/js/granizados.js?v=8.5"></script>
 <script src="/js/admin.js"></script>
 </body>
 </html>

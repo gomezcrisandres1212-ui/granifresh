@@ -757,6 +757,12 @@ h2 {
   display: none !important;
 }
 
+/* Sticker circular oficial en los 3 vasos */
+.cup-sticker {
+  pointer-events: none;
+  user-select: none;
+}
+
 @keyframes floatBadgeLeft {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(-1.2deg); }
   50% { transform: translate3d(0, -10px, 0) rotate(1deg); }
@@ -853,6 +859,12 @@ svg.gl-right {
 
 .hero-badge {
   display: none !important;
+}
+
+/* Sticker circular oficial en los 3 vasos */
+.cup-sticker {
+  pointer-events: none;
+  user-select: none;
 }
 
 @media (max-width: 820px) {
