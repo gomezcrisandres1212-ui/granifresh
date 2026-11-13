@@ -16,9 +16,10 @@ public class ConfiguracionJuegos {
     private boolean ruletaActiva;
     private boolean raspaActivo;
 
-    // Límites de intentos diarios gratuitos
+    // Límites de intentos diarios gratuitos y frecuencia de renovación
     private int intentosGratisRuletaDiarios;
     private int intentosGratisRaspaDiarios;
+    private int diasIntervaloIntentos = 1; // 1 = diario, N = cada N días
 
     // Puntos de bienvenida por registro
     private int puntosBienvenidaRegistro;
@@ -51,6 +52,7 @@ public class ConfiguracionJuegos {
         this.raspaActivo = true;
         this.intentosGratisRuletaDiarios = 1;
         this.intentosGratisRaspaDiarios = 1;
+        this.diasIntervaloIntentos = 1;
         this.puntosBienvenidaRegistro = 20; // 20 GraniPoints de bienvenida por defecto
         this.acumularPuntosPorCompra = true;
         this.modoPuntosCompra = "POR_VALOR";
@@ -150,5 +152,8 @@ public class ConfiguracionJuegos {
 
     public int getPuntosParaToppingGratis() { return puntosParaToppingGratis; }
     public void setPuntosParaToppingGratis(int puntosParaToppingGratis) { this.puntosParaToppingGratis = puntosParaToppingGratis; }
+
+    public int getDiasIntervaloIntentos() { return diasIntervaloIntentos <= 0 ? 1 : diasIntervaloIntentos; }
+    public void setDiasIntervaloIntentos(int diasIntervaloIntentos) { this.diasIntervaloIntentos = Math.max(1, diasIntervaloIntentos); }
 }
 

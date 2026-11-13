@@ -218,5 +218,12 @@ public class ClienteService {
     public List<TransaccionPuntos> listarTodasTransaccionesAdmin() {
         return transaccionRepository.findAllByOrderByFechaDesc();
     }
+
+    public void eliminarClienteAdmin(String clienteId) {
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con id: " + clienteId));
+        transaccionRepository.deleteByClienteId(clienteId);
+        clienteRepository.delete(cliente);
+    }
 }
 

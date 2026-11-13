@@ -34,6 +34,16 @@ public class AdminClienteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarCliente(@PathVariable String id) {
+        try {
+            clienteService.eliminarClienteAdmin(id);
+            return ResponseEntity.ok(Map.of("mensaje", "Cliente y su historial de puntos eliminados con éxito", "eliminado", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/puntos")
     public ResponseEntity<?> ajustarPuntos(@PathVariable String id, @RequestBody AjustePuntosDTO dto) {
         try {

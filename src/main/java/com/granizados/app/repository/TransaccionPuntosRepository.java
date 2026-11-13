@@ -10,5 +10,6 @@ import java.util.List;
 public interface TransaccionPuntosRepository extends MongoRepository<TransaccionPuntos, String> {
     List<TransaccionPuntos> findByClienteIdOrderByFechaDesc(String clienteId);
     List<TransaccionPuntos> findAllByOrderByFechaDesc();
+    void deleteByClienteId(String clienteId);
 }
 

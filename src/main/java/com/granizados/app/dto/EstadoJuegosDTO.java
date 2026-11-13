@@ -56,5 +56,9 @@ public class EstadoJuegosDTO {
 
     public List<PremioJuego> getPremiosRaspa() { return premiosRaspa; }
     public void setPremiosRaspa(List<PremioJuego> premiosRaspa) { this.premiosRaspa = premiosRaspa; }
+
+    private int diasIntervaloIntentos = 1;
+    public int getDiasIntervaloIntentos() { return diasIntervaloIntentos; }
+    public void setDiasIntervaloIntentos(int diasIntervaloIntentos) { this.diasIntervaloIntentos = diasIntervaloIntentos; }
 }
 

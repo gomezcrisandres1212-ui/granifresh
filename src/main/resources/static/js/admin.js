@@ -2466,6 +2466,9 @@ function renderizarTablaClientes(clientes) {
                         <button type="button" class="btn-action-small btn-action-historial" onclick="abrirModalHistorialClienteAdmin('${c.id}')" title="Ver movimientos">
                             📜 Historial
                         </button>
+                        <button type="button" class="btn-action-small" style="background:rgba(239,68,68,0.18); border:1px solid rgba(239,68,68,0.45); color:#EF4444;" onclick="eliminarClienteAdmin('${c.id}', '${escapeHtmlAdmin(c.nombre || '')}', '${escapeHtmlAdmin(c.telefono || '')}')" title="Eliminar cliente">
+                            🗑️ Eliminar
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -2520,6 +2523,12 @@ window.abrirModalDetalleClienteAdmin = function (clienteId) {
         btnHistorial.onclick = function () {
             cerrarModales();
             abrirModalHistorialClienteAdmin(cliente.id);
+        };
+    }
+    const btnEliminar = document.getElementById('adm-det-btn-eliminar');
+    if (btnEliminar) {
+        btnEliminar.onclick = function () {
+            eliminarClienteAdmin(cliente.id, cliente.nombre, cliente.telefono);
         };
     }
 
@@ -2673,6 +2682,31 @@ window.abrirModalHistorialClienteAdmin = async function (clienteId) {
     }
 };
 
+window.eliminarClienteAdmin = async function (clienteId, nombre, telefono) {
+    const ident = nombre ? `"${nombre}" (${telefono ? '+57 ' + telefono : ''})` : `con ID ${clienteId}`;
+    if (!confirm(`⚠️ ¿Estás COMPLETAMENTE SEGURO de eliminar la cuenta del cliente ${ident}?\n\nEsta acción borrará definitivamente al usuario y todo su saldo e historial de GraniPoints de la base de datos de forma irreversible.`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/admin/clientes/${clienteId}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+            if (window.showToast) window.showToast('✅ Cuenta de cliente eliminada con éxito', 'success');
+            if (window.cerrarModales) window.cerrarModales();
+            await cargarClientesAdmin();
+        } else {
+            alert('Error al eliminar cliente: ' + (data.error || 'No se pudo completar la operación.'));
+        }
+    } catch (err) {
+        console.error('Error al eliminar cliente:', err);
+        alert('Error de conexión con el servidor al intentar eliminar cliente.');
+    }
+};
+
 // ==========================================================
 // 8. CONTROL MAESTRO DE DINÁMICAS (RULETA & RASPA Y GANA)
 // ==========================================================
@@ -2732,9 +2766,12 @@ async function cargarConfigJuegosAdmin() {
         const elPtsGran = document.getElementById('cfg-puntos-para-granizado');
         if (elPtsGran) elPtsGran.value = cfg.puntosParaGranizadoGratis || 120;
 
-        // Intentos y bienvenida
+        // Intentos, frecuencia y bienvenida
         const elBienv = document.getElementById('cfg-puntos-bienvenida');
         if (elBienv) elBienv.value = cfg.puntosBienvenidaRegistro !== undefined ? cfg.puntosBienvenidaRegistro : 20;
+
+        const elIntervalo = document.getElementById('cfg-dias-intervalo-intentos');
+        if (elIntervalo) elIntervalo.value = cfg.diasIntervaloIntentos !== undefined ? cfg.diasIntervaloIntentos : 1;
 
         const elIntGratis = document.getElementById('cfg-intentos-gratis-diarios');
         if (elIntGratis) elIntGratis.value = cfg.intentosGratisRuletaDiarios !== undefined ? cfg.intentosGratisRuletaDiarios : 1;
@@ -2757,14 +2794,18 @@ async function cargarConfigJuegosAdmin() {
 window.actualizarLiveHelpAdmin = function () {
     // 1. Bienvenida e Intentos
     const ptsBienv = parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) || 0;
+    const intervalo = parseInt(document.getElementById('cfg-dias-intervalo-intentos')?.value, 10) || 1;
     const intRul = parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 0;
     const intRas = parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 0;
+    const txtFrecuencia = intervalo === 1 ? 'cada 24 horas (diario)' : ('cada ' + intervalo + ' días');
+
     const elHelpBienv = document.getElementById('live-help-bienvenida');
     if (elHelpBienv) {
         elHelpBienv.innerHTML = `
             <strong>💡 Vista en vivo para el administrador:</strong><br>
             • Cada nuevo cliente recibirá automáticamente <b style="color:#FFD166;">+${ptsBienv} GraniPoints</b> de regalo al registrarse. Este valor se actualiza en vivo en el anuncio emergente y botones de la tienda.<br>
-            • Cada cliente tendrá <b style="color:#38BDF8;">${intRul} tiro(s) gratis</b> de ruleta y <b style="color:#38BDF8;">${intRas} raspa(s) gratis</b> cada 24 horas.
+            • <b>Frecuencia configurada:</b> <b style="color:#38BDF8;">${txtFrecuencia}</b>. El anuncio del Hero y los textos del GraniClub se actualizan automáticamente.<br>
+            • Cada cliente tendrá <b style="color:#34D399;">${intRul} tiro(s) gratis</b> de ruleta y <b style="color:#34D399;">${intRas} raspa(s) gratis</b> ${intervalo === 1 ? 'cada día' : ('cada ' + intervalo + ' días')}.
         `;
     }
 
@@ -2989,6 +3030,7 @@ window.guardarConfigJuegosAdmin = async function (e) {
         puntosBienvenidaRegistro: !isNaN(parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10)) ? parseInt(document.getElementById('cfg-puntos-bienvenida')?.value, 10) : 20,
         intentosGratisRuletaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-diarios')?.value, 10) || 1,
         intentosGratisRaspaDiarios: parseInt(document.getElementById('cfg-intentos-gratis-raspa')?.value, 10) || 1,
+        diasIntervaloIntentos: parseInt(document.getElementById('cfg-dias-intervalo-intentos')?.value, 10) || 1,
         premiosRuleta: nuevosSectores,
         premiosRaspa: nuevosPremiosRaspa
     };

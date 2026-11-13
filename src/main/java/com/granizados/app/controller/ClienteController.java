@@ -126,6 +126,9 @@ public class ClienteController {
         resp.put("modoPuntosCompra", config.getModoPuntosCompra());
         resp.put("pesosPorPuntoAcumulado", config.getPesosPorPuntoAcumulado());
         resp.put("puntosFijosPorCompra", config.getPuntosFijosPorCompra());
+        resp.put("diasIntervaloIntentos", config.getDiasIntervaloIntentos());
+        resp.put("intentosGratisRuletaDiarios", config.getIntentosGratisRuletaDiarios());
+        resp.put("intentosGratisRaspaDiarios", config.getIntentosGratisRaspaDiarios());
         return ResponseEntity.ok(resp);
     }
 

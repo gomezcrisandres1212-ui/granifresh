@@ -1589,9 +1589,31 @@
           ? GraniClubState.configPublica.puntosBienvenidaRegistro
           : GraniClubState.configPublica.puntosBienvenida;
         aplicarTextosPuntosBienvenida(pts);
+        aplicarTextosFrecuenciaJuegos(GraniClubState.configPublica.diasIntervaloIntentos);
       }
     } catch (e) {
       console.warn("No se pudo cargar la config pública de juegos:", e);
+    }
+  }
+
+  function aplicarTextosFrecuenciaJuegos(intervalo) {
+    var num = (intervalo !== undefined && intervalo !== null && Number(intervalo) > 0) ? parseInt(intervalo, 10) : 1;
+    try { localStorage.setItem("grani_dias_intervalo", num); } catch(e){}
+
+    var elPerkTiradas = document.getElementById("promo-perk-tiradas-txt");
+    if (elPerkTiradas) {
+      elPerkTiradas.textContent = (num > 1) ? ("Tiradas c/" + num + " Días") : "Tiradas Diarias";
+    }
+
+    if (!GraniClubState.cliente) {
+      var hgbText = document.getElementById("hgb-text");
+      if (hgbText) {
+        if (num > 1) {
+          hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> cada <b>' + num + ' días</b> para acumular puntos y reclamar granizados gratis.';
+        } else {
+          hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.';
+        }
+      }
     }
   }
 
@@ -1615,6 +1637,14 @@
     } catch (e) {
       aplicarTextosPuntosBienvenida(20);
     }
+
+    try {
+      var cachedIntervalo = localStorage.getItem("grani_dias_intervalo");
+      aplicarTextosFrecuenciaJuegos(cachedIntervalo !== null ? parseInt(cachedIntervalo, 10) : 1);
+    } catch (e) {
+      aplicarTextosFrecuenciaJuegos(1);
+    }
+
     await cargarConfigPublicaJuegos();
 
     // Eventos de botones abrir club
@@ -1732,7 +1762,12 @@
       if (heroBanner) heroBanner.classList.remove("hgb-vip-mode");
       if (hgbSparkle) hgbSparkle.textContent = "🎁";
       if (hgbText) {
-        hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.';
+        var num = (GraniClubState.configPublica && GraniClubState.configPublica.diasIntervaloIntentos) || 1;
+        if (num > 1) {
+          hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> cada <b>' + num + ' días</b> para acumular puntos y reclamar granizados gratis.';
+        } else {
+          hgbText.innerHTML = '<b>¡Gana con GraniPoints!</b> Únete al Club, gira la <b>Ruleta Glacial</b> o juega <b>Raspa y Gana</b> para acumular puntos y reclamar granizados gratis.';
+        }
       }
       if (hgbAction) {
         hgbAction.className = "hgb-action";
@@ -1754,17 +1789,22 @@
         var est = await res.json();
         GraniClubState.estadoJuegos = est;
 
+        var num = (GraniClubState.configPublica && GraniClubState.configPublica.diasIntervaloIntentos) || (est.diasIntervaloIntentos || 1);
+        var cicloTxt = num > 1 ? ("cada " + num + " días") : "hoy";
+
         var bRul = document.getElementById("badge-giros-disp");
         if (bRul) {
           var totG = est.totalGirosDisponibles || 0;
-          bRul.textContent = totG > 0 ? (totG + " disponible" + (totG > 1 ? "s" : "")) : "0 giros hoy";
+          var noDispRul = num > 1 ? ("0 giros (c/" + num + "d)") : "0 giros hoy";
+          bRul.textContent = totG > 0 ? (totG + " disponible" + (totG > 1 ? "s" : "")) : noDispRul;
           bRul.className = "cgc-badge" + (totG > 0 ? " available" : "");
         }
 
         var bRas = document.getElementById("badge-raspas-disp");
         if (bRas) {
           var totR = est.totalRaspasDisponibles || 0;
-          bRas.textContent = totR > 0 ? (totR + " disponible" + (totR > 1 ? "s" : "")) : "0 raspas hoy";
+          var noDispRas = num > 1 ? ("0 raspas (c/" + num + "d)") : "0 raspas hoy";
+          bRas.textContent = totR > 0 ? (totR + " disponible" + (totR > 1 ? "s" : "")) : noDispRas;
           bRas.className = "cgc-badge" + (totR > 0 ? " available" : "");
         }
 
@@ -1774,7 +1814,7 @@
           var totR = est.totalRaspasDisponibles || 0;
           var totT = totG + totR;
           if (totT > 0) {
-            hgbGames.innerHTML = "🎯 <b>" + totT + " tirada" + (totT > 1 ? "s" : "") + " gratis hoy</b>";
+            hgbGames.innerHTML = "🎯 <b>" + totT + " tirada" + (totT > 1 ? "s" : "") + " disponible" + (totT > 1 ? "s " : " ") + cicloTxt + "</b>";
             hgbGames.style.color = "#FFE600";
           } else {
             hgbGames.innerHTML = "✨ ¡Pide y acumula más puntos!";

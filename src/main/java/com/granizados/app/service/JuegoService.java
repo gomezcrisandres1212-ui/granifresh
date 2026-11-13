@@ -44,12 +44,16 @@ public class JuegoService {
         return configJuegosRepository.save(config);
     }
 
-    private boolean esMismoDia(Date fecha1, Date fecha2) {
-        if (fecha1 == null || fecha2 == null) return false;
+    private boolean haJugadoEnPeriodo(Date ultimaFecha, Date ahora, int intervaloDias) {
+        if (ultimaFecha == null || ahora == null) return false;
         ZoneId zone = ZoneId.of("America/Bogota");
-        LocalDate d1 = fecha1.toInstant().atZone(zone).toLocalDate();
-        LocalDate d2 = fecha2.toInstant().atZone(zone).toLocalDate();
-        return d1.isEqual(d2);
+        LocalDate dUltima = ultimaFecha.toInstant().atZone(zone).toLocalDate();
+        LocalDate dAhora = ahora.toInstant().atZone(zone).toLocalDate();
+        if (intervaloDias <= 1) {
+            return dUltima.isEqual(dAhora);
+        }
+        long dias = java.time.temporal.ChronoUnit.DAYS.between(dUltima, dAhora);
+        return dias < intervaloDias;
     }
 
     public EstadoJuegosDTO obtenerEstadoJuegos(String telefono) {
@@ -59,11 +63,12 @@ public class JuegoService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         Date ahora = new Date();
-        boolean yaGiroHoy = esMismoDia(cliente.getUltimaTiradaRuleta(), ahora);
-        boolean yaRaspoHoy = esMismoDia(cliente.getUltimoRaspaGana(), ahora);
+        int intervalo = config.getDiasIntervaloIntentos();
+        boolean yaGiro = haJugadoEnPeriodo(cliente.getUltimaTiradaRuleta(), ahora, intervalo);
+        boolean yaRaspo = haJugadoEnPeriodo(cliente.getUltimoRaspaGana(), ahora, intervalo);
 
-        boolean puedeGirarHoy = config.isRuletaActiva() && (!yaGiroHoy && config.getIntentosGratisRuletaDiarios() > 0);
-        boolean puedeRasparHoy = config.isRaspaActivo() && (!yaRaspoHoy && config.getIntentosGratisRaspaDiarios() > 0);
+        boolean puedeGirarHoy = config.isRuletaActiva() && (!yaGiro && config.getIntentosGratisRuletaDiarios() > 0);
+        boolean puedeRasparHoy = config.isRaspaActivo() && (!yaRaspo && config.getIntentosGratisRaspaDiarios() > 0);
 
         int totalGiros = (puedeGirarHoy ? 1 : 0) + cliente.getGirosExtrasDisponibles();
         int totalRaspas = (puedeRasparHoy ? 1 : 0) + cliente.getRaspasExtrasDisponibles();
@@ -82,6 +87,7 @@ public class JuegoService {
         estado.setPuntosMinimosCanje(config.getPuntosMinimosCanje());
         estado.setPremiosRuleta(config.getPremiosRuleta());
         estado.setPremiosRaspa(config.getPremiosRaspa());
+        estado.setDiasIntervaloIntentos(intervalo);
 
         return estado;
     }
@@ -97,16 +103,20 @@ public class JuegoService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         Date ahora = new Date();
-        boolean yaGiroHoy = esMismoDia(cliente.getUltimaTiradaRuleta(), ahora);
-        boolean tieneGiroDiario = !yaGiroHoy && config.getIntentosGratisRuletaDiarios() > 0;
+        int intervalo = config.getDiasIntervaloIntentos();
+        boolean yaGiro = haJugadoEnPeriodo(cliente.getUltimaTiradaRuleta(), ahora, intervalo);
+        boolean tieneGiroPeriodico = !yaGiro && config.getIntentosGratisRuletaDiarios() > 0;
         int extras = cliente.getGirosExtrasDisponibles();
 
-        if (!tieneGiroDiario && extras <= 0) {
-            return new ResultadoJuegoDTO(false, "No tienes más giros hoy. ¡Vuelve mañana por tu tiro gratis o gana giros con tus pedidos!");
+        if (!tieneGiroPeriodico && extras <= 0) {
+            String msg = (intervalo > 1)
+                    ? "No tienes más giros disponibles. ¡Las tiradas gratuitas se renuevan cada " + intervalo + " días! También puedes ganar giros extra con tus pedidos."
+                    : "No tienes más giros hoy. ¡Vuelve mañana por tu tiro gratis o gana giros con tus pedidos!";
+            return new ResultadoJuegoDTO(false, msg);
         }
 
         // Consumir intento
-        if (tieneGiroDiario) {
+        if (tieneGiroPeriodico) {
             cliente.setUltimaTiradaRuleta(ahora);
         } else {
             cliente.setGirosExtrasDisponibles(extras - 1);
@@ -164,7 +174,8 @@ public class JuegoService {
         res.setPremio(premioGanador);
         res.setPuntosGanados(puntosGanados);
         res.setSaldoActual(cliente.getGranipoints());
-        res.setIntentosRestantes((!esMismoDia(cliente.getUltimaTiradaRuleta(), ahora) ? 1 : 0) + cliente.getGirosExtrasDisponibles());
+        boolean puedeGirarProximo = !haJugadoEnPeriodo(cliente.getUltimaTiradaRuleta(), ahora, intervalo);
+        res.setIntentosRestantes((puedeGirarProximo ? 1 : 0) + cliente.getGirosExtrasDisponibles());
         res.setMensaje(puntosGanados > 0
                 ? "¡Felicidades! Has ganado " + premioGanador.getTitulo() + " (" + puntosGanados + " GraniPoints)."
                 : "¡Casi! " + premioGanador.getTitulo() + ". ¡Vuelve pronto a probar tu suerte!");
@@ -183,16 +194,20 @@ public class JuegoService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
         Date ahora = new Date();
-        boolean yaRaspoHoy = esMismoDia(cliente.getUltimoRaspaGana(), ahora);
-        boolean tieneRaspaDiario = !yaRaspoHoy && config.getIntentosGratisRaspaDiarios() > 0;
+        int intervalo = config.getDiasIntervaloIntentos();
+        boolean yaRaspo = haJugadoEnPeriodo(cliente.getUltimoRaspaGana(), ahora, intervalo);
+        boolean tieneRaspaPeriodica = !yaRaspo && config.getIntentosGratisRaspaDiarios() > 0;
         int extras = cliente.getRaspasExtrasDisponibles();
 
-        if (!tieneRaspaDiario && extras <= 0) {
-            return new ResultadoJuegoDTO(false, "No tienes más raspadas hoy. ¡Vuelve mañana por tu raspa gratis o con tus pedidos!");
+        if (!tieneRaspaPeriodica && extras <= 0) {
+            String msg = (intervalo > 1)
+                    ? "No tienes más raspadas disponibles. ¡Las raspas se renuevan cada " + intervalo + " días! También puedes ganar raspas extras con tus pedidos."
+                    : "No tienes más raspadas hoy. ¡Vuelve mañana por tu raspa gratis o con tus pedidos!";
+            return new ResultadoJuegoDTO(false, msg);
         }
 
         // Consumir intento
-        if (tieneRaspaDiario) {
+        if (tieneRaspaPeriodica) {
             cliente.setUltimoRaspaGana(ahora);
         } else {
             cliente.setRaspasExtrasDisponibles(extras - 1);
@@ -246,10 +261,11 @@ public class JuegoService {
         res.setPremio(premioGanador);
         res.setPuntosGanados(puntosGanados);
         res.setSaldoActual(cliente.getGranipoints());
-        res.setIntentosRestantes((!esMismoDia(cliente.getUltimoRaspaGana(), ahora) ? 1 : 0) + cliente.getRaspasExtrasDisponibles());
+        boolean puedeRasparProximo = !haJugadoEnPeriodo(cliente.getUltimoRaspaGana(), ahora, intervalo);
+        res.setIntentosRestantes((puedeRasparProximo ? 1 : 0) + cliente.getRaspasExtrasDisponibles());
         res.setMensaje(puntosGanados > 0
                 ? "¡Raspaste y Ganaste! " + premioGanador.getTitulo() + " (" + puntosGanados + " GraniPoints)."
-                : premioGanador.getTitulo() + ". ¡Inténtalo de nuevo mañana!");
+                : premioGanador.getTitulo() + (intervalo > 1 ? ". ¡Inténtalo de nuevo en la próxima ronda!" : ". ¡Inténtalo de nuevo mañana!"));
 
         return res;
     }

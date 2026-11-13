@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=8.5">
+<link rel="stylesheet" href="/css/granizados.css?v=8.6">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -94,7 +94,7 @@
       <!-- ==============================================
            1. VASO IZQUIERDO: MENTA / LIMA GLACIAL
            ============================================== -->
-      <svg class="gl gl-trio gl-left" viewBox="0 -35 320 440" role="img" aria-label="Granizado Menta Lima Artesanal">
+      <svg class="gl gl-trio gl-left" viewBox="0 -35 320 440" role="img" aria-label="Granizado Menta Lima Artesanal" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
           <clipPath id="cupClipIzq">
             <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
@@ -135,8 +135,8 @@
 
           <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
           <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
-          <filter id="stickerShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.38"/>
+          <filter id="stickerShadowIzq" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
           </filter>
           <clipPath id="stickerClipIzq">
             <circle cx="160" cy="195" r="39"/>
@@ -195,11 +195,11 @@
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
 
           <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
-          <g class="cup-sticker" filter="url(#stickerShadow)">
+          <g class="cup-sticker" filter="url(#stickerShadowIzq)">
             <circle cx="160" cy="195" r="41" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.5"/>
-            <image href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipIzq)"/>
-            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.3"/>
-            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <image href="/img/granifresh-logo.jpg" xlink:href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipIzq)"/>
+            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.32"/>
+            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
           </g>
         </g>
       </svg>
@@ -208,7 +208,7 @@
       <!-- ==============================================
            2. VASO CENTRAL (HERO DESTACADO): FRESA / FRUTOS ROJOS
            ============================================== -->
-      <svg class="gl gl-trio gl-center" viewBox="0 -35 320 440" role="img" aria-label="Vaso principal de granizado artesanal Granifresh">
+      <svg class="gl gl-trio gl-center" viewBox="0 -35 320 440" role="img" aria-label="Vaso principal de granizado artesanal Granifresh" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
           <clipPath id="cupClip">
             <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
@@ -249,6 +249,9 @@
 
           <path id="st" d="M0-10L2.5-2.5L10 0L2.5 2.5L0 10L-2.5 2.5L-10 0L-2.5-2.5Z"/>
           <filter id="bl"><feGaussianBlur stdDeviation="6"/></filter>
+          <filter id="stickerShadowCenter" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.45"/>
+          </filter>
           <clipPath id="stickerClipCenter">
             <circle cx="160" cy="195" r="41"/>
           </clipPath>
@@ -306,9 +309,9 @@
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
 
           <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
-          <g class="cup-sticker" filter="url(#stickerShadow)">
+          <g class="cup-sticker" filter="url(#stickerShadowCenter)">
             <circle cx="160" cy="195" r="43" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.6"/>
-            <image href="/img/granifresh-logo.jpg" x="118" y="153" width="84" height="84" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipCenter)"/>
+            <image href="/img/granifresh-logo.jpg" xlink:href="/img/granifresh-logo.jpg" x="118" y="153" width="84" height="84" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipCenter)"/>
             <path d="M122 182 C128 162, 150 156, 174 156 C190 156, 196 162, 198 172 C178 168, 146 172, 122 182 Z" fill="#ffffff" opacity="0.32"/>
             <circle cx="160" cy="195" r="41" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
           </g>
@@ -332,7 +335,7 @@
       <!-- ==============================================
            3. VASO DERECHO: MANGO / MARACUYÁ SOLAR
            ============================================== -->
-      <svg class="gl gl-trio gl-right" viewBox="0 -35 320 440" role="img" aria-label="Granizado Mango Maracuyá Artesanal">
+      <svg class="gl gl-trio gl-right" viewBox="0 -35 320 440" role="img" aria-label="Granizado Mango Maracuyá Artesanal" xmlns:xlink="http://www.w3.org/1999/xlink">
         <defs>
           <clipPath id="cupClipDer">
             <path d="M58 70 C58 36, 102 18, 160 18 C218 18, 262 36, 262 70 L234 332 Q232 350 212 350 H108 Q88 350 86 332 Z"/>
@@ -346,6 +349,9 @@
             <stop offset="70%" stop-color="#FB8500"/>
             <stop offset="100%" stop-color="#C2410C"/>
           </linearGradient>
+          <filter id="stickerShadowDer" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="2.5" stdDeviation="3" flood-color="#000000" flood-opacity="0.4"/>
+          </filter>
           <clipPath id="stickerClipDer">
             <circle cx="160" cy="195" r="39"/>
           </clipPath>
@@ -403,11 +409,11 @@
           <ellipse cx="160" cy="70" rx="102" ry="7" fill="none" stroke="#a8f4ff" stroke-width="2" opacity=".9"/>
 
           <!-- Sticker del Logo Oficial Granifresh en el centro del vaso -->
-          <g class="cup-sticker" filter="url(#stickerShadow)">
+          <g class="cup-sticker" filter="url(#stickerShadowDer)">
             <circle cx="160" cy="195" r="41" fill="#FFD13B" stroke="#FFFFFF" stroke-width="2.5"/>
-            <image href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipDer)"/>
-            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.3"/>
-            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/>
+            <image href="/img/granifresh-logo.jpg" xlink:href="/img/granifresh-logo.jpg" x="120" y="155" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#stickerClipDer)"/>
+            <path d="M124 182 C130 164, 150 158, 172 158 C188 158, 194 163, 196 172 C178 168, 148 172, 124 182 Z" fill="#ffffff" opacity="0.32"/>
+            <circle cx="160" cy="195" r="39" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.2"/>
           </g>
         </g>
       </svg>
@@ -2163,26 +2169,40 @@
                             </div>
                         </div>
 
-                        <!-- Sección 1: Bienvenida e Intentos -->
+                        <!-- Sección 1: Bienvenida, Frecuencia e Intentos -->
                         <div style="margin-bottom:20px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px;">
                             <h4 style="color:#38BDF8; font-size:0.95rem; margin:0 0 12px 0; display:flex; align-items:center; gap:8px;">
-                                <span>✨</span> Bienvenida e Intentos Gratuitos Diarios
+                                <span>✨</span> Bienvenida, Frecuencia de Intentos y Giros Gratuitos
                             </h4>
-                            <div class="form-grid-3">
+                            <div class="form-grid-4">
                                 <div class="form-group">
-                                    <label>Puntos Regalo de Bienvenida</label>
+                                    <label>Puntos Regalo Bienvenida</label>
                                     <input type="number" class="form-control" id="cfg-puntos-bienvenida" min="0" step="5" required oninput="actualizarLiveHelpAdmin()">
-                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Puntos acreditados al crear la cuenta.</small>
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Acreditados al crear cuenta.</small>
                                 </div>
                                 <div class="form-group">
-                                    <label>Intentos Gratis Diarios (Ruleta)</label>
+                                    <label>Frecuencia de Intentos *</label>
+                                    <select class="form-control" id="cfg-dias-intervalo-intentos" onchange="actualizarLiveHelpAdmin()" style="font-weight:700; color:#38BDF8;">
+                                        <option value="1">Diario (cada 24 horas)</option>
+                                        <option value="2">Cada 2 días</option>
+                                        <option value="3">Cada 3 días</option>
+                                        <option value="4">Cada 4 días</option>
+                                        <option value="5">Cada 5 días</option>
+                                        <option value="7">Semanal (cada 7 días)</option>
+                                        <option value="15">Quincenal (cada 15 días)</option>
+                                        <option value="30">Mensual (cada 30 días)</option>
+                                    </select>
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Actualiza el anuncio público.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Intentos Ruleta</label>
                                     <input type="number" class="form-control" id="cfg-intentos-gratis-diarios" min="0" max="5" step="1" required oninput="actualizarLiveHelpAdmin()">
-                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tiradas gratuitas cada 24 horas por cliente.</small>
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Tiradas por cada ciclo.</small>
                                 </div>
                                 <div class="form-group">
-                                    <label>Intentos Gratis Diarios (Raspa y Gana)</label>
+                                    <label>Intentos Raspa y Gana</label>
                                     <input type="number" class="form-control" id="cfg-intentos-gratis-raspa" min="0" max="5" step="1" required oninput="actualizarLiveHelpAdmin()">
-                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Raspas gratuitas cada 24 horas por cliente.</small>
+                                    <small class="form-hint" style="color:var(--mut); font-size:0.75rem;">Raspadas por cada ciclo.</small>
                                 </div>
                             </div>
                             <div id="live-help-bienvenida" style="margin-top:12px; background:rgba(56,189,248,0.08); border-left:3px solid #38BDF8; padding:10px 14px; border-radius:8px; font-size:0.83rem; color:#BAE6FD; line-height:1.45;">
@@ -2407,7 +2427,7 @@
                             <polygon points="16,1.5 18.8,5.5 13.2,5.5" fill="#FFE600" stroke="#000" stroke-width="0.6"/>
                         </svg>
                     </span>
-                    <small>Tiradas Diarias</small>
+                    <small id="promo-perk-tiradas-txt">Tiradas Diarias</small>
                 </div>
                 <div class="promo-perk-item">
                     <span class="promo-perk-icon">
@@ -2885,12 +2905,15 @@
 
             <!-- Acciones rápidas desde la ficha -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <div style="display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
                     <button type="button" class="btn-action-small btn-action-adjust" id="adm-det-btn-ajustar" style="padding:8px 16px;">
                         ⚙️ Ajustar Puntos
                     </button>
                     <button type="button" class="btn-action-small btn-action-historial" id="adm-det-btn-historial" style="padding:8px 16px;">
                         📜 Ver Movimientos
+                    </button>
+                    <button type="button" class="btn-action-small" id="adm-det-btn-eliminar" style="padding:8px 16px; background:rgba(239,68,68,0.18); border:1px solid rgba(239,68,68,0.45); color:#EF4444;">
+                        🗑️ Eliminar Cuenta
                     </button>
                 </div>
                 <button type="button" class="btn-action-small" onclick="cerrarModales()" style="padding:8px 20px;">
@@ -2902,7 +2925,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=8.5"></script>
-<script src="/js/admin.js"></script>
+<script src="/js/granizados.js?v=8.6"></script>
+<script src="/js/admin.js?v=8.6"></script>
 </body>
 </html>
