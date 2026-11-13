@@ -6,7 +6,7 @@
 <title>Granifresh — Refresca Tu Día con Granizados 100% Fruta Natural</title>
 <link rel="icon" type="image/jpeg" href="/img/granifresh-logo.jpg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap">
-<link rel="stylesheet" href="/css/granizados.css?v=8.8">
+<link rel="stylesheet" href="/css/granizados.css?v=8.9">
 <!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <!-- Chart.js para analíticas administrativas -->
@@ -438,6 +438,102 @@
     </div>
   </div>
 </div></section>
+
+<!-- ==========================================================
+     ZONA DE MINIJUEGOS VIP (EN VISTA PRINCIPAL)
+     Exclusivo para clientes con sesión iniciada
+     ========================================================== -->
+<section id="seccion-juegos-vip" class="seccion-juegos-vip" style="display:none;">
+  <div class="vip-games-header">
+    <div class="eyebrow" style="color:#FFB703;">🎮 EXCLUSIVO SOCIOS VIP GRANICLUB</div>
+    <h2 style="font-size:2.2rem; margin:6px 0 10px; color:#FFFFFF;">Minijuegos Glaciales &amp; Premios en Vivo</h2>
+    <p class="sub" style="margin:0 auto; max-width:640px; color:var(--mut); font-size:0.95rem;">
+      ¡Gira la ruleta y raspa tu tarjeta para ganar GraniPoints diarios y canjearlos por granizados 100% fruta natural gratis!
+    </p>
+  </div>
+
+  <div class="vip-games-grid">
+    <!-- MINIJUEGO 1: RULETA GLACIAL -->
+    <div class="vip-game-card">
+      <div class="vip-game-badge vip-badge-ruleta">
+        <span>🎡</span> Minijuego 1
+      </div>
+      <h3 class="vip-game-title">Ruleta Glacial Sub-Cero</h3>
+      <p class="vip-game-desc">
+        ¡Prueba tu suerte! Gira la ruleta y acumula GraniPoints directos a tu perfil.
+      </p>
+
+      <div class="ruleta-container">
+        <div class="ruleta-wheel-wrap">
+          <div class="ruleta-needle"></div>
+          <canvas id="canvas-ruleta" width="320" height="320"></canvas>
+          <div class="ruleta-center-pin" title="Granifresh Oficial">
+            <img src="/img/granifresh-logo.jpg" alt="Granifresh" class="ruleta-hub-img">
+          </div>
+        </div>
+
+        <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:14px 38px; font-size:1.05rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(255,183,3,0.4); background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; cursor:pointer;">
+          🌀 ¡GIRAR RULETA!
+        </button>
+
+        <div class="game-intentos-badge" id="ruleta-intentos-txt">
+          Giros disponibles: 1
+        </div>
+
+        <!-- Caja de Resultado Ruleta -->
+        <div class="game-result-box" id="ruleta-result-box" style="display:none; width:100%; max-width:320px;">
+          <div style="font-size:2.4rem;" id="ruleta-res-icon">🎉</div>
+          <h3 style="color:#FFB703; margin:6px 0;" id="ruleta-res-title">¡+25 GraniPoints!</h3>
+          <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="ruleta-res-desc">¡Sumados a tu cuenta con éxito!</p>
+          <button type="button" class="cta" onclick="continuarDespuesDeRuleta()" style="padding:8px 22px; font-size:0.85rem; border-radius:8px;">
+            ¡Genial! ➔
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINIJUEGO 2: RASPA Y GANA GLACIAL -->
+    <div class="vip-game-card">
+      <div class="vip-game-badge vip-badge-raspa">
+        <span>🎫</span> Minijuego 2
+      </div>
+      <h3 class="vip-game-title">Raspa y Gana Glacial</h3>
+      <p class="vip-game-desc">
+        Pasa tu dedo o cursor sobre la escarcha plateada para descubrir tu premio secreto.
+      </p>
+
+      <div class="raspa-container">
+        <div class="raspa-card-frame" id="raspa-card-frame">
+          <!-- Premio oculto debajo -->
+          <div class="raspa-under-prize" id="raspa-under-prize">
+            <div class="raspa-under-icon" id="raspa-icon">🍓</div>
+            <h3 class="raspa-under-title" id="raspa-title">+30 GraniPoints</h3>
+            <p class="raspa-under-sub" id="raspa-sub">¡Fruta 100% natural!</p>
+          </div>
+          <!-- Lienzo de escarcha para raspar -->
+          <canvas id="canvas-raspa" width="310" height="220"></canvas>
+        </div>
+
+        <button type="button" class="cta" id="btn-iniciar-raspa" onclick="iniciarNuevaPartidaRaspa()" style="padding:13px 34px; font-size:1.02rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(56,189,248,0.4); background:linear-gradient(135deg,#38BDF8,#0284C7); color:#FFFFFF; cursor:pointer; margin-top:16px;">
+          ❄️ ¡NUEVA TARJETA RASPA!
+        </button>
+
+        <div class="game-intentos-badge" id="raspa-intentos-txt">
+          Raspas disponibles: 1
+        </div>
+
+        <!-- Caja de Resultado Raspa -->
+        <div class="game-result-box" id="raspa-result-box" style="display:none; width:100%; max-width:310px;">
+          <h3 style="color:#FFB703; margin:4px 0;" id="raspa-res-title">¡Premio Descubierto!</h3>
+          <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="raspa-res-desc">Puntos sumados a tu perfil.</p>
+          <button type="button" class="cta" onclick="continuarDespuesDeRaspa()" style="padding:8px 22px; font-size:0.85rem; border-radius:8px;">
+            Continuar ➔
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="menu">
   <div class="eyebrow">COSECHA &amp; NATURALEZA</div><h2>Explosión de Fruta Pura 100% Natural</h2><p class="sub">Fruta fresca seleccionada diariamente, triturada en frío al punto de nieve exacto sin colorantes ni conservantes artificiales.</p>
@@ -2618,159 +2714,38 @@
                 </div>
             </div>
 
-            <div class="chk-section-eyebrow" style="margin-bottom:10px;">
-                <span>🎮</span> ZONA DE DINÁMICAS &amp; MINIJUEGOS
-            </div>
-
-            <!-- Accesos a los Juegos -->
-            <div class="club-games-grid">
-                <div class="club-game-card card-ruleta" onclick="abrirRuletaGlacial()">
-                    <div class="cgc-icon">
-                        <svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:auto; filter:drop-shadow(0 2px 8px rgba(255,183,3,0.4));">
-                            <circle cx="16" cy="16" r="14" fill="#0F1713" stroke="#FFB703" stroke-width="1.8"/>
-                            <path d="M16 16 L16 3 A13 13 0 0 1 25.19 6.81 Z" fill="#EF4444"/>
-                            <path d="M16 16 L25.19 6.81 A13 13 0 0 1 29 16 Z" fill="#FFB703"/>
-                            <path d="M16 16 L29 16 A13 13 0 0 1 25.19 25.19 Z" fill="#00E5FF"/>
-                            <path d="M16 16 L25.19 25.19 A13 13 0 0 1 16 29 Z" fill="#A855F7"/>
-                            <path d="M16 16 L16 29 A13 13 0 0 1 6.81 25.19 Z" fill="#10B981"/>
-                            <path d="M16 16 L6.81 25.19 A13 13 0 0 1 3 16 Z" fill="#EC4899"/>
-                            <path d="M16 16 L3 16 A13 13 0 0 1 6.81 6.81 Z" fill="#F59E0B"/>
-                            <path d="M16 16 L6.81 6.81 A13 13 0 0 1 16 3 Z" fill="#3B82F6"/>
-                            <circle cx="16" cy="16" r="4.2" fill="#FFB703" stroke="#FFFFFF" stroke-width="1.2"/>
-                            <circle cx="16" cy="16" r="1.8" fill="#FFFFFF"/>
-                            <polygon points="16,1.5 18.8,5.5 13.2,5.5" fill="#FFE600" stroke="#000" stroke-width="0.6"/>
-                        </svg>
+            <!-- Acceso directo a Minijuegos en Pantalla Principal -->
+            <div class="club-go-to-games-card" onclick="irAZonaJuegosPrincipal()" style="background: linear-gradient(135deg, rgba(255,183,3,0.15) 0%, rgba(16,185,129,0.18) 100%); border: 1.5px solid rgba(255,183,3,0.45); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.35);">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span style="font-size:2rem; filter:drop-shadow(0 2px 6px rgba(255,183,3,0.5));">🎮</span>
+                    <div style="text-align:left;">
+                        <strong style="color:#FFF; font-size:0.94rem; display:block;">Zona de Minijuegos VIP</strong>
+                        <small style="color:#A7F3D0; font-size:0.78rem;" id="badge-juegos-modal-resumen">Ruleta y Raspa activos en pantalla principal</small>
                     </div>
-                    <h4 class="cgc-title">Ruleta Glacial</h4>
-                    <span class="cgc-badge" id="badge-giros-disp">Cargando...</span>
                 </div>
-
-                <div class="club-game-card" onclick="abrirRaspaGlacial()">
-                    <div class="cgc-icon">🎫</div>
-                    <h4 class="cgc-title">Raspa y Gana</h4>
-                    <span class="cgc-badge" id="badge-raspas-disp">Cargando...</span>
-                </div>
+                <span style="background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; font-weight:900; font-size:0.8rem; padding:8px 16px; border-radius:99px; box-shadow:0 0 14px rgba(255,183,3,0.4); white-space:nowrap;">
+                    ¡Ir a Jugar! ➔
+                </span>
             </div>
 
-            <!-- Historial de Movimientos -->
-            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px; margin-bottom:18px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <strong style="font-size:0.88rem; color:#FFF;">📜 Historial de GraniPoints</strong>
+            <!-- Historial de Movimientos de GraniPoints -->
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; margin-bottom:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <strong style="font-size:0.92rem; color:#FFF; display:flex; align-items:center; gap:6px;">
+                        <span>📜</span> Historial de GraniPoints
+                    </strong>
                     <button type="button" class="btn-action-small btn-action-historial" onclick="cargarHistorialCliente()">
                         🔄 Actualizar
                     </button>
                 </div>
-                <div id="cl-historial-lista" style="max-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+                <div id="cl-historial-lista" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
                     <small style="color:var(--mut); text-align:center;">Cargando movimientos...</small>
                 </div>
             </div>
 
-            <button type="button" class="btn-action-small" onclick="cerrarSesionCliente()" style="width:100%; padding:10px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; font-weight:700; border-radius:10px; justify-content:center;">
+            <button type="button" class="btn-action-small" onclick="cerrarSesionCliente()" style="width:100%; padding:11px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; font-weight:700; border-radius:10px; justify-content:center;">
                 🚪 Cerrar Sesión de Mi Cuenta
             </button>
-        </div>
-    </div>
-</div>
-
-<!-- ==========================================================
-     MODAL DINÁMICA 1: RULETA GLACIAL INTERACTIVA
-     ========================================================== -->
-<div class="modal-overlay" id="modal-ruleta" style="z-index: 9992 !important;">
-    <div class="modal-box club-modal-box" style="max-width: 440px; text-align:center;">
-        <div class="modal-header">
-            <h3 style="display:flex; align-items:center; justify-content:center; gap:8px;">
-                <span>
-                    <svg viewBox="0 0 32 32" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block; vertical-align:middle; filter:drop-shadow(0 0 6px rgba(255,183,3,0.5));">
-                        <circle cx="16" cy="16" r="14" fill="#0F1713" stroke="#FFB703" stroke-width="1.8"/>
-                        <path d="M16 16 L16 3 A13 13 0 0 1 25.19 6.81 Z" fill="#EF4444"/>
-                        <path d="M16 16 L25.19 6.81 A13 13 0 0 1 29 16 Z" fill="#FFB703"/>
-                        <path d="M16 16 L29 16 A13 13 0 0 1 25.19 25.19 Z" fill="#00E5FF"/>
-                        <path d="M16 16 L25.19 25.19 A13 13 0 0 1 16 29 Z" fill="#A855F7"/>
-                        <path d="M16 16 L16 29 A13 13 0 0 1 6.81 25.19 Z" fill="#10B981"/>
-                        <path d="M16 16 L6.81 25.19 A13 13 0 0 1 3 16 Z" fill="#EC4899"/>
-                        <path d="M16 16 L3 16 A13 13 0 0 1 6.81 6.81 Z" fill="#F59E0B"/>
-                        <path d="M16 16 L6.81 6.81 A13 13 0 0 1 16 3 Z" fill="#3B82F6"/>
-                        <circle cx="16" cy="16" r="4.2" fill="#FFB703" stroke="#FFFFFF" stroke-width="1.2"/>
-                        <circle cx="16" cy="16" r="1.8" fill="#FFFFFF"/>
-                        <polygon points="16,1.5 18.8,5.5 13.2,5.5" fill="#FFE600" stroke="#000" stroke-width="0.6"/>
-                    </svg>
-                </span> Ruleta <b>Glacial Sub-Cero</b>
-            </h3>
-            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
-        </div>
-
-        <p style="font-size:0.84rem; color:var(--mut); margin:0 0 14px 0;">
-            ¡Prueba tu suerte! Gira la ruleta y acumula GraniPoints para tus granizados.
-        </p>
-
-        <div class="ruleta-container">
-            <div class="ruleta-wheel-wrap">
-                <div class="ruleta-needle"></div>
-                <canvas id="canvas-ruleta" width="320" height="320"></canvas>
-                <div class="ruleta-center-pin" title="Granifresh Oficial">
-                    <img src="/img/granifresh-logo.jpg" alt="Granifresh" class="ruleta-hub-img">
-                </div>
-            </div>
-
-            <button type="button" class="cta" id="btn-spin-wheel" onclick="ejecutarGiroRuleta()" style="padding:14px 36px; font-size:1.1rem; font-weight:900; border-radius:99px; box-shadow:0 0 25px rgba(255,183,3,0.4); background:linear-gradient(135deg,#FFB703,#FB8500); color:#051A10; cursor:pointer;">
-                🌀 ¡GIRAR RULETA!
-            </button>
-
-            <div style="margin-top:12px; font-size:0.82rem; color:#A7F3D0;" id="ruleta-intentos-txt">
-                Giros disponibles: 1
-            </div>
-
-            <!-- Caja de Resultado -->
-            <div class="game-result-box" id="ruleta-result-box" style="display:none; width:100%; max-width:320px;">
-                <div style="font-size:2.4rem;" id="ruleta-res-icon">🎉</div>
-                <h3 style="color:#FFB703; margin:6px 0;" id="ruleta-res-title">¡+25 GraniPoints!</h3>
-                <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="ruleta-res-desc">¡Sumados a tu cuenta con éxito!</p>
-                <button type="button" class="cta" onclick="continuarDespuesDeRuleta()" style="padding:8px 20px; font-size:0.85rem; border-radius:8px;">
-                    ¡Genial! ➔
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- ==========================================================
-     MODAL DINÁMICA 2: RASPA Y GANA GLACIAL INTERACTIVO
-     ========================================================== -->
-<div class="modal-overlay" id="modal-raspa" style="z-index: 9992 !important;">
-    <div class="modal-box club-modal-box" style="max-width: 440px; text-align:center;">
-        <div class="modal-header">
-            <h3><span>🎫</span> Raspa y Gana <b>Glacial</b></h3>
-            <button class="btn-close-drawer" onclick="cerrarModales()">✕</button>
-        </div>
-
-        <p style="font-size:0.84rem; color:var(--mut); margin:0 0 14px 0;">
-            Pasa el dedo o el mouse sobre la capa de escarcha para raspar y descubrir tu premio.
-        </p>
-
-        <div class="raspa-container">
-            <div class="raspa-card-frame" id="raspa-card-frame">
-                <!-- Premio oculto debajo -->
-                <div class="raspa-under-prize" id="raspa-under-prize">
-                    <div class="raspa-under-icon" id="raspa-icon">🍓</div>
-                    <h3 class="raspa-under-title" id="raspa-title">+30 GraniPoints</h3>
-                    <p class="raspa-under-sub" id="raspa-sub">¡Fruta 100% natural!</p>
-                </div>
-                <!-- Lienzo de escarcha para raspar -->
-                <canvas id="canvas-raspa" width="310" height="220"></canvas>
-            </div>
-
-            <div style="font-size:0.82rem; color:#A7F3D0; margin-bottom:12px;" id="raspa-intentos-txt">
-                Raspas disponibles: 1
-            </div>
-
-            <!-- Caja de Resultado Raspa -->
-            <div class="game-result-box" id="raspa-result-box" style="display:none; width:100%; max-width:310px;">
-                <h3 style="color:#FFB703; margin:4px 0;" id="raspa-res-title">¡Premio Descubierto!</h3>
-                <p style="color:#FFF; font-size:0.85rem; margin:0 0 12px 0;" id="raspa-res-desc">Puntos sumados a tu perfil.</p>
-                <button type="button" class="cta" onclick="continuarDespuesDeRaspa()" style="padding:8px 20px; font-size:0.85rem; border-radius:8px;">
-                    Continuar ➔
-                </button>
-            </div>
         </div>
     </div>
 </div>
@@ -2942,7 +2917,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=8.8"></script>
-<script src="/js/admin.js?v=8.8"></script>
+<script src="/js/granizados.js?v=8.9"></script>
+<script src="/js/admin.js?v=8.9"></script>
 </body>
 </html>

@@ -1652,7 +1652,15 @@
     if (btnClub) btnClub.addEventListener("click", abrirModalGraniClub);
 
     var bannerHero = document.getElementById("hero-granipoints-banner");
-    if (bannerHero) bannerHero.addEventListener("click", abrirModalGraniClub);
+    if (bannerHero) {
+      bannerHero.addEventListener("click", function () {
+        if (GraniClubState.cliente) {
+          irAZonaJuegosPrincipal();
+        } else {
+          abrirModalGraniClub();
+        }
+      });
+    }
 
     if (GraniClubState.token) {
       try {
@@ -1679,6 +1687,18 @@
   window.inicializarGraniClub = inicializarGraniClub;
   window.recargarPerfilClienteSiExiste = inicializarGraniClub;
 
+  window.irAZonaJuegosPrincipal = function () {
+    cerrarModales();
+    var sec = document.getElementById("seccion-juegos-vip");
+    if (sec) {
+      sec.style.display = "block";
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+      sec.classList.add("vip-games-highlight");
+      setTimeout(function () { sec.classList.remove("vip-games-highlight"); }, 2000);
+      inicializarJuegosVistaPrincipal();
+    }
+  };
+
   function actualizarUIPerfilCliente() {
     var cl = GraniClubState.cliente;
     var btnClub = document.getElementById("btn-open-graniclub");
@@ -1693,8 +1713,11 @@
     var hgbText = document.getElementById("hgb-text");
     var hgbAction = document.getElementById("hgb-action");
 
+    var secJuegos = document.getElementById("seccion-juegos-vip");
+
     if (cl) {
       document.body.classList.add("cliente-vip-activo");
+      if (secJuegos) secJuegos.style.display = "block";
 
       if (btnClub) btnClub.classList.add("nav-club-vip");
       if (iconNav) iconNav.textContent = "👑";
@@ -1750,9 +1773,11 @@
       }
 
       refrescarEstadoJuegosCliente();
+      inicializarJuegosVistaPrincipal();
 
     } else {
       document.body.classList.remove("cliente-vip-activo");
+      if (secJuegos) secJuegos.style.display = "none";
 
       if (btnClub) btnClub.classList.remove("nav-club-vip");
       if (iconNav) iconNav.textContent = "🎁";
@@ -1792,9 +1817,12 @@
         var num = (GraniClubState.configPublica && GraniClubState.configPublica.diasIntervaloIntentos) || (est.diasIntervaloIntentos || 1);
         var cicloTxt = num > 1 ? ("cada " + num + " días") : "hoy";
 
+        var totG = est.totalGirosDisponibles || 0;
+        var totR = est.totalRaspasDisponibles || 0;
+        var totT = totG + totR;
+
         var bRul = document.getElementById("badge-giros-disp");
         if (bRul) {
-          var totG = est.totalGirosDisponibles || 0;
           var noDispRul = num > 1 ? ("0 giros (c/" + num + "d)") : "0 giros hoy";
           bRul.textContent = totG > 0 ? (totG + " disponible" + (totG > 1 ? "s" : "")) : noDispRul;
           bRul.className = "cgc-badge" + (totG > 0 ? " available" : "");
@@ -1802,17 +1830,47 @@
 
         var bRas = document.getElementById("badge-raspas-disp");
         if (bRas) {
-          var totR = est.totalRaspasDisponibles || 0;
           var noDispRas = num > 1 ? ("0 raspas (c/" + num + "d)") : "0 raspas hoy";
           bRas.textContent = totR > 0 ? (totR + " disponible" + (totR > 1 ? "s" : "")) : noDispRas;
           bRas.className = "cgc-badge" + (totR > 0 ? " available" : "");
         }
 
+        var bModalResumen = document.getElementById("badge-juegos-modal-resumen");
+        if (bModalResumen) {
+          if (totT > 0) {
+            bModalResumen.textContent = totT + " partida" + (totT > 1 ? "s" : "") + " disponible" + (totT > 1 ? "s " : " ") + cicloTxt;
+            bModalResumen.style.color = "#FFE600";
+          } else {
+            bModalResumen.textContent = "Ruleta y Raspa activos en pantalla principal";
+            bModalResumen.style.color = "#A7F3D0";
+          }
+        }
+
+        var txtIntRul = document.getElementById("ruleta-intentos-txt");
+        if (txtIntRul) {
+          txtIntRul.textContent = "Giros disponibles: " + totG;
+        }
+
+        var btnSpin = document.getElementById("btn-spin-wheel");
+        if (btnSpin && !GraniClubState.ruletaGirando) {
+          btnSpin.disabled = totG <= 0;
+          btnSpin.style.opacity = totG <= 0 ? "0.5" : "1";
+        }
+
+        var txtIntRas = document.getElementById("raspa-intentos-txt");
+        if (txtIntRas) {
+          txtIntRas.textContent = "Raspas disponibles: " + totR;
+        }
+
+        var btnRas = document.getElementById("btn-iniciar-raspa");
+        if (btnRas && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+          btnRas.disabled = totR <= 0;
+          btnRas.style.opacity = totR <= 0 ? "0.5" : "1";
+          btnRas.textContent = totR > 0 ? "❄️ ¡NUEVA TARJETA RASPA!" : "❄️ ¡Sin más raspadas hoy!";
+        }
+
         var hgbGames = document.getElementById("hgb-vip-games-status");
         if (hgbGames) {
-          var totG = est.totalGirosDisponibles || 0;
-          var totR = est.totalRaspasDisponibles || 0;
-          var totT = totG + totR;
           if (totT > 0) {
             hgbGames.innerHTML = "🎯 <b>" + totT + " tirada" + (totT > 1 ? "s" : "") + " disponible" + (totT > 1 ? "s " : " ") + cicloTxt + "</b>";
             hgbGames.style.color = "#FFE600";
@@ -2179,35 +2237,48 @@
   };
 
   // ==========================================
-  // RULETA GLACIAL INTERACTIVA
+  // ZONA DE MINIJUEGOS VIP (VISTA PRINCIPAL)
   // ==========================================
-  window.abrirRuletaGlacial = async function () {
-    if (!GraniClubState.cliente) {
-      abrirModalGraniClub();
-      return;
-    }
+  window.abrirRuletaGlacial = function () {
+    irAZonaJuegosPrincipal();
+  };
 
+  window.abrirRaspaGlacial = function () {
+    irAZonaJuegosPrincipal();
+  };
+
+  window.inicializarJuegosVistaPrincipal = async function () {
+    if (!GraniClubState.cliente) return;
     await refrescarEstadoJuegosCliente();
     var est = GraniClubState.estadoJuegos;
     var sectores = (est && est.premiosRuleta) || (GraniClubState.configPublica && GraniClubState.configPublica.premiosRuleta) || [];
 
     dibujarRuletaGlacial(sectores, GraniClubState.ruletaAnguloActual || 0);
 
-    var resBox = document.getElementById("ruleta-result-box");
-    if (resBox) resBox.style.display = "none";
-
     var txtInt = document.getElementById("ruleta-intentos-txt");
-    var tot = (est && est.totalGirosDisponibles) || 0;
-    if (txtInt) txtInt.textContent = "Giros disponibles: " + tot;
+    var totGiros = (est && est.totalGirosDisponibles) || 0;
+    if (txtInt) txtInt.textContent = "Giros disponibles: " + totGiros;
 
-    var btn = document.getElementById("btn-spin-wheel");
-    if (btn) {
-      btn.disabled = tot <= 0;
-      btn.style.opacity = tot <= 0 ? "0.5" : "1";
+    var btnSpin = document.getElementById("btn-spin-wheel");
+    if (btnSpin && !GraniClubState.ruletaGirando) {
+      btnSpin.disabled = totGiros <= 0;
+      btnSpin.style.opacity = totGiros <= 0 ? "0.5" : "1";
     }
 
-    var modal = document.getElementById("modal-ruleta");
-    if (modal) modal.classList.add("active");
+    var txtRaspa = document.getElementById("raspa-intentos-txt");
+    var totRaspas = (est && est.totalRaspasDisponibles) || 0;
+    if (txtRaspa) txtRaspa.textContent = "Raspas disponibles: " + totRaspas;
+
+    var btnRaspa = document.getElementById("btn-iniciar-raspa");
+    if (btnRaspa && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+      btnRaspa.disabled = totRaspas <= 0;
+      btnRaspa.style.opacity = totRaspas <= 0 ? "0.5" : "1";
+      btnRaspa.textContent = totRaspas > 0 ? "❄️ ¡NUEVA TARJETA RASPA!" : "❄️ ¡Sin más raspadas hoy!";
+    }
+
+    if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
+      prepararCanvasRaspaInicial();
+    }
   };
 
   function dibujarRuletaGlacial(sectores, anguloRad) {
@@ -2308,6 +2379,10 @@
 
   window.ejecutarGiroRuleta = async function () {
     if (GraniClubState.ruletaGirando) return;
+    if (!GraniClubState.cliente) {
+      abrirModalGraniClub();
+      return;
+    }
     var btn = document.getElementById("btn-spin-wheel");
     if (btn) btn.disabled = true;
 
@@ -2374,7 +2449,13 @@
           }
 
           var txtInt = document.getElementById("ruleta-intentos-txt");
-          if (txtInt) txtInt.textContent = "Giros restantes: " + (data.intentosRestantes || 0);
+          var intRest = data.intentosRestantes || 0;
+          if (txtInt) txtInt.textContent = "Giros disponibles: " + intRest;
+
+          if (btn) {
+            btn.disabled = intRest <= 0;
+            btn.style.opacity = intRest <= 0 ? "0.5" : "1";
+          }
 
           if (data.puntosGanados > 0) {
             lanzarConfetiCelebracion();
@@ -2392,15 +2473,55 @@
   };
 
   window.continuarDespuesDeRuleta = function () {
-    var modal = document.getElementById("modal-ruleta");
-    if (modal) modal.classList.remove("active");
-    abrirModalGraniClub();
+    var resBox = document.getElementById("ruleta-result-box");
+    if (resBox) resBox.style.display = "none";
+    refrescarEstadoJuegosCliente();
   };
 
   // ==========================================
   // RASPA Y GANA GLACIAL INTERACTIVO
   // ==========================================
-  window.abrirRaspaGlacial = async function () {
+  function prepararCanvasRaspaInicial() {
+    var canvas = document.getElementById("canvas-raspa");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var w = canvas.width;
+    var h = canvas.height;
+
+    ctx.globalCompositeOperation = "source-over";
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, "#94A3B8");
+    grad.addColorStop(0.3, "#E2E8F0");
+    grad.addColorStop(0.6, "#38BDF8");
+    grad.addColorStop(1, "#0284C7");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Escarcha decorativa
+    ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
+    for (var i = 0; i < 180; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * w, Math.random() * h, Math.random() * 3 + 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "900 18px 'Outfit', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("❄️ RASPA Y GANA AQUÍ ❄️", w / 2, h / 2 - 8);
+    ctx.font = "bold 12px 'Outfit', sans-serif";
+    ctx.fillStyle = "#1E293B";
+    ctx.fillText("Presiona 'NUEVA TARJETA' para raspar", w / 2, h / 2 + 16);
+
+    // Si hace clic sobre el canvas sin partida activa, iniciar automáticamente
+    canvas.onclick = function () {
+      if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
+        iniciarNuevaPartidaRaspa();
+      }
+    };
+  }
+
+  window.iniciarNuevaPartidaRaspa = async function () {
     if (!GraniClubState.cliente) {
       abrirModalGraniClub();
       return;
@@ -2442,12 +2563,16 @@
       if (resBox) resBox.style.display = "none";
 
       var txtInt = document.getElementById("raspa-intentos-txt");
-      if (txtInt) txtInt.textContent = "Raspas restantes: " + (data.intentosRestantes || 0);
+      if (txtInt) txtInt.textContent = "Raspas disponibles: " + (data.intentosRestantes || 0);
+
+      var btn = document.getElementById("btn-iniciar-raspa");
+      if (btn) {
+        btn.textContent = "❄️ ¡Raspando tarjeta en curso!";
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+      }
 
       prepararCanvasRaspa();
-
-      var modal = document.getElementById("modal-raspa");
-      if (modal) modal.classList.add("active");
 
     } catch (err) {
       console.error("Error al preparar raspa:", err);
@@ -2458,6 +2583,7 @@
   function prepararCanvasRaspa() {
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
+    canvas.onclick = null; // Remover trigger de inicio
     var ctx = canvas.getContext("2d");
     var w = canvas.width;
     var h = canvas.height;
@@ -2482,12 +2608,12 @@
     }
 
     ctx.fillStyle = "#0F172A";
-    ctx.font = "900 18px sans-serif";
+    ctx.font = "900 18px 'Outfit', sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("❄️ RASPA Y GANA AQUÍ ❄️", w / 2, h / 2 - 6);
-    ctx.font = "bold 12px sans-serif";
+    ctx.fillText("❄️ ¡RASPA CON TU DEDO O CURSOR! ❄️", w / 2, h / 2 - 6);
+    ctx.font = "bold 12px 'Outfit', sans-serif";
     ctx.fillStyle = "#1E293B";
-    ctx.fillText("Pasa tu dedo o cursor sobre la escarcha", w / 2, h / 2 + 18);
+    ctx.fillText("Frota para revelar tu premio secreto", w / 2, h / 2 + 18);
 
     // Eventos de raspado
     var isRaspando = false;
@@ -2499,7 +2625,7 @@
       ctx.arc(x, y, 22, 0, Math.PI * 2);
       ctx.fill();
 
-      // Chequear porcentaje raspado cada 10 raspadas
+      // Chequear porcentaje raspado cada cierto movimiento
       if (Math.random() < 0.25) {
         verificarPorcentajeRaspado(ctx, w, h);
       }
@@ -2566,15 +2692,26 @@
       resBox.style.display = "block";
     }
 
+    var btn = document.getElementById("btn-iniciar-raspa");
+    var intRest = data.intentosRestantes || 0;
+    if (btn) {
+      btn.textContent = (intRest > 0) ? "❄️ ¡Raspar otra tarjeta!" : "❄️ ¡Sin más raspadas hoy!";
+      btn.disabled = intRest <= 0;
+      btn.style.opacity = intRest <= 0 ? "0.5" : "1";
+    }
+
+    var txtInt = document.getElementById("raspa-intentos-txt");
+    if (txtInt) txtInt.textContent = "Raspas disponibles: " + intRest;
+
     if (data.puntosGanados > 0) {
       lanzarConfetiCelebracion();
     }
   }
 
   window.continuarDespuesDeRaspa = function () {
-    var modal = document.getElementById("modal-raspa");
-    if (modal) modal.classList.remove("active");
-    abrirModalGraniClub();
+    var resBox = document.getElementById("raspa-result-box");
+    if (resBox) resBox.style.display = "none";
+    refrescarEstadoJuegosCliente();
   };
 
   // ==========================================
