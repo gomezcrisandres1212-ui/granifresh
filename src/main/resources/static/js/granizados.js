@@ -2291,8 +2291,12 @@
         btnP.classList.add("active");
       }
     }
-    if (tab === "raspa" && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
-      setTimeout(prepararCanvasRaspaInicial, 60);
+    if (tab === "raspa") {
+      setTimeout(function () {
+        if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
+          prepararCanvasRaspaInicial();
+        }
+      }, 50);
     }
   };
 
@@ -2329,13 +2333,13 @@
     if (txtRaspa) txtRaspa.textContent = "Raspas disponibles: " + totRaspas;
 
     var btnRaspa = document.getElementById("btn-iniciar-raspa");
-    if (btnRaspa && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+    if (btnRaspa && !GraniClubState.raspaPremioActual) {
       btnRaspa.disabled = totRaspas <= 0;
       btnRaspa.style.opacity = totRaspas <= 0 ? "0.5" : "1";
       btnRaspa.textContent = totRaspas > 0 ? "❄️ ¡NUEVA TARJETA RASPA!" : "❄️ ¡Sin más raspadas hoy!";
     }
 
-    if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
+    if (!GraniClubState.raspaPremioActual) {
       prepararCanvasRaspaInicial();
     }
   };
@@ -2541,59 +2545,58 @@
   // RASPA Y GANA GLACIAL INTERACTIVO
   // ==========================================
   var logoRaspaImg = new Image();
-  logoRaspaImg.crossOrigin = "anonymous";
+  // Carga de imagen con origen estándar sin flag de crossOrigin para evitar bloqueos CORS
   logoRaspaImg.src = "/img/granifresh-logo.jpg";
   logoRaspaImg.onload = function () {
     var canvas = document.getElementById("canvas-raspa");
-    if (canvas && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+    if (canvas && !GraniClubState.raspaPremioActual) {
       prepararCanvasRaspaInicial();
     }
   };
 
-  function configurarCanvasRaspa(canvas) {
-    if (!canvas) return null;
-    var dpr = Math.min(window.devicePixelRatio || 1, 3);
-    var rect = canvas.getBoundingClientRect();
-    var displayW = Math.round(rect.width) || (window.innerWidth <= 768 ? 270 : 310);
-    var displayH = Math.round(rect.height) || (window.innerWidth <= 768 ? 185 : 220);
+  function renderSuperficieRaspa(ctx, modo) {
+    var w = 620;
+    var h = 440;
 
-    canvas.width = Math.round(displayW * dpr);
-    canvas.height = Math.round(displayH * dpr);
-
-    var ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return { ctx: ctx, w: displayW, h: displayH, dpr: dpr };
-  }
-
-  function renderSuperficieRaspa(ctx, w, h, modo) {
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalCompositeOperation = "source-over";
 
     // Fondo tropical con degradado rico en contraste y brillo
     var grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, "#033B26");
-    grad.addColorStop(0.28, "#059669");
-    grad.addColorStop(0.68, "#D97706");
-    grad.addColorStop(1, "#FFB703");
+    if (modo === "agotado") {
+      grad.addColorStop(0, "#052014");
+      grad.addColorStop(0.5, "#0A3320");
+      grad.addColorStop(1, "#12472F");
+    } else {
+      grad.addColorStop(0, "#033B26");
+      grad.addColorStop(0.28, "#059669");
+      grad.addColorStop(0.68, "#D97706");
+      grad.addColorStop(1, "#FFB703");
+    }
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
     // Destellos y micro-estrellas doradas y frutales
-    ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.fillStyle = modo === "agotado" ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.35)";
     for (var i = 0; i < 90; i++) {
       ctx.beginPath();
-      var px = ((i * 47) % (w - 24)) + 12;
-      var py = ((i * 31) % (h - 24)) + 12;
-      ctx.arc(px, py, (i % 3) + 1, 0, Math.PI * 2);
+      var px = ((i * 47) % (w - 30)) + 15;
+      var py = ((i * 31) % (h - 30)) + 15;
+      ctx.arc(px, py, (i % 3) + 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Cálculos de centrado matemático exacto
-    var isMobile = w < 290;
-    var logoSize = isMobile ? 40 : 46;
-    var logoRadius = logoSize / 2;
+    // Marco interior dorado reflectivo
+    ctx.strokeStyle = modo === "agotado" ? "rgba(148, 163, 184, 0.3)" : "rgba(255, 230, 0, 0.45)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(16, 16, w - 32, h - 32);
 
-    var totalContentHeight = logoSize + 60;
-    var startY = Math.max(10, Math.round((h - totalContentHeight) / 2));
+    // Cálculos de centrado matemático exacto
+    var logoSize = 88;
+    var logoRadius = logoSize / 2;
+    var totalContentHeight = logoSize + 120;
+    var startY = Math.max(16, Math.round((h - totalContentHeight) / 2));
 
     var logoX = Math.round((w - logoSize) / 2);
     var logoY = startY;
@@ -2611,7 +2614,7 @@
       ctx.fillStyle = "#FFB703";
       ctx.fillRect(logoX, logoY, logoSize, logoSize);
       ctx.fillStyle = "#042013";
-      ctx.font = "bold 20px sans-serif";
+      ctx.font = "bold 38px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("🍃", w / 2, logoY + logoRadius);
@@ -2619,38 +2622,45 @@
     ctx.restore();
 
     // Borde circular dorado con resplandor
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#FFB703";
-    ctx.shadowColor = "rgba(255, 183, 3, 0.85)";
-    ctx.shadowBlur = 10;
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = modo === "agotado" ? "#94A3B8" : "#FFB703";
+    ctx.shadowColor = modo === "agotado" ? "rgba(0, 0, 0, 0.5)" : "rgba(255, 183, 3, 0.85)";
+    ctx.shadowBlur = 14;
     ctx.stroke();
     ctx.restore();
 
-    // Textos oficiales Granifresh centrados
+    // Textos oficiales Granifresh centrados con sombra de alto contraste
     ctx.save();
     ctx.textAlign = "center";
     ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetY = 2;
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 3;
 
     // Marca Granifresh
-    ctx.fillStyle = "#FFE600";
-    ctx.font = isMobile ? "900 11px 'Fredoka', 'Outfit', sans-serif" : "900 12px 'Fredoka', 'Outfit', sans-serif";
-    ctx.fillText("GRANIFRESH OFICIAL", w / 2, logoY + logoSize + 16);
+    ctx.fillStyle = modo === "agotado" ? "#94A3B8" : "#FFE600";
+    ctx.font = "900 22px 'Fredoka', 'Outfit', sans-serif";
+    ctx.fillText("GRANIFRESH OFICIAL", w / 2, logoY + logoSize + 30);
 
     // Título Raspa y Gana
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = isMobile ? "900 17px 'Fredoka', 'Outfit', sans-serif" : "900 19px 'Fredoka', 'Outfit', sans-serif";
-    ctx.fillText("¡RASPA Y GANA!", w / 2, logoY + logoSize + 36);
+    ctx.font = "900 36px 'Fredoka', 'Outfit', sans-serif";
+    if (modo === "agotado") {
+      ctx.fillText("¡VUELVE MAÑANA!", w / 2, logoY + logoSize + 70);
+    } else {
+      ctx.fillText("¡RASPA Y GANA!", w / 2, logoY + logoSize + 70);
+    }
 
     // Subtítulo según modo
-    ctx.fillStyle = "#A7F3D0";
-    ctx.font = isMobile ? "bold 10.5px 'Outfit', sans-serif" : "bold 11.5px 'Outfit', sans-serif";
+    ctx.fillStyle = modo === "agotado" ? "#E2E8F0" : "#A7F3D0";
+    ctx.font = "bold 21px 'Outfit', sans-serif";
     if (modo === "activo") {
-      ctx.fillText("✨ ¡Frota con tu dedo o cursor! ✨", w / 2, logoY + logoSize + 53);
+      ctx.fillText("✨ ¡Frota con tu dedo o cursor! ✨", w / 2, logoY + logoSize + 104);
+    } else if (modo === "agotado") {
+      ctx.fillText("Has usado tus raspadas de hoy ✨", w / 2, logoY + logoSize + 104);
     } else {
-      ctx.fillText("Toca 'NUEVA TARJETA' para raspar", w / 2, logoY + logoSize + 53);
+      ctx.fillText("Toca 'NUEVA TARJETA' para raspar", w / 2, logoY + logoSize + 104);
     }
+    ctx.restore();
     ctx.restore();
   }
 
@@ -2658,14 +2668,22 @@
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
 
-    var conf = configurarCanvasRaspa(canvas);
-    if (!conf) return;
+    // Forzar resolución nativa Retina HD fija (nunca 0)
+    canvas.width = 620;
+    canvas.height = 440;
 
-    renderSuperficieRaspa(conf.ctx, conf.w, conf.h, "inicial");
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    // Si hace clic sobre el canvas sin partida activa, iniciar automáticamente
+    var est = GraniClubState.estadoJuegos;
+    var tot = (est && est.totalRaspasDisponibles) || 0;
+    var modo = tot <= 0 ? "agotado" : "inicial";
+
+    renderSuperficieRaspa(ctx, modo);
+
+    // Si hace clic sobre el canvas sin partida activa y tiene intentos, iniciar automáticamente
     canvas.onclick = function () {
-      if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
+      if (tot > 0 && !GraniClubState.raspaPremioActual) {
         iniciarNuevaPartidaRaspa();
       }
     };
@@ -2692,6 +2710,12 @@
       return;
     }
 
+    var btn = document.getElementById("btn-iniciar-raspa");
+    if (btn) {
+      btn.textContent = "⏳ Preparando tarjeta...";
+      btn.disabled = true;
+    }
+
     try {
       var res = await fetch("/api/cliente/juegos/raspa/jugar", {
         method: "POST",
@@ -2700,6 +2724,10 @@
       var data = await res.json();
       if (!res.ok || !data.exito) {
         window.showToast(data.mensaje || "No se pudo iniciar la partida de raspa.", "info");
+        if (btn) {
+          btn.textContent = "❄️ ¡NUEVA TARJETA RASPA!";
+          btn.disabled = false;
+        }
         return;
       }
 
@@ -2721,11 +2749,13 @@
       var txtInt = document.getElementById("raspa-intentos-txt");
       if (txtInt) txtInt.textContent = "Raspas disponibles: " + (data.intentosRestantes || 0);
 
-      var btn = document.getElementById("btn-iniciar-raspa");
+      var cntP = document.getElementById("tab-counter-raspa");
+      if (cntP) cntP.textContent = (data.intentosRestantes || 0);
+
       if (btn) {
         btn.textContent = "❄️ ¡Raspando tarjeta en curso!";
         btn.disabled = true;
-        btn.style.opacity = "0.7";
+        btn.style.opacity = "0.75";
       }
 
       prepararCanvasRaspa();
@@ -2733,6 +2763,10 @@
     } catch (err) {
       console.error("Error al preparar raspa:", err);
       window.showToast("Error de conexión al servidor.", "error");
+      if (btn) {
+        btn.textContent = "❄️ ¡NUEVA TARJETA RASPA!";
+        btn.disabled = false;
+      }
     }
   };
 
@@ -2740,23 +2774,27 @@
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
     canvas.onclick = null; // Remover trigger de inicio
-    
-    var conf = configurarCanvasRaspa(canvas);
-    if (!conf) return;
-    var ctx = conf.ctx;
-    var w = conf.w;
-    var h = conf.h;
 
-    renderSuperficieRaspa(ctx, w, h, "activo");
+    // Forzar resolución fija 620x440
+    canvas.width = 620;
+    canvas.height = 440;
 
-    // Grid de Cobertura para Detección Infalible de Raspado (Zero-Fail, Sin CORS, 60 FPS)
+    var ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    var w = 620;
+    var h = 440;
+
+    renderSuperficieRaspa(ctx, "activo");
+
+    // Grid de Cobertura 16x12 (192 celdas) para Detección Infalible de Raspado (Zero-Fail, Sin CORS, 60 FPS)
     var gridCols = 16;
     var gridRows = 12;
     var totalCells = gridCols * gridRows;
     var grid = new Uint8Array(totalCells);
     var cellsCleared = 0;
     var trazosCount = 0;
-    var brushRadius = w < 280 ? 24 : 28;
+    var brushRadius = 55; // en escala interna 620x440
 
     var isRaspando = false;
 
@@ -2789,8 +2827,8 @@
       }
 
       var ratio = cellsCleared / totalCells;
-      // Cuando se haya raspado el 32% o más, completar automáticamente
-      if (ratio >= 0.32) {
+      // Cuando se haya raspado el 28% o más, completar automáticamente
+      if (ratio >= 0.28) {
         completarRaspaGlacial();
       }
     }
@@ -2799,9 +2837,11 @@
       var rect = canvas.getBoundingClientRect();
       var clientX = (e.touches && e.touches.length) ? e.touches[0].clientX : e.clientX;
       var clientY = (e.touches && e.touches.length) ? e.touches[0].clientY : e.clientY;
+      var scaleX = w / (rect.width || 1);
+      var scaleY = h / (rect.height || 1);
       return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
       };
     }
 
@@ -2819,7 +2859,7 @@
     window.onmouseup = function () {
       if (isRaspando) {
         isRaspando = false;
-        if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.22 || trazosCount >= 18)) {
+        if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.18 || trazosCount >= 12)) {
           completarRaspaGlacial();
         }
       }
@@ -2838,14 +2878,14 @@
     };
     canvas.ontouchend = function () {
       isRaspando = false;
-      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.22 || trazosCount >= 18)) {
+      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.18 || trazosCount >= 12)) {
         completarRaspaGlacial();
       }
     };
 
     // Respaldo de seguridad: si el usuario toca la tarjeta descubierta, finalizar
     canvas.onclick = function () {
-      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.18 || trazosCount >= 10)) {
+      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.15 || trazosCount >= 8)) {
         completarRaspaGlacial();
       }
     };
@@ -2858,19 +2898,28 @@
     var canvas = document.getElementById("canvas-raspa");
     if (canvas) {
       var c = canvas.getContext("2d");
-      c.save();
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      c.clearRect(0, 0, canvas.width, canvas.height);
-      c.restore();
+      if (c) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.clearRect(0, 0, canvas.width, canvas.height);
+        c.restore();
+      }
+      canvas.onclick = null;
+      canvas.onmousedown = null;
+      canvas.onmousemove = null;
+      canvas.ontouchstart = null;
+      canvas.ontouchmove = null;
+      canvas.ontouchend = null;
     }
 
     var data = GraniClubState.raspaPremioActual;
     if (!data) return;
 
     // Actualizar puntos de inmediato en el perfil
-    if (GraniClubState.cliente) {
+    if (GraniClubState.cliente && data.saldoActual !== undefined) {
       GraniClubState.cliente.granipoints = data.saldoActual;
       actualizarUIPerfilCliente();
+      sincronizarCheckoutGraniPoints();
     }
 
     // Mostrar caja de resultado
@@ -2906,7 +2955,10 @@
   window.continuarDespuesDeRaspa = function () {
     var resBox = document.getElementById("raspa-result-box");
     if (resBox) resBox.style.display = "none";
+    GraniClubState.raspaPremioActual = null;
+    GraniClubState.raspaCompletado = false;
     refrescarEstadoJuegosCliente();
+    prepararCanvasRaspaInicial();
   };
 
   // ==========================================
