@@ -2291,6 +2291,9 @@
         btnP.classList.add("active");
       }
     }
+    if (tab === "raspa" && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
+      setTimeout(prepararCanvasRaspaInicial, 60);
+    }
   };
 
   window.abrirRuletaGlacial = function () {
@@ -2538,6 +2541,7 @@
   // RASPA Y GANA GLACIAL INTERACTIVO
   // ==========================================
   var logoRaspaImg = new Image();
+  logoRaspaImg.crossOrigin = "anonymous";
   logoRaspaImg.src = "/img/granifresh-logo.jpg";
   logoRaspaImg.onload = function () {
     var canvas = document.getElementById("canvas-raspa");
@@ -2546,11 +2550,25 @@
     }
   };
 
+  function configurarCanvasRaspa(canvas) {
+    if (!canvas) return null;
+    var dpr = Math.min(window.devicePixelRatio || 1, 3);
+    var rect = canvas.getBoundingClientRect();
+    var displayW = Math.round(rect.width) || (window.innerWidth <= 768 ? 270 : 310);
+    var displayH = Math.round(rect.height) || (window.innerWidth <= 768 ? 185 : 220);
+
+    canvas.width = Math.round(displayW * dpr);
+    canvas.height = Math.round(displayH * dpr);
+
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx: ctx, w: displayW, h: displayH, dpr: dpr };
+  }
+
   function renderSuperficieRaspa(ctx, w, h, modo) {
     ctx.globalCompositeOperation = "source-over";
 
-    // Fondo con los colores oficiales de la marca Granifresh:
-    // Verde esmeralda tropical profundo, verde menta vibrante y amarillo mango cítrico / oro
+    // Fondo tropical con degradado rico en contraste y brillo
     var grad = ctx.createLinearGradient(0, 0, w, h);
     grad.addColorStop(0, "#033B26");
     grad.addColorStop(0.28, "#059669");
@@ -2569,14 +2587,19 @@
       ctx.fill();
     }
 
-    // Logo pequeño en la parte superior central
-    var logoSize = 48;
-    var logoX = (w - logoSize) / 2;
-    var logoY = 16;
+    // Cálculos de centrado matemático exacto
+    var isMobile = w < 290;
+    var logoSize = isMobile ? 40 : 46;
     var logoRadius = logoSize / 2;
 
+    var totalContentHeight = logoSize + 60;
+    var startY = Math.max(10, Math.round((h - totalContentHeight) / 2));
+
+    var logoX = Math.round((w - logoSize) / 2);
+    var logoY = startY;
+
+    // Dibujar logo circular con borde dorado reflectivo
     ctx.save();
-    // Círculo clip para el logo
     ctx.beginPath();
     ctx.arc(w / 2, logoY + logoRadius, logoRadius, 0, Math.PI * 2);
     ctx.closePath();
@@ -2598,12 +2621,12 @@
     // Borde circular dorado con resplandor
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#FFB703";
-    ctx.shadowColor = "rgba(255, 183, 3, 0.8)";
+    ctx.shadowColor = "rgba(255, 183, 3, 0.85)";
     ctx.shadowBlur = 10;
     ctx.stroke();
     ctx.restore();
 
-    // Textos oficiales Granifresh
+    // Textos oficiales Granifresh centrados
     ctx.save();
     ctx.textAlign = "center";
     ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
@@ -2612,21 +2635,21 @@
 
     // Marca Granifresh
     ctx.fillStyle = "#FFE600";
-    ctx.font = "900 12px 'Fredoka', 'Outfit', sans-serif";
+    ctx.font = isMobile ? "900 11px 'Fredoka', 'Outfit', sans-serif" : "900 12px 'Fredoka', 'Outfit', sans-serif";
     ctx.fillText("GRANIFRESH OFICIAL", w / 2, logoY + logoSize + 16);
 
     // Título Raspa y Gana
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "900 19px 'Fredoka', 'Outfit', sans-serif";
-    ctx.fillText("¡RASPA Y GANA!", w / 2, logoY + logoSize + 38);
+    ctx.font = isMobile ? "900 17px 'Fredoka', 'Outfit', sans-serif" : "900 19px 'Fredoka', 'Outfit', sans-serif";
+    ctx.fillText("¡RASPA Y GANA!", w / 2, logoY + logoSize + 36);
 
     // Subtítulo según modo
     ctx.fillStyle = "#A7F3D0";
-    ctx.font = "bold 11px 'Outfit', sans-serif";
+    ctx.font = isMobile ? "bold 10.5px 'Outfit', sans-serif" : "bold 11.5px 'Outfit', sans-serif";
     if (modo === "activo") {
-      ctx.fillText("✨ ¡Frota con tu dedo o cursor! ✨", w / 2, logoY + logoSize + 56);
+      ctx.fillText("✨ ¡Frota con tu dedo o cursor! ✨", w / 2, logoY + logoSize + 53);
     } else {
-      ctx.fillText("Toca 'NUEVA TARJETA' para raspar", w / 2, logoY + logoSize + 56);
+      ctx.fillText("Toca 'NUEVA TARJETA' para raspar", w / 2, logoY + logoSize + 53);
     }
     ctx.restore();
   }
@@ -2634,11 +2657,11 @@
   function prepararCanvasRaspaInicial() {
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width;
-    var h = canvas.height;
 
-    renderSuperficieRaspa(ctx, w, h, "inicial");
+    var conf = configurarCanvasRaspa(canvas);
+    if (!conf) return;
+
+    renderSuperficieRaspa(conf.ctx, conf.w, conf.h, "inicial");
 
     // Si hace clic sobre el canvas sin partida activa, iniciar automáticamente
     canvas.onclick = function () {
@@ -2651,6 +2674,12 @@
   window.iniciarNuevaPartidaRaspa = async function () {
     if (!GraniClubState.cliente) {
       abrirModalGraniClub();
+      return;
+    }
+
+    // Respaldo de seguridad: si había una partida abierta y se presiona el botón, finalizarla
+    if (GraniClubState.raspaPremioActual && !GraniClubState.raspaCompletado) {
+      completarRaspaGlacial();
       return;
     }
 
@@ -2711,91 +2740,152 @@
     var canvas = document.getElementById("canvas-raspa");
     if (!canvas) return;
     canvas.onclick = null; // Remover trigger de inicio
-    var ctx = canvas.getContext("2d");
-    var w = canvas.width;
-    var h = canvas.height;
+    
+    var conf = configurarCanvasRaspa(canvas);
+    if (!conf) return;
+    var ctx = conf.ctx;
+    var w = conf.w;
+    var h = conf.h;
 
     renderSuperficieRaspa(ctx, w, h, "activo");
 
-    // Eventos de raspado
+    // Grid de Cobertura para Detección Infalible de Raspado (Zero-Fail, Sin CORS, 60 FPS)
+    var gridCols = 16;
+    var gridRows = 12;
+    var totalCells = gridCols * gridRows;
+    var grid = new Uint8Array(totalCells);
+    var cellsCleared = 0;
+    var trazosCount = 0;
+    var brushRadius = w < 280 ? 24 : 28;
+
     var isRaspando = false;
 
     function raspar(x, y) {
       if (GraniClubState.raspaCompletado) return;
+      trazosCount++;
+
+      // Borrar trazo en el canvas
       ctx.globalCompositeOperation = "destination-out";
       ctx.beginPath();
-      ctx.arc(x, y, 22, 0, Math.PI * 2);
+      ctx.arc(x, y, brushRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Chequear porcentaje raspado cada cierto movimiento
-      if (Math.random() < 0.25) {
-        verificarPorcentajeRaspado(ctx, w, h);
+      // Mapear celdas raspadas en la cuadrícula de cobertura
+      var cellW = w / gridCols;
+      var cellH = h / gridRows;
+      var minCol = Math.max(0, Math.floor((x - brushRadius) / cellW));
+      var maxCol = Math.min(gridCols - 1, Math.floor((x + brushRadius) / cellW));
+      var minRow = Math.max(0, Math.floor((y - brushRadius) / cellH));
+      var maxRow = Math.min(gridRows - 1, Math.floor((y + brushRadius) / cellH));
+
+      for (var r = minRow; r <= maxRow; r++) {
+        for (var c = minCol; c <= maxCol; c++) {
+          var idx = r * gridCols + c;
+          if (grid[idx] === 0) {
+            grid[idx] = 1;
+            cellsCleared++;
+          }
+        }
+      }
+
+      var ratio = cellsCleared / totalCells;
+      // Cuando se haya raspado el 32% o más, completar automáticamente
+      if (ratio >= 0.32) {
+        completarRaspaGlacial();
       }
     }
 
     function getCoords(e) {
       var rect = canvas.getBoundingClientRect();
-      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      var clientX = (e.touches && e.touches.length) ? e.touches[0].clientX : e.clientX;
+      var clientY = (e.touches && e.touches.length) ? e.touches[0].clientY : e.clientY;
       return {
-        x: (clientX - rect.left) * (w / rect.width),
-        y: (clientY - rect.top) * (h / rect.height)
+        x: clientX - rect.left,
+        y: clientY - rect.top
       };
     }
 
-    canvas.onmousedown = function (e) { isRaspando = true; var c = getCoords(e); raspar(c.x, c.y); };
-    canvas.onmousemove = function (e) { if (isRaspando) { var c = getCoords(e); raspar(c.x, c.y); } };
-    window.onmouseup = function () { isRaspando = false; };
+    canvas.onmousedown = function (e) {
+      isRaspando = true;
+      var c = getCoords(e);
+      raspar(c.x, c.y);
+    };
+    canvas.onmousemove = function (e) {
+      if (isRaspando) {
+        var c = getCoords(e);
+        raspar(c.x, c.y);
+      }
+    };
+    window.onmouseup = function () {
+      if (isRaspando) {
+        isRaspando = false;
+        if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.22 || trazosCount >= 18)) {
+          completarRaspaGlacial();
+        }
+      }
+    };
 
-    canvas.ontouchstart = function (e) { isRaspando = true; var c = getCoords(e); raspar(c.x, c.y); };
-    canvas.ontouchmove = function (e) { if (isRaspando) { var c = getCoords(e); raspar(c.x, c.y); } };
-    canvas.ontouchend = function () { isRaspando = false; };
+    canvas.ontouchstart = function (e) {
+      isRaspando = true;
+      var c = getCoords(e);
+      raspar(c.x, c.y);
+    };
+    canvas.ontouchmove = function (e) {
+      if (isRaspando) {
+        var c = getCoords(e);
+        raspar(c.x, c.y);
+      }
+    };
+    canvas.ontouchend = function () {
+      isRaspando = false;
+      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.22 || trazosCount >= 18)) {
+        completarRaspaGlacial();
+      }
+    };
+
+    // Respaldo de seguridad: si el usuario toca la tarjeta descubierta, finalizar
+    canvas.onclick = function () {
+      if (!GraniClubState.raspaCompletado && (cellsCleared / totalCells >= 0.18 || trazosCount >= 10)) {
+        completarRaspaGlacial();
+      }
+    };
   }
 
-  function verificarPorcentajeRaspado(ctx, w, h) {
+  function completarRaspaGlacial() {
     if (GraniClubState.raspaCompletado) return;
-    try {
-      var imgData = ctx.getImageData(0, 0, w, h);
-      var pix = imgData.data;
-      var total = pix.length / 4;
-      var transparentes = 0;
-
-      // Muestrear cada 16 pixeles para máxima fluidez
-      for (var i = 3; i < pix.length; i += 16) {
-        if (pix[i] === 0) transparentes += 4;
-      }
-
-      var ratio = transparentes / total;
-      if (ratio > 0.40) {
-        completarRaspaGlacial(ctx, w, h);
-      }
-    } catch (e) {}
-  }
-
-  function completarRaspaGlacial(ctx, w, h) {
     GraniClubState.raspaCompletado = true;
-    ctx.clearRect(0, 0, w, h);
+
+    var canvas = document.getElementById("canvas-raspa");
+    if (canvas) {
+      var c = canvas.getContext("2d");
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.clearRect(0, 0, canvas.width, canvas.height);
+      c.restore();
+    }
 
     var data = GraniClubState.raspaPremioActual;
     if (!data) return;
 
+    // Actualizar puntos de inmediato en el perfil
     if (GraniClubState.cliente) {
       GraniClubState.cliente.granipoints = data.saldoActual;
       actualizarUIPerfilCliente();
     }
 
+    // Mostrar caja de resultado
     var resBox = document.getElementById("raspa-result-box");
     var resTitle = document.getElementById("raspa-res-title");
     var resDesc = document.getElementById("raspa-res-desc");
 
     if (resBox && resTitle && resDesc) {
       resTitle.textContent = data.premio ? data.premio.titulo : "¡Premio Revelado!";
-      resDesc.textContent = data.mensaje;
+      resDesc.textContent = data.mensaje || "Puntos sumados a tu perfil con éxito.";
       resBox.style.display = "block";
     }
 
     var btn = document.getElementById("btn-iniciar-raspa");
-    var intRest = data.intentosRestantes || 0;
+    var intRest = (data.intentosRestantes !== undefined) ? data.intentosRestantes : 0;
     if (btn) {
       btn.textContent = (intRest > 0) ? "❄️ ¡Raspar otra tarjeta!" : "❄️ ¡Sin más raspadas hoy!";
       btn.disabled = intRest <= 0;
@@ -2805,7 +2895,10 @@
     var txtInt = document.getElementById("raspa-intentos-txt");
     if (txtInt) txtInt.textContent = "Raspas disponibles: " + intRest;
 
-    if (data.puntosGanados > 0) {
+    var cntP = document.getElementById("tab-counter-raspa");
+    if (cntP) cntP.textContent = intRest;
+
+    if (data.puntosGanados > 0 && typeof lanzarConfetiCelebracion === "function") {
       lanzarConfetiCelebracion();
     }
   }
