@@ -1099,6 +1099,54 @@
     }
   };
 
+  // Formatear dirección completa uniendo Barrio y Dirección (ej: "pozon transversal 69 A")
+  function formatearDireccionCompletaCliente(cl) {
+    if (!cl) return "";
+    var dir = (cl.direccionPredeterminada || "").trim();
+    var bar = (cl.barrioPredeterminado || "").trim();
+
+    if (bar && dir) {
+      var dirLower = dir.toLowerCase();
+      var barLower = bar.toLowerCase();
+      // Si la dirección ya incluye el barrio, evitar duplicación
+      if (dirLower.indexOf(barLower) !== -1) {
+        return dir;
+      }
+      return bar + " " + dir;
+    }
+    return dir || bar || "";
+  }
+
+  function autoRellenarCheckoutCliente(cl, forzar) {
+    if (!cl) return;
+    var elN = $("#checkout-nombre") || document.getElementById("checkout-nombre");
+    if (elN && (forzar || !elN.value || elN.value.trim() === "")) {
+      elN.value = cl.nombre || "";
+    }
+
+    var elT = $("#checkout-telefono") || document.getElementById("checkout-telefono");
+    if (elT && (forzar || !elT.value || elT.value.trim() === "")) {
+      elT.value = cl.telefono || "";
+    }
+
+    var elD = $("#checkout-direccion") || document.getElementById("checkout-direccion");
+    if (elD) {
+      var dirCompleta = formatearDireccionCompletaCliente(cl);
+      if (dirCompleta && (forzar || !elD.value || elD.value.trim() === "" || (cl.direccionPredeterminada && elD.value.trim() === cl.direccionPredeterminada.trim()))) {
+        elD.value = dirCompleta;
+      }
+    }
+
+    var elI = $("#checkout-indicaciones") || document.getElementById("checkout-indicaciones");
+    if (elI && cl.indicacionesPredeterminadas) {
+      if (forzar || !elI.value || elI.value.trim() === "") {
+        elI.value = cl.indicacionesPredeterminadas;
+      }
+    }
+  }
+  window.autoRellenarCheckoutCliente = autoRellenarCheckoutCliente;
+  window.formatearDireccionCompletaCliente = formatearDireccionCompletaCliente;
+
   // Apertura global del checkout
   window.abrirCheckout = function (pasoInicial) {
     var panel = $("#panel");
@@ -1111,12 +1159,7 @@
     }
 
     if (window.GraniClubState && window.GraniClubState.cliente) {
-      var cl = window.GraniClubState.cliente;
-      var elN = $("#checkout-nombre"); if (elN && !elN.value) elN.value = cl.nombre || "";
-      var elT = $("#checkout-telefono"); if (elT && !elT.value) elT.value = cl.telefono || "";
-      var elD = $("#checkout-direccion"); if (elD && !elD.value && cl.direccionPredeterminada) elD.value = cl.direccionPredeterminada;
-      var elB = $("#checkout-barrio"); if (elB && !elB.value && cl.barrioPredeterminado) elB.value = cl.barrioPredeterminado;
-      var elI = $("#checkout-indicaciones"); if (elI && !elI.value && cl.indicacionesPredeterminadas) elI.value = cl.indicacionesPredeterminadas;
+      autoRellenarCheckoutCliente(window.GraniClubState.cliente);
     }
 
     irAPasoCheckout(pasoInicial || 1);
@@ -1151,12 +1194,17 @@
       ? $("#checkout-direccion").value.trim()
       : ("Recogida en " + dirSede);
 
+    var cl = (window.GraniClubState && window.GraniClubState.cliente) || null;
+    var barrioFinal = isDom
+      ? ((cl && cl.barrioPredeterminado) ? cl.barrioPredeterminado : "Domicilio Express")
+      : "Recogida Local";
+
     var payload = {
       clienteNombre: $("#checkout-nombre").value.trim(),
       clienteTelefono: $("#checkout-telefono").value.trim(),
       clienteDireccion: dirFinal,
       tipoEntrega: isDom ? "DOMICILIO" : "RECOGIDA",
-      barrio: isDom ? "Domicilio Express" : "Recogida Local",
+      barrio: barrioFinal,
       indicaciones: $("#checkout-indicaciones").value.trim() + (!isDom ? " [RECOGIDA EN LOCAL FÍSICO]" : ""),
       metodoPago: checkoutState.metodoPago,
       clienteId: clienteId,
@@ -1213,6 +1261,12 @@
 
       // Mostrar Éxito
       var cod = pedidoGuardado.codigoPedido || resJson.codigoPedido || "GRZ-" + Math.floor(10000 + Math.random() * 90000);
+      try {
+        localStorage.setItem("granifresh_ultimo_pedido", cod);
+        var inputTc = $("#tc");
+        if (inputTc) inputTc.value = cod;
+      } catch (e) {}
+
       $("#exito-codigo-pedido").textContent = cod;
       $("#exito-cliente-nombre").textContent = pedidoGuardado.clienteNombre || payload.clienteNombre;
       $("#exito-direccion").textContent = pedidoGuardado.clienteDireccion || payload.clienteDireccion;
@@ -1284,10 +1338,18 @@
 
   // 11. Rastreo de Pedido
   async function track() {
-    var c = $("#tc").value.trim().toUpperCase();
-    if (!c) {
+    var inp = $("#tc");
+    var raw = inp ? inp.value.trim().toUpperCase() : "";
+    if (!raw) {
       window.showToast("Ingresa el código de pedido (ej: GRZ-12345)", "error");
       return;
+    }
+
+    // Permitir ingresar tanto el código completo "GRZ-82910" como solo los dígitos "82910"
+    var c = raw;
+    if (/^\d{4,8}$/.test(c)) {
+      c = "GRZ-" + c;
+      if (inp) inp.value = c;
     }
 
     $("#eta").textContent = "Buscando en la cámara de congelación...";
@@ -1295,14 +1357,14 @@
     try {
       var res = await fetch("/api/public/pedidos/rastreo/" + encodeURIComponent(c));
       if (!res.ok) {
-        $("#eta").textContent = "Pedido no encontrado. Verifica el código.";
+        $("#eta").textContent = "Pedido no encontrado (" + c + "). Verifica el código de tu pedido.";
         $$(".st").forEach(function (e) { e.classList.remove("on"); });
         $("#bar").style.width = "0%";
         return;
       }
 
       var pedido = await res.json();
-      var estado = pedido.estadoPedido;
+      var estado = (pedido.estado || pedido.estadoPedido || "").toUpperCase();
 
       var stepMap = {
         "RECIBIDO": 1,
@@ -1315,7 +1377,7 @@
       var n = stepMap[estado] !== undefined ? stepMap[estado] : 1;
 
       if (n === 0) {
-        $("#eta").textContent = "Este pedido fue cancelado. Comunícate por WhatsApp si tienes dudas.";
+        $("#eta").innerHTML = "❌ <span style='color:#EF4444;'>Este pedido fue cancelado.</span> Comunícate por WhatsApp si tienes dudas.";
         $$(".st").forEach(function (e) { e.classList.remove("on"); });
         $("#bar").style.width = "0%";
         return;
@@ -1326,16 +1388,19 @@
       });
       $("#bar").style.width = ((n - 1) / 3 * 88) + "%";
 
+      var minEst = pedido.tiempoEstimadoMinutos || 35;
+      var destino = pedido.clienteDireccion || (pedido.barrio ? ("Barrio " + pedido.barrio) : "tu dirección");
       var msgs = [
         "",
-        "📥 Pedido recibido en sistema. Pronto comenzamos el batido.",
-        "🧊 Macerando fruta fresca y preparando frappé a -4°C…",
-        "🛵 ¡En camino con empaque térmico! Llega en unos " + (pedido.tiempoEstimadoMinutos || 35) + " min a " + (pedido.clienteDireccion || "tu dirección") + ".",
-        "🎉 Entregado. ¡Disfruta la frescura de la fruta real!"
+        "📥 Pedido recibido en sistema (" + c + "). Pronto comenzamos el batido artesanal.",
+        "🧊 Macerando fruta fresca y preparando frappé a -4°C en cocina…",
+        "🛵 ¡En camino con empaque térmico antifusión! Llega en unos " + minEst + " min a " + destino + ".",
+        "🎉 Pedido entregado con éxito. ¡Disfruta la frescura de la fruta real!"
       ];
       $("#eta").textContent = msgs[n];
 
     } catch (err) {
+      console.error("Error al rastrear pedido:", err);
       $("#eta").textContent = "Error al conectar con el servidor de rastreo.";
     }
   }
@@ -1344,6 +1409,14 @@
     e.preventDefault();
     track();
   };
+
+  try {
+    var ultCod = localStorage.getItem("granifresh_ultimo_pedido");
+    var inpTc = $("#tc");
+    if (inpTc && !inpTc.value && ultCod) {
+      inpTc.value = ultCod;
+    }
+  } catch (e) {}
 
   // 12. Marquesina Botánica Infinita y Fluida
   function updateMarquee(customText) {
@@ -1803,6 +1876,7 @@
       var elDescAhorro = document.getElementById("cl-desc-ahorro-txt");
       if (elDescAhorro) elDescAhorro.textContent = fmt(ptsActuales * valPunto);
 
+      autoRellenarCheckoutCliente(cl);
       refrescarEstadoJuegosCliente();
       inicializarJuegosVistaPrincipal();
 
@@ -2171,15 +2245,8 @@
       GraniClubState.cliente = data.cliente;
       localStorage.setItem("granifresh_cliente_token", data.token);
 
-      // Auto rellenar checkout con los datos del perfil
-      var chkNom = document.getElementById("checkout-nombre");
-      if (chkNom && !chkNom.value) chkNom.value = data.cliente.nombre || "";
-      var chkTel = document.getElementById("checkout-telefono");
-      if (chkTel && !chkTel.value) chkTel.value = data.cliente.telefono || "";
-      var chkDir = document.getElementById("checkout-direccion");
-      if (chkDir && !chkDir.value) chkDir.value = data.cliente.direccionPredeterminada || "";
-      var chkBar = document.getElementById("checkout-barrio");
-      if (chkBar && !chkBar.value && data.cliente.barrioPredeterminado) chkBar.value = data.cliente.barrioPredeterminado;
+      // Auto rellenar checkout con los datos del perfil (incluyendo barrio + dirección completa)
+      autoRellenarCheckoutCliente(data.cliente, true);
 
       var ptsRegalo = (GraniClubState.configPublica && GraniClubState.configPublica.puntosBienvenidaRegistro) || 20;
       window.showToast("¡Bienvenido al Club GraniPoints! 🎉 Has recibido " + ptsRegalo + " puntos de regalo.", "success");
@@ -2214,6 +2281,9 @@
       GraniClubState.cliente = data.cliente;
       localStorage.setItem("granifresh_cliente_token", data.token);
 
+      // Auto rellenar checkout con los datos del perfil
+      autoRellenarCheckoutCliente(data.cliente, true);
+
       window.showToast("¡Hola de nuevo " + (data.cliente.nombre ? data.cliente.nombre.split(" ")[0] : "") + "! 🥤", "success");
       actualizarUIPerfilCliente();
 
@@ -2231,6 +2301,13 @@
     localStorage.removeItem("granifresh_cliente_token");
     actualizarUIPerfilCliente();
     actualizarValoresTotales();
+
+    // Limpiar campos de checkout al cerrar sesión
+    var elN = document.getElementById("checkout-nombre"); if (elN) elN.value = "";
+    var elT = document.getElementById("checkout-telefono"); if (elT) elT.value = "";
+    var elD = document.getElementById("checkout-direccion"); if (elD) elD.value = "";
+    var elI = document.getElementById("checkout-indicaciones"); if (elI) elI.value = "";
+
     window.showToast("Sesión cerrada correctamente.", "info");
   };
 
@@ -2333,13 +2410,13 @@
     if (txtRaspa) txtRaspa.textContent = "Raspas disponibles: " + totRaspas;
 
     var btnRaspa = document.getElementById("btn-iniciar-raspa");
-    if (btnRaspa && !GraniClubState.raspaPremioActual) {
+    if (btnRaspa && (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado)) {
       btnRaspa.disabled = totRaspas <= 0;
       btnRaspa.style.opacity = totRaspas <= 0 ? "0.5" : "1";
       btnRaspa.textContent = totRaspas > 0 ? "❄️ ¡NUEVA TARJETA RASPA!" : "❄️ ¡Sin más raspadas hoy!";
     }
 
-    if (!GraniClubState.raspaPremioActual) {
+    if (!GraniClubState.raspaPremioActual || GraniClubState.raspaCompletado) {
       prepararCanvasRaspaInicial();
     }
   };
