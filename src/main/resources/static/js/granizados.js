@@ -91,19 +91,19 @@
       var posY = aj.posY !== undefined && aj.posY !== null ? aj.posY : 50;
       var imgStyle = "object-fit:" + fit + "; object-position:" + posX + "% " + posY + "%; transform:scale(" + zoom + ") translateZ(0);";
       return '<img class="pic" src="' + x.img + '" alt="' + x.n + '" style="' + imgStyle + '" loading="lazy" onerror="this.style.display=\'none\'; if(this.nextElementSibling) this.nextElementSibling.style.display=\'block\';">' +
-             '<div class="cupw" style="display:none;"><span class="top">' + x.e + '</span><span class="str"></span><div class="cup"></div></div>';
+        '<div class="cupw" style="display:none;"><span class="top">' + x.e + '</span><span class="str"></span><div class="cup"></div></div>';
     }
     return '<div class="cupw"><span class="top">' + x.e + '</span><span class="str"></span><div class="cup"></div></div>';
   }
 
   // Estructuras de datos conectadas a la API
   var P = [];
-  var rawCatalog = { 
-    granizados: [], 
-    configuracion: { 
+  var rawCatalog = {
+    granizados: [],
+    configuracion: {
       costoEnvioBase: 5000,
       whatsappPedidos: "573013557467"
-    } 
+    }
   };
   var cart = [];
 
@@ -129,13 +129,13 @@
     return L.divIcon({
       className: 'custom-map-pin-badge',
       html: '<div class="map-brand-pin-marker">' +
-              '<div class="pin-radar-ripple"></div>' +
-              '<div class="pin-logo-bubble">' +
-                '<img src="/img/granifresh-logo.jpg" alt="Granifresh Logo" />' +
-              '</div>' +
-              '<div class="pin-pointer-tip"></div>' +
-              '<div class="pin-name-tag">GRANIFRESH</div>' +
-            '</div>',
+        '<div class="pin-radar-ripple"></div>' +
+        '<div class="pin-logo-bubble">' +
+        '<img src="/img/granifresh-logo.jpg" alt="Granifresh Logo" />' +
+        '</div>' +
+        '<div class="pin-pointer-tip"></div>' +
+        '<div class="pin-name-tag">GRANIFRESH</div>' +
+        '</div>',
       iconSize: [64, 82],
       iconAnchor: [32, 68],
       popupAnchor: [0, -68]
@@ -227,9 +227,9 @@
 
       publicNosotrosMarker.bindPopup(
         '<div style="text-align:center; font-family:Outfit,sans-serif; padding:4px;">' +
-          '<b style="color:#00B4D8; font-size:1.05rem;">🍃 ' + nombreNegocioFinal + '</b><br>' +
-          '<span style="font-size:0.85rem; color:#444;">' + (config.direccionSede || "Cra. 50 #31b, Olaya Herrera") + '</span><br>' +
-          '<small style="color:#10B981; font-weight:700;">100% Fruta Natural Cosechada</small>' +
+        '<b style="color:#00B4D8; font-size:1.05rem;">🍃 ' + nombreNegocioFinal + '</b><br>' +
+        '<span style="font-size:0.85rem; color:#444;">' + (config.direccionSede || "Cra. 50 #31b, Olaya Herrera") + '</span><br>' +
+        '<small style="color:#10B981; font-weight:700;">100% Fruta Natural Cosechada</small>' +
         '</div>'
       ).openPopup();
     } else {
@@ -240,9 +240,9 @@
         : "GRANIFRESH";
       publicNosotrosMarker.setPopupContent(
         '<div style="text-align:center; font-family:Outfit,sans-serif; padding:4px;">' +
-          '<b style="color:#00B4D8; font-size:1.05rem;">🍃 ' + nombreNegocioFinal + '</b><br>' +
-          '<span style="font-size:0.85rem; color:#444;">' + (config.direccionSede || "Cra. 50 #31b, Olaya Herrera") + '</span><br>' +
-          '<small style="color:#10B981; font-weight:700;">100% Fruta Natural Cosechada</small>' +
+        '<b style="color:#00B4D8; font-size:1.05rem;">🍃 ' + nombreNegocioFinal + '</b><br>' +
+        '<span style="font-size:0.85rem; color:#444;">' + (config.direccionSede || "Cra. 50 #31b, Olaya Herrera") + '</span><br>' +
+        '<small style="color:#10B981; font-weight:700;">100% Fruta Natural Cosechada</small>' +
         '</div>'
       );
     }
@@ -278,10 +278,10 @@
     });
     if (inCart && inCart.qty > 0) {
       return '<div class="card-qty-ctrl">' +
-               '<button type="button" class="btn-card-qty-minus" onclick="modificarCantidadPorCard(' + prodIndex + ', -1)" aria-label="Disminuir cantidad">−</button>' +
-               '<span class="card-qty-num">' + inCart.qty + '</span>' +
-               '<button type="button" class="btn-card-qty-plus" onclick="modificarCantidadPorCard(' + prodIndex + ', 1)" aria-label="Aumentar cantidad">+</button>' +
-             '</div>';
+        '<button type="button" class="btn-card-qty-minus" onclick="modificarCantidadPorCard(' + prodIndex + ', -1)" aria-label="Disminuir cantidad">−</button>' +
+        '<span class="card-qty-num">' + inCart.qty + '</span>' +
+        '<button type="button" class="btn-card-qty-plus" onclick="modificarCantidadPorCard(' + prodIndex + ', 1)" aria-label="Aumentar cantidad">+</button>' +
+        '</div>';
     }
     return '<button type="button" class="add" onclick="modificarCantidadPorCard(' + prodIndex + ', 1)">+ Añadir</button>';
   }
@@ -426,25 +426,25 @@
     $("#grid").innerHTML = P.map(function (x, i) {
       return (
         '<article class="card" data-k="' + x.k + '" data-n="' + x.n.toLowerCase() + '" data-i="' + i + '" data-s="0">' +
-          '<div class="art" style="--a:' + x.c[0] + ';--b:' + x.c[1] + '">' +
-            (x.t ? '<span class="bd r">' + x.t + '</span>' : '') +
-            vis(x) +
-          "</div>" +
-          '<div class="cb">' +
-            "<h3>" + x.n + "</h3>" +
-            "<p>" + x.d + "</p>" +
-            '<div class="sz">' +
-              x.sizes.map(function (s, j) {
-                return '<button data-s="' + j + '" class="' + (j === 0 ? "on" : "") + '">' + s + "</button>";
-              }).join("") +
-            "</div>" +
-            '<div class="ft" id="card-ft-' + i + '">' +
-              '<div class="pr"><small>PRECIO</small><span>' + fmt(x.priceList[0]) + "</span></div>" +
-              '<div class="card-action-box" id="card-act-' + i + '">' +
-                renderCardAction(i, 0) +
-              '</div>' +
-            "</div>" +
-          "</div>" +
+        '<div class="art" style="--a:' + x.c[0] + ';--b:' + x.c[1] + '">' +
+        (x.t ? '<span class="bd r">' + x.t + '</span>' : '') +
+        vis(x) +
+        "</div>" +
+        '<div class="cb">' +
+        "<h3>" + x.n + "</h3>" +
+        "<p>" + x.d + "</p>" +
+        '<div class="sz">' +
+        x.sizes.map(function (s, j) {
+          return '<button data-s="' + j + '" class="' + (j === 0 ? "on" : "") + '">' + s + "</button>";
+        }).join("") +
+        "</div>" +
+        '<div class="ft" id="card-ft-' + i + '">' +
+        '<div class="pr"><small>PRECIO</small><span>' + fmt(x.priceList[0]) + "</span></div>" +
+        '<div class="card-action-box" id="card-act-' + i + '">' +
+        renderCardAction(i, 0) +
+        '</div>' +
+        "</div>" +
+        "</div>" +
         "</article>"
       );
     }).join("");
@@ -512,8 +512,8 @@
     var icon = type === "error" ? "⚠️" : (type === "success" ? "🥭" : "🍃");
     toast.className = "toast-msg " + typeClass;
     toast.innerHTML = '<span style="font-size:18px;">' + icon + '</span>' +
-                      '<span style="flex:1; line-height:1.35;">' + message + '</span>' +
-                      '<button type="button" style="background:none; border:none; color:var(--mut, #888); font-size:16px; cursor:pointer; padding:0 4px; line-height:1;" onclick="this.parentElement.remove()">✕</button>';
+      '<span style="flex:1; line-height:1.35;">' + message + '</span>' +
+      '<button type="button" style="background:none; border:none; color:var(--mut, #888); font-size:16px; cursor:pointer; padding:0 4px; line-height:1;" onclick="this.parentElement.remove()">✕</button>';
     container.appendChild(toast);
     setTimeout(function () {
       toast.classList.add("hide");
@@ -528,7 +528,7 @@
     var t = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
     var cn = $("#cn");
     if (cn) cn.textContent = count;
-    
+
     var fbar = $("#fbar");
     if (fbar) {
       fbar.classList.toggle("on", count > 0);
@@ -551,7 +551,7 @@
 
     try {
       localStorage.setItem("frost_cart", JSON.stringify(cart));
-    } catch (e) {}
+    } catch (e) { }
 
     // Sincronizar controles en tarjetas del catálogo
     $$("#grid .card").forEach(function (cardEl) {
@@ -678,47 +678,47 @@
     if (step1Subtotal) step1Subtotal.textContent = fmt(subtotal);
 
     if (count === 0) {
-      cont.innerHTML = 
+      cont.innerHTML =
         '<div class="chk-empty-state">' +
-          '<div class="chk-empty-cup-box">' +
-            '<svg class="chk-granizado-svg" viewBox="0 0 100 135" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vaso de granizado vacío">' +
-              '<line x1="64" y1="6" x2="48" y2="46" stroke="#00B4D8" stroke-width="7" stroke-linecap="round"/>' +
-              '<line x1="62" y1="10" x2="50" y2="42" stroke="#90E0EF" stroke-width="2.5" stroke-linecap="round"/>' +
-              '<path d="M22 46 C22 26, 78 26, 78 46 Z" fill="url(#slushEmptyGrad)"/>' +
-              '<polygon points="40,30 46,24 52,28 46,34" fill="#FFFFFF" fill-opacity="0.6"/>' +
-              '<polygon points="56,32 62,26 68,31 61,36" fill="#FFFFFF" fill-opacity="0.5"/>' +
-              '<polygon points="28,38 34,33 40,37 33,42" fill="#FFFFFF" fill-opacity="0.5"/>' +
-              '<ellipse cx="50" cy="46" rx="30" ry="7.5" fill="#FFFFFF" fill-opacity="0.25" stroke="#FFFFFF" stroke-width="1.8"/>' +
-              '<path d="M20 46 L32 116 Q33 124 42 124 L58 124 Q67 124 68 116 L80 46 Z" fill="url(#cupEmptyGlassGrad)" stroke="#FFFFFF" stroke-width="1.8" stroke-opacity="0.45"/>' +
-              '<path d="M23 52 L33 114 Q34 120 42 120 L58 120 Q66 120 67 114 L77 52 Q64 56 50 52 Q36 48 23 52 Z" fill="url(#slushEmptyBodyGrad)"/>' +
-              '<circle cx="42" cy="72" r="2" fill="#FFFFFF" fill-opacity="0.75"/>' +
-              '<circle cx="58" cy="86" r="2.5" fill="#FFFFFF" fill-opacity="0.75"/>' +
-              '<circle cx="48" cy="102" r="1.8" fill="#FFFFFF" fill-opacity="0.65"/>' +
-              '<circle cx="38" cy="92" r="1.5" fill="#FFFFFF" fill-opacity="0.55"/>' +
-              '<circle cx="63" cy="67" r="1.8" fill="#FFFFFF" fill-opacity="0.65"/>' +
-              '<path d="M26 54 L35 112" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.45"/>' +
-              '<defs>' +
-                '<linearGradient id="slushEmptyGrad" x1="22" y1="26" x2="78" y2="46" gradientUnits="userSpaceOnUse">' +
-                  '<stop stop-color="#FFB703"/>' +
-                  '<stop offset="0.5" stop-color="#FB8500"/>' +
-                  '<stop offset="1" stop-color="#FF1E56"/>' +
-                '</linearGradient>' +
-                '<linearGradient id="slushEmptyBodyGrad" x1="23" y1="52" x2="77" y2="120" gradientUnits="userSpaceOnUse">' +
-                  '<stop stop-color="#FFB703"/>' +
-                  '<stop offset="0.4" stop-color="#FB8500"/>' +
-                  '<stop offset="0.75" stop-color="#FF1E56"/>' +
-                  '<stop offset="1" stop-color="#10B981"/>' +
-                '</linearGradient>' +
-                '<linearGradient id="cupEmptyGlassGrad" x1="20" y1="46" x2="80" y2="124" gradientUnits="userSpaceOnUse">' +
-                  '<stop stop-color="#FFFFFF" stop-opacity="0.18"/>' +
-                  '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0.04"/>' +
-                '</linearGradient>' +
-              '</defs>' +
-            '</svg>' +
-          '</div>' +
-          '<div class="chk-empty-title">Tu carrito está vacío</div>' +
-          '<p class="chk-empty-sub">Aún no has añadido granizados 100% fruta natural. ¡Elige tus sabores favoritos recién batidos a -4°C!</p>' +
-          '<button type="button" class="cta chk-empty-btn" onclick="cerrarModales()">¡Pedir Granizados Frescos! 🥤</button>' +
+        '<div class="chk-empty-cup-box">' +
+        '<svg class="chk-granizado-svg" viewBox="0 0 100 135" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vaso de granizado vacío">' +
+        '<line x1="64" y1="6" x2="48" y2="46" stroke="#00B4D8" stroke-width="7" stroke-linecap="round"/>' +
+        '<line x1="62" y1="10" x2="50" y2="42" stroke="#90E0EF" stroke-width="2.5" stroke-linecap="round"/>' +
+        '<path d="M22 46 C22 26, 78 26, 78 46 Z" fill="url(#slushEmptyGrad)"/>' +
+        '<polygon points="40,30 46,24 52,28 46,34" fill="#FFFFFF" fill-opacity="0.6"/>' +
+        '<polygon points="56,32 62,26 68,31 61,36" fill="#FFFFFF" fill-opacity="0.5"/>' +
+        '<polygon points="28,38 34,33 40,37 33,42" fill="#FFFFFF" fill-opacity="0.5"/>' +
+        '<ellipse cx="50" cy="46" rx="30" ry="7.5" fill="#FFFFFF" fill-opacity="0.25" stroke="#FFFFFF" stroke-width="1.8"/>' +
+        '<path d="M20 46 L32 116 Q33 124 42 124 L58 124 Q67 124 68 116 L80 46 Z" fill="url(#cupEmptyGlassGrad)" stroke="#FFFFFF" stroke-width="1.8" stroke-opacity="0.45"/>' +
+        '<path d="M23 52 L33 114 Q34 120 42 120 L58 120 Q66 120 67 114 L77 52 Q64 56 50 52 Q36 48 23 52 Z" fill="url(#slushEmptyBodyGrad)"/>' +
+        '<circle cx="42" cy="72" r="2" fill="#FFFFFF" fill-opacity="0.75"/>' +
+        '<circle cx="58" cy="86" r="2.5" fill="#FFFFFF" fill-opacity="0.75"/>' +
+        '<circle cx="48" cy="102" r="1.8" fill="#FFFFFF" fill-opacity="0.65"/>' +
+        '<circle cx="38" cy="92" r="1.5" fill="#FFFFFF" fill-opacity="0.55"/>' +
+        '<circle cx="63" cy="67" r="1.8" fill="#FFFFFF" fill-opacity="0.65"/>' +
+        '<path d="M26 54 L35 112" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.45"/>' +
+        '<defs>' +
+        '<linearGradient id="slushEmptyGrad" x1="22" y1="26" x2="78" y2="46" gradientUnits="userSpaceOnUse">' +
+        '<stop stop-color="#FFB703"/>' +
+        '<stop offset="0.5" stop-color="#FB8500"/>' +
+        '<stop offset="1" stop-color="#FF1E56"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="slushEmptyBodyGrad" x1="23" y1="52" x2="77" y2="120" gradientUnits="userSpaceOnUse">' +
+        '<stop stop-color="#FFB703"/>' +
+        '<stop offset="0.4" stop-color="#FB8500"/>' +
+        '<stop offset="0.75" stop-color="#FF1E56"/>' +
+        '<stop offset="1" stop-color="#10B981"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="cupEmptyGlassGrad" x1="20" y1="46" x2="80" y2="124" gradientUnits="userSpaceOnUse">' +
+        '<stop stop-color="#FFFFFF" stop-opacity="0.18"/>' +
+        '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0.04"/>' +
+        '</linearGradient>' +
+        '</defs>' +
+        '</svg>' +
+        '</div>' +
+        '<div class="chk-empty-title">Tu carrito está vacío</div>' +
+        '<p class="chk-empty-sub">Aún no has añadido granizados 100% fruta natural. ¡Elige tus sabores favoritos recién batidos a -4°C!</p>' +
+        '<button type="button" class="cta chk-empty-btn" onclick="cerrarModales()">¡Pedir Granizados Frescos! 🥤</button>' +
         '</div>';
       var nextBtn = $("#btn-chk-next");
       if (nextBtn && checkoutState.pasoActual === 1) nextBtn.disabled = true;
@@ -737,26 +737,26 @@
       var qty = it.qty || 1;
       var itemTotal = it.p * qty;
 
-      html += 
+      html +=
         '<div class="chk-item-card">' +
-          '<div class="chk-item-thumb">' + thumb + '</div>' +
-          '<div class="chk-item-info">' +
-            '<h4 class="chk-item-name">' + it.n + '</h4>' +
-            '<div class="chk-item-sub">' + (it.tamano || '12oz Frappé') + ' · <b style="color:var(--li);">' + fmt(itemTotal) + '</b></div>' +
-          '</div>' +
-          '<div class="chk-item-qty-wrap">' +
-            '<div class="chk-qty-selector" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(52,211,153,0.35); border-radius:8px; padding:3px 6px;">' +
-              '<button type="button" class="chk-qty-btn chk-qty-minus" onclick="modificarCantidadCartItem(' + idx + ', -1)" aria-label="Restar una unidad" title="Restar uno" style="width:26px; height:26px; border:none; background:rgba(255,255,255,0.08); border-radius:6px; color:#fff; font-weight:800; cursor:pointer; font-size:15px; display:grid; place-items:center;">−</button>' +
-              '<span class="chk-qty-val" style="min-width:20px; text-align:center; font-weight:800; color:#fff; font-size:13.5px;">' + qty + '</span>' +
-              '<button type="button" class="chk-qty-btn chk-qty-plus" onclick="modificarCantidadCartItem(' + idx + ', 1)" aria-label="Sumar otra unidad" title="Sumar otro" style="width:26px; height:26px; border:none; background:rgba(255,255,255,0.08); border-radius:6px; color:#fff; font-weight:800; cursor:pointer; font-size:15px; display:grid; place-items:center;">+</button>' +
-            '</div>' +
-            '<button type="button" class="chk-del-btn" onclick="quitarItemCart(' + idx + ')" title="Quitar este granizado del pedido" aria-label="Quitar este granizado">' +
-              '<svg class="chk-del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-                '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>' +
-              '</svg>' +
-              '<span>Quitar</span>' +
-            '</button>' +
-          '</div>' +
+        '<div class="chk-item-thumb">' + thumb + '</div>' +
+        '<div class="chk-item-info">' +
+        '<h4 class="chk-item-name">' + it.n + '</h4>' +
+        '<div class="chk-item-sub">' + (it.tamano || '12oz Frappé') + ' · <b style="color:var(--li);">' + fmt(itemTotal) + '</b></div>' +
+        '</div>' +
+        '<div class="chk-item-qty-wrap">' +
+        '<div class="chk-qty-selector" style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(52,211,153,0.35); border-radius:8px; padding:3px 6px;">' +
+        '<button type="button" class="chk-qty-btn chk-qty-minus" onclick="modificarCantidadCartItem(' + idx + ', -1)" aria-label="Restar una unidad" title="Restar uno" style="width:26px; height:26px; border:none; background:rgba(255,255,255,0.08); border-radius:6px; color:#fff; font-weight:800; cursor:pointer; font-size:15px; display:grid; place-items:center;">−</button>' +
+        '<span class="chk-qty-val" style="min-width:20px; text-align:center; font-weight:800; color:#fff; font-size:13.5px;">' + qty + '</span>' +
+        '<button type="button" class="chk-qty-btn chk-qty-plus" onclick="modificarCantidadCartItem(' + idx + ', 1)" aria-label="Sumar otra unidad" title="Sumar otro" style="width:26px; height:26px; border:none; background:rgba(255,255,255,0.08); border-radius:6px; color:#fff; font-weight:800; cursor:pointer; font-size:15px; display:grid; place-items:center;">+</button>' +
+        '</div>' +
+        '<button type="button" class="chk-del-btn" onclick="quitarItemCart(' + idx + ')" title="Quitar este granizado del pedido" aria-label="Quitar este granizado">' +
+        '<svg class="chk-del-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>' +
+        '</svg>' +
+        '<span>Quitar</span>' +
+        '</button>' +
+        '</div>' +
         '</div>';
     });
 
@@ -814,7 +814,7 @@
 
     var txtEnvio = $("#chk-resumen-envio-txt");
     if (txtEnvio) {
-      txtEnvio.innerHTML = isDom 
+      txtEnvio.innerHTML = isDom
         ? fmt(checkoutState.costoEnvio) + " (Domicilio térmico)"
         : '<span style="color:#34D399; font-weight:800;">¡GRATIS! (Recogida en local)</span>';
     }
@@ -908,6 +908,7 @@
 
     var descPuntos = (window.GraniClubState && window.GraniClubState.descuentoCalculado) || 0;
     var total = Math.max(0, (subtotal - descPuntos) + costoEnvio);
+    var esGratisPuntos = (total === 0 && descPuntos > 0);
 
     var elSub = $("#checkout-subtotal-val");
     if (elSub) elSub.textContent = fmt(subtotal);
@@ -938,6 +939,50 @@
 
     var elCostBadge = $("#chk-delivery-cost-badge");
     if (elCostBadge) elCostBadge.textContent = fmt((rawCatalog && rawCatalog.configuracion && rawCatalog.configuracion.costoEnvioBase) || 5000) + " COP";
+
+    // Si estamos en el paso 3, ajustar la vista según si es 100% gratis por puntos o requiere pago
+    if (checkoutState.pasoActual === 3) {
+      var boxGratis = $("#chk-box-pedido-gratis-puntos");
+      var headingPay = $("#chk-heading-metodo-pago");
+      var gridPay = $("#chk-payments-grid");
+      var guideTrans = $("#chk-steps-transferencia");
+      var guideCash = $("#chk-steps-efectivo");
+      var sub = $("#chk-step-subtitle");
+      var btnNext = $("#btn-chk-next");
+
+      if (esGratisPuntos) {
+        if (boxGratis) boxGratis.style.display = "block";
+        if (headingPay) headingPay.style.display = "none";
+        if (gridPay) gridPay.style.display = "none";
+        if (guideTrans) guideTrans.style.display = "none";
+        if (guideCash) guideCash.style.display = "none";
+        if (sub) sub.textContent = "Paso 3 de 3: ¡Tu pedido es 100% Gratis con GraniPoints! 🎉";
+        if (btnNext) {
+          btnNext.innerHTML = "🎁 Confirmar Canje de Granizado Gratis ➔";
+          btnNext.style.background = "linear-gradient(135deg, #10B981, #059669)";
+          btnNext.style.boxShadow = "0 4px 18px rgba(16, 185, 129, 0.4)";
+        }
+      } else {
+        if (boxGratis) boxGratis.style.display = "none";
+        if (headingPay) headingPay.style.display = "flex";
+        if (gridPay) gridPay.style.display = "grid";
+        var esEfectivo = checkoutState.metodoPago === "EFECTIVO";
+        if (guideTrans) guideTrans.style.display = esEfectivo ? "none" : "block";
+        if (guideCash) guideCash.style.display = esEfectivo ? "block" : "none";
+        if (sub) {
+          sub.textContent = esEfectivo
+            ? "Paso 3 de 3: Confirma tu pedido para pagar en caja al recoger"
+            : "Paso 3 de 3: Transfiere a cuenta y envía comprobante";
+        }
+        if (btnNext) {
+          btnNext.innerHTML = esEfectivo
+            ? "📲 Confirmar Pedido para Recogida ➔"
+            : "📲 Enviar Comprobante por WhatsApp ➔";
+          btnNext.style.background = "linear-gradient(135deg, #10B981, #059669)";
+          btnNext.style.boxShadow = "0 4px 18px rgba(16, 185, 129, 0.4)";
+        }
+      }
+    }
   }
 
   // Navegar entre los 3 pasos del checkout con los granizados
@@ -1014,7 +1059,8 @@
       }
       var subtotalStep3 = cart.reduce(function (a, b) { return a + (b.p * (b.qty || 1)); }, 0);
       var costoStep3 = checkoutState.metodoEntrega === "DOMICILIO" ? checkoutState.costoEnvio : 0;
-      var totStep3 = subtotalStep3 + costoStep3;
+      var descStep3 = (window.GraniClubState && window.GraniClubState.descuentoCalculado) || 0;
+      var totStep3 = Math.max(0, (subtotalStep3 - descStep3) + costoStep3);
       var pillTot = $("#chk-step3-total-pill");
       if (pillTot) pillTot.textContent = fmt(totStep3) + " COP";
       var pillCashTot = $("#chk-step3-cash-total-pill");
@@ -1188,6 +1234,8 @@
     var puntosUsados = (window.GraniClubState && window.GraniClubState.puntosAUsar) || 0;
     var clienteId = (window.GraniClubState && window.GraniClubState.cliente && window.GraniClubState.cliente.id) || null;
     var total = Math.max(0, (subtotal - descPuntos) + costoEnvio);
+    var esPuntosGratis = (total === 0 && puntosUsados > 0);
+    var metodoPagoFinal = esPuntosGratis ? "GRANIPOINTS" : checkoutState.metodoPago;
 
     var dirSede = (rawCatalog.configuracion && rawCatalog.configuracion.direccionSede) || "el local comercial";
     var dirFinal = isDom
@@ -1206,7 +1254,8 @@
       tipoEntrega: isDom ? "DOMICILIO" : "RECOGIDA",
       barrio: barrioFinal,
       indicaciones: $("#checkout-indicaciones").value.trim() + (!isDom ? " [RECOGIDA EN LOCAL FÍSICO]" : ""),
-      metodoPago: checkoutState.metodoPago,
+      metodoPago: metodoPagoFinal,
+      tipoCanje: (window.GraniClubState && window.GraniClubState.tipoCanje) || null,
       clienteId: clienteId,
       puntosUsados: puntosUsados,
       descuentoPuntos: descPuntos,
@@ -1251,6 +1300,7 @@
       if (window.GraniClubState) {
         window.GraniClubState.puntosAUsar = 0;
         window.GraniClubState.descuentoCalculado = 0;
+        window.GraniClubState.tipoCanje = null;
       }
       if (window.recargarPerfilClienteSiExiste) {
         window.recargarPerfilClienteSiExiste();
@@ -1267,10 +1317,41 @@
         if (inputTc) inputTc.value = cod;
       } catch (e) {}
 
+      var totalGuardado = typeof pedidoGuardado.total === "number" ? pedidoGuardado.total : payload.total;
+      var puntosGuardados = pedidoGuardado.puntosUsados !== undefined ? pedidoGuardado.puntosUsados : payload.puntosUsados;
+      var descGuardado = pedidoGuardado.descuentoPuntos !== undefined ? pedidoGuardado.descuentoPuntos : payload.descuentoPuntos;
+      var esTotalGratisPuntos = (totalGuardado === 0 && puntosGuardados > 0) || pedidoGuardado.metodoPago === "GRANIPOINTS";
+
       $("#exito-codigo-pedido").textContent = cod;
       $("#exito-cliente-nombre").textContent = pedidoGuardado.clienteNombre || payload.clienteNombre;
       $("#exito-direccion").textContent = pedidoGuardado.clienteDireccion || payload.clienteDireccion;
-      $("#exito-total").textContent = fmt(pedidoGuardado.total || payload.total);
+
+      var elExitoRowPuntos = $("#exito-row-puntos");
+      var elExitoDescPuntos = $("#exito-descuento-puntos");
+      if (elExitoRowPuntos && elExitoDescPuntos) {
+        if (puntosGuardados > 0 || descGuardado > 0) {
+          elExitoRowPuntos.style.display = "flex";
+          elExitoDescPuntos.textContent = "-" + fmt(descGuardado) + " (" + puntosGuardados + " pts)";
+        } else {
+          elExitoRowPuntos.style.display = "none";
+        }
+      }
+
+      var elExitoTotal = $("#exito-total");
+      var elExitoLabelTotal = $("#exito-label-total");
+      if (esTotalGratisPuntos) {
+        if (elExitoLabelTotal) elExitoLabelTotal.textContent = "Total a Pagar:";
+        if (elExitoTotal) {
+          elExitoTotal.textContent = "$0 COP (¡Gratis con GraniPoints! 🎁)";
+          elExitoTotal.style.color = "#10B981";
+        }
+      } else {
+        if (elExitoLabelTotal) elExitoLabelTotal.textContent = "Total a Pagar:";
+        if (elExitoTotal) {
+          elExitoTotal.textContent = fmt(totalGuardado);
+          elExitoTotal.style.color = "var(--li)";
+        }
+      }
 
       // Armar enlace de WhatsApp
       var whatsappNum = (rawCatalog.configuracion && (rawCatalog.configuracion.whatsappPedidos || rawCatalog.configuracion.whatsappNegocio)) || "573013557467";
@@ -1287,30 +1368,45 @@
       var entregaTxt = isDom ? "🛵 Domicilio Express a " + payload.clienteDireccion : ("🏪 Recogida en punto físico (" + dirSede + ")");
 
       var esEfectivo = payload.metodoPago === "EFECTIVO";
-      var nomMetodo = esEfectivo
-        ? "💵 Efectivo (Pago contra entrega en el punto físico)"
-        : (payload.metodoPago === "BANCOLOMBIA"
+      var nomMetodo = esTotalGratisPuntos
+        ? "🎁 Canje GraniPoints (100% Gratis - $0 COP)"
+        : (esEfectivo
+          ? "💵 Efectivo (Pago contra entrega en el punto físico)"
+          : (payload.metodoPago === "BANCOLOMBIA"
             ? "Bancolombia Transferencia"
-            : (payload.metodoPago === "DAVIPLATA" ? "Daviplata Móvil" : "Nequi"));
+            : (payload.metodoPago === "DAVIPLATA" ? "Daviplata Móvil" : "Nequi")));
 
-      var headerPago = esEfectivo
-        ? "Acabo de realizar mi pedido web para recoger con pago en efectivo:"
-        : "Acabo de realizar mi pedido web y transferir el pago:";
-      var totalLabel = esEfectivo ? "💰 *Total a Cancelar en Caja:* " : "💰 *Total Transferido:* ";
-      var cierreMsg = esEfectivo
-        ? "💵 *PAGO EN EFECTIVO AL RECOGER EN EL LOCAL.* Por favor confirmarme que mi pedido esté recibido para pasar a recogerlo. ¡Muchas gracias! 🚀"
-        : "📎 *ADJUNTO MI COMPROBANTE DE PAGO EN ESTE CHAT* para que rectifiquen mi transferencia e inicien el batido. ¡Muchas gracias! 🚀";
+      var headerPago = esTotalGratisPuntos
+        ? "🥤 *¡Acabo de canjear mi pedido 100% GRATIS con mis GraniPoints!* 🎁"
+        : (esEfectivo
+          ? "Acabo de realizar mi pedido web para recoger con pago en efectivo:"
+          : "Acabo de realizar mi pedido web y transferir el pago:");
+
+      var totalLabel = esTotalGratisPuntos
+        ? "🎉 *Total a Pagar:* $0 COP (¡Cubierto con Puntos!)"
+        : (esEfectivo ? "💰 *Total a Cancelar en Caja:* " + fmt(totalGuardado) : "💰 *Total Transferido:* " + fmt(totalGuardado));
+
+      var puntosCanjeadosTxt = puntosGuardados > 0
+        ? ("💎 *Puntos GraniClub Canjeados:* " + puntosGuardados + " pts (Descuento de -" + fmt(descGuardado) + ")%0A")
+        : "";
+
+      var cierreMsg = esTotalGratisPuntos
+        ? "✨ *PEDIDO CANJEADO CON PUNTOS.* No requiere transferencia bancaria ni efectivo en caja. ¡Por favor confírmenme para pasar a recoger mi granizado fresco! Muchas gracias por premiar mi fidelidad 🚀"
+        : (esEfectivo
+          ? "💵 *PAGO EN EFECTIVO AL RECOGER EN EL LOCAL.* Por favor confirmarme que mi pedido esté recibido para pasar a recogerlo. ¡Muchas gracias! 🚀"
+          : "📎 *ADJUNTO MI COMPROBANTE DE PAGO EN ESTE CHAT* para que rectifiquen mi transferencia e inicien el batido. ¡Muchas gracias! 🚀");
 
       var msgWp = "¡Hola *GRANIFRESH*! 🥤%0A%0A" +
-                  headerPago + "%0A" +
-                  "📌 *Código de Pedido:* " + cod + "%0A" +
-                  "👤 *Cliente:* " + payload.clienteNombre + "%0A" +
-                  "📱 *WhatsApp:* " + payload.clienteTelefono + "%0A" +
-                  "📍 *Modalidad:* " + entregaTxt + "%0A" +
-                  "💳 *Método de Pago:* " + nomMetodo + "%0A" +
-                  totalLabel + fmt(payload.total) + "%0A%0A" +
-                  "🥤 *Granizados Solicitados:*%0A" + itemsTxt + "%0A%0A" +
-                  cierreMsg;
+        headerPago + "%0A" +
+        "📌 *Código de Pedido:* " + cod + "%0A" +
+        "👤 *Cliente:* " + payload.clienteNombre + "%0A" +
+        "📱 *WhatsApp:* " + payload.clienteTelefono + "%0A" +
+        "📍 *Modalidad:* " + entregaTxt + "%0A" +
+        "💳 *Método de Pago:* " + nomMetodo + "%0A" +
+        puntosCanjeadosTxt +
+        totalLabel + "%0A%0A" +
+        "🥤 *Granizados Solicitados:*%0A" + itemsTxt + "%0A%0A" +
+        cierreMsg;
 
       var wpUrl = "https://wa.me/" + whatsappNum + "?text=" + msgWp;
       var wpBtn = $("#btn-whatsapp-confirmar");
@@ -1319,7 +1415,7 @@
       // Abrir WhatsApp en nueva pestaña para que el cliente adjunte el comprobante
       try {
         window.open(wpUrl, "_blank");
-      } catch (e) {}
+      } catch (e) { }
 
       $("#modal-exito-pedido").classList.add("active");
 
@@ -1436,7 +1532,7 @@
 
   // 13. Micro-Burbujas SVG Dinámicas en el Trío de Vasos
   var NS = "http://www.w3.org/2000/svg";
-  ["#bubs", "#bubs-left", "#bubs-right"].forEach(function(sel) {
+  ["#bubs", "#bubs-left", "#bubs-right"].forEach(function (sel) {
     var bu = $(sel);
     if (bu) {
       for (var i = 0; i < 10; i++) {
@@ -1671,7 +1767,7 @@
 
   function aplicarTextosFrecuenciaJuegos(intervalo) {
     var num = (intervalo !== undefined && intervalo !== null && Number(intervalo) > 0) ? parseInt(intervalo, 10) : 1;
-    try { localStorage.setItem("grani_dias_intervalo", num); } catch(e){}
+    try { localStorage.setItem("grani_dias_intervalo", num); } catch (e) { }
 
     var elPerkTiradas = document.getElementById("promo-perk-tiradas-txt");
     if (elPerkTiradas) {
@@ -1692,7 +1788,7 @@
 
   function aplicarTextosPuntosBienvenida(pts) {
     var num = (pts !== undefined && pts !== null) ? pts : 20;
-    try { localStorage.setItem("grani_pts_bienvenida", num); } catch(e){}
+    try { localStorage.setItem("grani_pts_bienvenida", num); } catch (e) { }
     var elPromoTxt = document.getElementById("promo-pts-regalo-txt");
     if (elPromoTxt) elPromoTxt.textContent = "+" + num + " GraniPoints";
     var elPerkTxt = document.getElementById("promo-perk-pts-txt");
@@ -1805,16 +1901,16 @@
       if (hgbText) {
         var primNombre = cl.nombre ? cl.nombre.split(" ")[0] : "Miembro";
         var ptsFormatted = (cl.granipoints || 0).toLocaleString("es-CO");
-        hgbText.innerHTML = 
+        hgbText.innerHTML =
           '<div class="hgb-vip-content">' +
-            '<div class="hgb-vip-header">' +
-              '<span class="hgb-vip-name">¡Hola, ' + escapeHtmlText(primNombre) + '!</span>' +
-              '<span class="hgb-vip-badge">Socio VIP GraniClub</span>' +
-            '</div>' +
-            '<div class="hgb-vip-details">' +
-              '<span>🪙 Saldo: <b class="hgb-vip-points">' + ptsFormatted + ' GraniPoints</b></span>' +
-              '<span class="hgb-vip-games" id="hgb-vip-games-status">🎁 Ver premios & historial</span>' +
-            '</div>' +
+          '<div class="hgb-vip-header">' +
+          '<span class="hgb-vip-name">¡Hola, ' + escapeHtmlText(primNombre) + '!</span>' +
+          '<span class="hgb-vip-badge">Socio VIP GraniClub</span>' +
+          '</div>' +
+          '<div class="hgb-vip-details">' +
+          '<span>🪙 Saldo: <b class="hgb-vip-points">' + ptsFormatted + ' GraniPoints</b></span>' +
+          '<span class="hgb-vip-games" id="hgb-vip-games-status">🎁 Ver premios & historial</span>' +
+          '</div>' +
           '</div>';
       }
       if (hgbAction) {
@@ -3135,9 +3231,11 @@
     if (chk && chk.checked) {
       if (chkGranizado) chkGranizado.checked = false; // Mutuamente excluyentes
       if (wrap) wrap.style.display = "block";
+      GraniClubState.tipoCanje = "DESCUENTO_DINERO";
       setExactPointsPreset('max');
     } else {
       if (wrap) wrap.style.display = "none";
+      GraniClubState.tipoCanje = null;
       GraniClubState.puntosAUsar = 0;
       GraniClubState.descuentoCalculado = 0;
       actualizarValoresTotales();
@@ -3157,9 +3255,11 @@
       var ptsGranizado = cfg.puntosParaGranizadoGratis || 120;
       var precio1Granizado = (cart.length > 0 && cart[0].p) ? cart[0].p : 12000;
 
+      GraniClubState.tipoCanje = "GRANIZADO_GRATIS";
       GraniClubState.puntosAUsar = ptsGranizado;
       GraniClubState.descuentoCalculado = precio1Granizado;
     } else {
+      GraniClubState.tipoCanje = null;
       GraniClubState.puntosAUsar = 0;
       GraniClubState.descuentoCalculado = 0;
     }
@@ -3268,7 +3368,7 @@
     if (modal) modal.classList.remove("active");
     try {
       sessionStorage.setItem("grani_promo_vista", "1");
-    } catch (e) {}
+    } catch (e) { }
   };
 
   window.irARegistroDesdePromo = function () {
@@ -3286,7 +3386,7 @@
     try {
       var cachedPts = localStorage.getItem("grani_pts_bienvenida");
       if (cachedPts !== null) aplicarTextosPuntosBienvenida(parseInt(cachedPts, 10));
-    } catch(e) {}
+    } catch (e) { }
 
     // Actualizar textos con la cantidad configurada por el admin si ya cargó
     if (GraniClubState.configPublica) {

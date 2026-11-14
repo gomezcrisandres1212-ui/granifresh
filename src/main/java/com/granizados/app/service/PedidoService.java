@@ -109,35 +109,70 @@ public class PedidoService {
             Cliente cliente = clienteOpt.get();
             pedido.setClienteId(cliente.getId());
 
-            // 1. Canje de puntos exactos
-            if (configJuegos.isCanjePuntosHabilitado() && puntosUsados > 0 && cliente.getGranipoints() >= puntosUsados) {
-                double valCalculado = puntosUsados * configJuegos.getValorPesosPorPunto();
-                double maxDescuento = subtotal * (configJuegos.getMaximoPorcentajeDescuentoPedido() / 100.0);
-                descuentoPuntos = Math.min(valCalculado, maxDescuento);
+            // 1. Canje de puntos: o 1 Granizado Gratis o Descuento en Dinero
+            int ptsGranizadoGratis = configJuegos.getPuntosParaGranizadoGratis() > 0 ? configJuegos.getPuntosParaGranizadoGratis() : 120;
+            boolean esCanjeGranizadoGratis = "GRANIZADO_GRATIS".equalsIgnoreCase(pedido.getTipoCanje())
+                    || (configJuegos.isCanjePorGranizadoHabilitado() && puntosUsados == ptsGranizadoGratis && pedido.getDescuentoPuntos() > (puntosUsados * configJuegos.getValorPesosPorPunto()));
 
-                cliente.setGranipoints(cliente.getGranipoints() - puntosUsados);
+            if (puntosUsados > 0 && cliente.getGranipoints() >= puntosUsados) {
+                if (esCanjeGranizadoGratis && configJuegos.isCanjePorGranizadoHabilitado()) {
+                    // El canje de 1 Granizado Gratis descuenta el 100% del valor de 1 granizado sin tope de porcentaje
+                    double precioPrimerGranizado = subtotal;
+                    if (pedido.getItems() != null && !pedido.getItems().isEmpty()) {
+                        precioPrimerGranizado = pedido.getItems().get(0).getPrecioUnitario();
+                    }
+                    descuentoPuntos = Math.min(subtotal, precioPrimerGranizado);
+                    cliente.setGranipoints(cliente.getGranipoints() - puntosUsados);
 
-                TransaccionPuntos transGasto = new TransaccionPuntos(
-                        cliente.getId(),
-                        cliente.getTelefono(),
-                        cliente.getNombre(),
-                        "CANJE_CHECKOUT",
-                        -puntosUsados,
-                        cliente.getGranipoints(),
-                        "🛒 Canje de " + puntosUsados + " GraniPoints por descuento de $" + String.format("%.0f", descuentoPuntos) + " en pedido " + codigo,
-                        codigo
-                );
-                transaccionRepository.save(transGasto);
+                    TransaccionPuntos transGasto = new TransaccionPuntos(
+                            cliente.getId(),
+                            cliente.getTelefono(),
+                            cliente.getNombre(),
+                            "CANJE_GRANIZADO_GRATIS",
+                            -puntosUsados,
+                            cliente.getGranipoints(),
+                            "🥤 Canje de 1 Granizado 100% Gratis por " + puntosUsados + " GraniPoints en pedido " + codigo,
+                            codigo
+                    );
+                    transaccionRepository.save(transGasto);
+                    pedido.setTipoCanje("GRANIZADO_GRATIS");
+
+                } else if (configJuegos.isCanjePuntosHabilitado()) {
+                    // Canje tradicional por dinero COP (con límite de porcentaje configurable)
+                    double valCalculado = puntosUsados * configJuegos.getValorPesosPorPunto();
+                    double maxPorcentaje = configJuegos.getMaximoPorcentajeDescuentoPedido() > 0 ? configJuegos.getMaximoPorcentajeDescuentoPedido() : 50;
+                    double maxDescuento = subtotal * (maxPorcentaje / 100.0);
+                    descuentoPuntos = Math.min(valCalculado, maxDescuento);
+
+                    cliente.setGranipoints(cliente.getGranipoints() - puntosUsados);
+
+                    TransaccionPuntos transGasto = new TransaccionPuntos(
+                            cliente.getId(),
+                            cliente.getTelefono(),
+                            cliente.getNombre(),
+                            "CANJE_CHECKOUT",
+                            -puntosUsados,
+                            cliente.getGranipoints(),
+                            "🛒 Canje de " + puntosUsados + " GraniPoints por descuento de $" + String.format("%.0f", descuentoPuntos) + " en pedido " + codigo,
+                            codigo
+                    );
+                    transaccionRepository.save(transGasto);
+                    pedido.setTipoCanje("DESCUENTO_DINERO");
+                } else {
+                    puntosUsados = 0;
+                    descuentoPuntos = 0.0;
+                }
             } else {
                 puntosUsados = 0;
+                descuentoPuntos = 0.0;
             }
 
             // 2. Acumulación por compra (según decida el admin: por valor o puntos fijos)
-            if (configJuegos.isAcumularPuntosPorCompra()) {
+            double baseParaPuntos = Math.max(0, subtotal - descuentoPuntos);
+            if (configJuegos.isAcumularPuntosPorCompra() && baseParaPuntos > 0) {
                 if ("FIJO".equalsIgnoreCase(configJuegos.getModoPuntosCompra())) {
                     puntosGanados = Math.max(0, configJuegos.getPuntosFijosPorCompra());
                 } else if (configJuegos.getPesosPorPuntoAcumulado() > 0) {
-                    double baseParaPuntos = Math.max(0, subtotal - descuentoPuntos);
                     puntosGanados = (int) (baseParaPuntos / configJuegos.getPesosPorPuntoAcumulado());
                 }
 
@@ -159,7 +194,7 @@ public class PedidoService {
             }
 
             // 3. Giros extras por compra
-            if (configJuegos.isOtorgarGirosPorCompra()) {
+            if (configJuegos.isOtorgarGirosPorCompra() && baseParaPuntos > 0) {
                 cliente.setGirosExtrasDisponibles(cliente.getGirosExtrasDisponibles() + 1);
                 cliente.setRaspasExtrasDisponibles(cliente.getRaspasExtrasDisponibles() + 1);
             }
@@ -176,6 +211,11 @@ public class PedidoService {
 
         double totalFinal = Math.max(0, (subtotal - descuentoPuntos) + costoEnvio);
         pedido.setTotal(totalFinal);
+
+        // Si el total final es 0 COP por canje de puntos, el método de pago oficial es GRANIPOINTS
+        if (totalFinal == 0 && puntosUsados > 0) {
+            pedido.setMetodoPago("GRANIPOINTS");
+        }
 
         return pedidoRepository.save(pedido);
     }

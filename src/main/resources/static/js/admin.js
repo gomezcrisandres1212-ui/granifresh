@@ -610,10 +610,13 @@ function renderizarPedidosUrgentesDashboard() {
         let telLimpio = (p.clienteTelefono || '').replace(/[^0-9]/g, '');
         if (!telLimpio.startsWith('57') && telLimpio.length === 10) telLimpio = '57' + telLimpio;
 
+        const esPuntos = p.metodoPago === 'GRANIPOINTS' || (p.total === 0 && (p.puntosUsados > 0 || p.descuentoPuntos > 0));
         const esEfectivo = p.metodoPago === 'EFECTIVO';
-        const msgWpValidar = esEfectivo
+        const msgWpValidar = esPuntos
+            ? encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu pedido ${p.codigoPedido} canjeado con tus GraniPoints (100% Gratis). ¡Ya está entrando a preparación! Te avisaremos cuando esté listo. 🧊`)
+            : (esEfectivo
             ? encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu pedido ${p.codigoPedido} con pago en efectivo para recoger en el local. ¿Nos confirmas a qué hora pasas por tus granizados para tenerlos listos y recién batidos?`)
-            : encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu solicitud web ${p.codigoPedido}. ¿Nos puedes compartir tu comprobante de pago por aquí para validar tu pedido e iniciar el batido?`);
+            : encodeURIComponent(`¡Hola ${p.clienteNombre}! 🥤 Te contactamos de GRANIFRESH sobre tu solicitud web ${p.codigoPedido}. ¿Nos puedes compartir tu comprobante de pago por aquí para validar tu pedido e iniciar el batido?`));
 
         return `
             <div class="dash-urgent-card">
@@ -629,16 +632,16 @@ function renderizarPedidosUrgentesDashboard() {
                     🥤 ${itemsStr}
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.25); border-radius:8px; padding:6px 10px; margin:4px 0 10px 0;">
-                    <span style="font-size:0.8rem; color:var(--mut);">${esEfectivo ? 'Pago:' : 'Transferencia:'} <strong style="color:${esEfectivo ? '#34D399' : '#fff'};">${p.metodoPago || 'NEQUI'}</strong></span>
-                    <strong style="color:var(--li); font-size:1.05rem;">${fmtMoney(p.total)}</strong>
+                    <span style="font-size:0.8rem; color:var(--mut);">${esPuntos ? '🎁 Fidelización:' : (esEfectivo ? 'Pago:' : 'Transferencia:')} <strong style="color:${esPuntos ? '#10B981' : (esEfectivo ? '#34D399' : '#fff')};">${esPuntos ? 'GRANIPOINTS (Gratis)' : (p.metodoPago || 'NEQUI')}</strong></span>
+                    <strong style="color:${esPuntos ? '#10B981' : 'var(--li)'}; font-size:1.05rem;">${esPuntos ? '$0 (100% Puntos)' : fmtMoney(p.total)}</strong>
                 </div>
                 <div class="dash-urgent-footer" style="flex-wrap:wrap; gap:8px;">
-                    <a href="https://wa.me/${telLimpio}?text=${msgWpValidar}" target="_blank" title="${esEfectivo ? 'Abrir Chat de WhatsApp con el Cliente' : 'Abrir Chat de WhatsApp para Comprobante'}" style="background:#25D366; text-decoration:none; display:inline-flex; align-items:center; gap:5px; color:#fff; border-radius:8px; padding:7px 11px; font-weight:800; font-size:0.8rem;">
-                        ${esEfectivo ? '💬 Contactar Cliente' : '💬 Ver Comprobante'}
+                    <a href="https://wa.me/${telLimpio}?text=${msgWpValidar}" target="_blank" title="${esPuntos ? 'Notificar al Cliente' : (esEfectivo ? 'Abrir Chat de WhatsApp con el Cliente' : 'Abrir Chat de WhatsApp para Comprobante')}" style="background:#25D366; text-decoration:none; display:inline-flex; align-items:center; gap:5px; color:#fff; border-radius:8px; padding:7px 11px; font-weight:800; font-size:0.8rem;">
+                        ${esPuntos ? '💬 Notificar Cliente' : (esEfectivo ? '💬 Contactar Cliente' : '💬 Ver Comprobante')}
                     </a>
                     <div style="display:flex; gap:6px; margin-left:auto;">
-                        <button onclick="cambiarEstadoPedido('${p.id}', 'RECIBIDO')" class="btn-approve-req" title="Comprobante válido: Aprobar solicitud y enviar a cocina para batido">
-                            ✅ Aprobar Solicitud
+                        <button onclick="cambiarEstadoPedido('${p.id}', 'RECIBIDO')" class="btn-approve-req" title="Aprobar pedido y enviar a cocina para batido">
+                            ✅ Aprobar Pedido
                         </button>
                         <button onclick="eliminarPedidoAdmin('${p.id}', '${p.codigoPedido}')" class="btn-reject-req" title="Descartar o rechazar solicitud no pagada">
                             🗑️ Rechazar
@@ -1019,12 +1022,12 @@ window.abrirModalDetallePedido = function (id) {
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:rgba(0,240,255,0.06); padding:14px 18px; border-radius:14px; border:1px solid rgba(0,240,255,0.2); margin-top:14px;">
             <div>
                 <span style="color:var(--mut); font-size:0.85rem;">Método de Pago:</span>
-                <strong style="color:#fff; display:block; font-size:1.05rem;">${p.metodoPago || 'EFECTIVO'}</strong>
-                <span style="color:var(--mut); font-size:0.8rem;">Subtotal: ${fmtMoney(p.subtotal)} · Envío: ${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '$0 (Recogida en Local)' : fmtMoney(p.costoEnvio)}</span>
+                <strong style="color:${(p.metodoPago === 'GRANIPOINTS' || (p.total === 0 && (p.puntosUsados > 0 || p.descuentoPuntos > 0))) ? '#10B981' : '#fff'}; display:block; font-size:1.05rem;">${(p.metodoPago === 'GRANIPOINTS' || (p.total === 0 && (p.puntosUsados > 0 || p.descuentoPuntos > 0))) ? '🎁 GraniPoints (100% Gratis)' : (p.metodoPago || 'EFECTIVO')}</strong>
+                <span style="color:var(--mut); font-size:0.8rem;">Subtotal: ${fmtMoney(p.subtotal)}${p.descuentoPuntos > 0 ? ` · Canje: -${fmtMoney(p.descuentoPuntos)} (${p.puntosUsados || 0} pts)` : ''} · Envío: ${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '$0 (Recogida)' : fmtMoney(p.costoEnvio)}</span>
             </div>
             <div style="text-align:right;">
                 <span style="color:var(--mut); font-size:0.85rem;">Total a Cobrar:</span>
-                <strong style="color:var(--li); font-size:1.45rem; display:block;">${fmtMoney(p.total)}</strong>
+                <strong style="color:${(p.metodoPago === 'GRANIPOINTS' || (p.total === 0 && (p.puntosUsados > 0 || p.descuentoPuntos > 0))) ? '#10B981' : 'var(--li)'}; font-size:1.45rem; display:block;">${(p.metodoPago === 'GRANIPOINTS' || (p.total === 0 && (p.puntosUsados > 0 || p.descuentoPuntos > 0))) ? '$0 (100% Puntos)' : fmtMoney(p.total)}</strong>
             </div>
         </div>
 

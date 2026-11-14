@@ -30,6 +30,7 @@ public class Pedido {
     private int puntosUsados;
     private double descuentoPuntos;
     private int puntosGanados;
+    private String tipoCanje; // GRANIZADO_GRATIS, DESCUENTO_DINERO, null
 
     private List<ItemPedido> items = new ArrayList<>();
     private double subtotal;
@@ -115,5 +116,8 @@ public class Pedido {
 
     public int getPuntosGanados() { return puntosGanados; }
     public void setPuntosGanados(int puntosGanados) { this.puntosGanados = puntosGanados; }
+
+    public String getTipoCanje() { return tipoCanje; }
+    public void setTipoCanje(String tipoCanje) { this.tipoCanje = tipoCanje; }
 }
 

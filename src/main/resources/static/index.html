@@ -885,12 +885,22 @@
 
             <!-- CONTENIDO PASO 3: MÉTODO DE PAGO & VALIDACIÓN DE COMPROBANTE -->
             <div class="checkout-step-content" id="chk-pane-3">
+                <!-- Tarjeta Especial cuando el Pedido está 100% Cubierto con GraniPoints -->
+                <div id="chk-box-pedido-gratis-puntos" style="display:none; background: linear-gradient(135deg, rgba(16,185,129,0.18), rgba(6,182,212,0.14)); border: 2px solid #10B981; border-radius: 14px; padding: 18px 16px; margin-bottom: 16px; text-align: center; box-shadow: 0 4px 20px rgba(16,185,129,0.2);">
+                    <div style="font-size: 2.2rem; margin-bottom: 4px;">🎉🥤🎁</div>
+                    <strong style="color: #34D399; font-size: 1.05rem; display: block; font-weight: 900; letter-spacing: 0.3px;">¡TU PEDIDO ES 100% GRATIS CON GRANIPOINTS!</strong>
+                    <p style="color: #E2E8F0; font-size: 0.88rem; margin: 8px 0 0 0; line-height: 1.45;">
+                        Has canjeado tu granizado con tus puntos acumulados. <strong>Total a pagar: $0 COP</strong>.<br>
+                        No requieres transferir dinero ni pagar en efectivo. ¡Solo confirma y lo prepararemos de inmediato!
+                    </p>
+                </div>
+
                 <!-- 1. Cuentas para Transferencia Directa o Efectivo -->
-                <div class="chk-section-eyebrow">
+                <div class="chk-section-eyebrow" id="chk-heading-metodo-pago">
                     <span>💳</span> 1. SELECCIONA TU MÉTODO DE PAGO
                 </div>
 
-                <div class="chk-payments-grid" style="grid-template-columns: 1fr; gap:12px;">
+                <div class="chk-payments-grid" id="chk-payments-grid" style="grid-template-columns: 1fr; gap:12px;">
                     <!-- Efectivo (Disponible en Recogida en Local) -->
                     <label class="chk-payment-card" id="pay-card-efectivo" onclick="cambiarMetodoPago('EFECTIVO')" style="display:none;">
                         <input type="radio" name="chk-metodo-pago-radio" value="EFECTIVO">
@@ -1166,8 +1176,12 @@
                 <span style="color:var(--mut); font-size:0.85rem;">Entrega en:</span>
                 <span id="exito-direccion" style="color:#fff;">-</span>
             </div>
+            <div id="exito-row-puntos" style="display:none; justify-content:space-between; margin-bottom: 6px; color:#10B981;">
+                <span style="font-size:0.85rem;">Canje GraniPoints:</span>
+                <strong style="font-size:0.85rem;" id="exito-descuento-puntos">-$0 (0 pts)</strong>
+            </div>
             <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--bd); padding-top:8px;">
-                <span style="color:var(--mut); font-size:0.85rem;">Total a Pagar:</span>
+                <span style="color:var(--mut); font-size:0.85rem;" id="exito-label-total">Total a Pagar:</span>
                 <strong style="color:var(--li); font-size:1.15rem;" id="exito-total">$0</strong>
             </div>
         </div>
@@ -2979,7 +2993,7 @@
 </div>
 
 <!-- Scripts de la aplicación -->
-<script src="/js/granizados.js?v=9.5"></script>
-<script src="/js/admin.js?v=9.5"></script>
+<script src="/js/granizados.js?v=9.6"></script>
+<script src="/js/admin.js?v=9.6"></script>
 </body>
 </html>
