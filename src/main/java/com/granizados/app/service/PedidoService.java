@@ -69,7 +69,13 @@ public class PedidoService {
                         Optional<Granizado> granOpt = granizadoRepository.findById(item.getGranizadoId());
                         if (granOpt.isPresent()) {
                             Granizado g = granOpt.get();
-                            precioReal = g.getPrecio();
+                            precioReal = g.getPrecioBase();
+                            if (g.getPreciosPorTamano() != null && item.getTamano() != null && g.getPreciosPorTamano().containsKey(item.getTamano())) {
+                                Double pTam = g.getPreciosPorTamano().get(item.getTamano());
+                                if (pTam != null && pTam > 0) {
+                                    precioReal = pTam;
+                                }
+                            }
                             item.setGranizadoNombre(g.getNombre());
                         }
                     }

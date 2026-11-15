@@ -82,6 +82,9 @@ public class Granizado {
     public double getPrecioBase() { return precioBase; }
     public void setPrecioBase(double precioBase) { this.precioBase = precioBase; }
 
+    public double getPrecio() { return precioBase; }
+    public void setPrecio(double precio) { this.precioBase = precio; }
+
     public Map<String, Double> getPreciosPorTamano() { return preciosPorTamano; }
     public void setPreciosPorTamano(Map<String, Double> preciosPorTamano) { this.preciosPorTamano = preciosPorTamano; }
 
