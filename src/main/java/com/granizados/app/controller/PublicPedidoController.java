@@ -45,7 +45,23 @@ public class PublicPedidoController {
     @GetMapping("/rastreo/{codigo}")
     public ResponseEntity<?> rastrearPedido(@PathVariable String codigo) {
         return pedidoService.buscarPorCodigo(codigo)
-                .map(ResponseEntity::ok)
+                .map(p -> {
+                    Map<String, Object> tracking = new java.util.HashMap<>();
+                    tracking.put("codigoPedido", p.getCodigoPedido());
+                    tracking.put("estado", p.getEstado());
+                    tracking.put("tiempoEstimadoMinutos", p.getTiempoEstimadoMinutos());
+                    tracking.put("tipoEntrega", p.getTipoEntrega());
+                    tracking.put("barrio", p.getBarrio());
+
+                    // Dirección enmascarada para protección de datos personales
+                    String dir = p.getClienteDireccion();
+                    if (dir != null && dir.length() > 8) {
+                        dir = dir.substring(0, Math.min(dir.length(), 14)) + "...";
+                    }
+                    tracking.put("clienteDireccion", dir);
+                    tracking.put("fechaCreacion", p.getFechaCreacion());
+                    return ResponseEntity.ok(tracking);
+                })
                 .orElse(ResponseEntity.notFound().build());
     }
 }

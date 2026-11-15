@@ -621,12 +621,12 @@ function renderizarPedidosUrgentesDashboard() {
         return `
             <div class="dash-urgent-card">
                 <div class="dash-urgent-header">
-                    <span class="dash-urgent-code">${p.codigoPedido}</span>
+                    <span class="dash-urgent-code">${escapeHtmlAdmin(p.codigoPedido || '')}</span>
                     <span class="dash-urgent-time">🕒 ${horaStr}</span>
                 </div>
                 <div>
-                    <div class="dash-urgent-client">${p.clienteNombre}</div>
-                    <div class="dash-urgent-addr">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : `📍 ${p.clienteDireccion} ${p.barrio ? `(${p.barrio})` : ''}`}</div>
+                    <div class="dash-urgent-client">${escapeHtmlAdmin(p.clienteNombre || '')}</div>
+                    <div class="dash-urgent-addr">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : `📍 ${escapeHtmlAdmin(p.clienteDireccion || '')} ${p.barrio ? `(${escapeHtmlAdmin(p.barrio)})` : ''}`}</div>
                 </div>
                 <div class="dash-urgent-items">
                     🥤 ${itemsStr}
@@ -873,18 +873,18 @@ function renderizarTablaPedidos() {
         return `
             <tr>
                 <td>
-                    <strong style="color:var(--cy); font-size:0.95rem;">${p.codigoPedido}</strong>
+                    <strong style="color:var(--cy); font-size:0.95rem;">${escapeHtmlAdmin(p.codigoPedido || '')}</strong>
                     <div style="font-size:0.75rem; color:var(--mut);">${fechaStr} · ${horaStr}</div>
                 </td>
                 <td>
-                    <div style="font-weight:800; color:#fff;">${p.clienteNombre}</div>
-                    <a href="https://wa.me/${p.clienteTelefono.replace(/[^0-9]/g, '')}" target="_blank" style="font-size:0.8rem; color:#25D366; text-decoration:none; font-weight:700;">
-                        📱 ${p.clienteTelefono}
+                    <div style="font-weight:800; color:#fff;">${escapeHtmlAdmin(p.clienteNombre || '')}</div>
+                    <a href="https://wa.me/${(p.clienteTelefono || '').replace(/[^0-9]/g, '')}" target="_blank" style="font-size:0.8rem; color:#25D366; text-decoration:none; font-weight:700;">
+                        📱 ${escapeHtmlAdmin(p.clienteTelefono || '')}
                     </a>
                 </td>
                 <td>
-                    <div style="color:#fff;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : p.clienteDireccion}</div>
-                    <small style="color:var(--mut);">${p.barrio ? `Barrio: ${p.barrio}` : ''} ${p.indicaciones ? `· ${p.indicaciones}` : ''}</small>
+                    <div style="color:#fff;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : escapeHtmlAdmin(p.clienteDireccion || '')}</div>
+                    <small style="color:var(--mut);">${p.barrio ? `Barrio: ${escapeHtmlAdmin(p.barrio)}` : ''} ${p.indicaciones ? `· ${escapeHtmlAdmin(p.indicaciones)}` : ''}</small>
                 </td>
                 <td style="font-size:0.84rem; line-height:1.4;">${itemsResumen}</td>
                 <td>
@@ -1004,13 +1004,13 @@ window.abrirModalDetallePedido = function (id) {
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; background:rgba(255,255,255,0.03); padding:16px; border-radius:16px; border:1px solid rgba(255,255,255,0.08);">
             <div>
                 <small style="color:var(--mut);">Cliente:</small>
-                <div style="font-weight:800; color:#fff; font-size:1.05rem;">${p.clienteNombre}</div>
-                <div style="color:#25D366; font-weight:700;">📱 ${p.clienteTelefono}</div>
+                <div style="font-weight:800; color:#fff; font-size:1.05rem;">${escapeHtmlAdmin(p.clienteNombre || '')}</div>
+                <div style="color:#25D366; font-weight:700;">📱 ${escapeHtmlAdmin(p.clienteTelefono || '')}</div>
             </div>
             <div>
                 <small style="color:var(--mut);">Destino de Entrega:</small>
-                <div style="color:#fff; font-weight:700;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : p.clienteDireccion}</div>
-                <div style="font-size:0.85rem; color:var(--cy);">${p.barrio ? `Barrio: ${p.barrio}` : ''} ${p.indicaciones ? `· ${p.indicaciones}` : ''}</div>
+                <div style="color:#fff; font-weight:700;">${(p.tipoEntrega === 'RECOGIDA' || p.costoEnvio === 0) ? '🛍️ Recogida en Local' : escapeHtmlAdmin(p.clienteDireccion || '')}</div>
+                <div style="font-size:0.85rem; color:var(--cy);">${p.barrio ? `Barrio: ${escapeHtmlAdmin(p.barrio)}` : ''} ${p.indicaciones ? `· ${escapeHtmlAdmin(p.indicaciones)}` : ''}</div>
             </div>
         </div>
 
@@ -1886,10 +1886,10 @@ function cargarHistorialAdmin() {
         return `
             <tr>
                 <td style="font-size:0.8rem; color:var(--mut);">${fechaStr} · ${horaStr}</td>
-                <td><strong style="color:var(--cy); font-size:0.95rem;">${p.codigoPedido}</strong></td>
+                <td><strong style="color:var(--cy); font-size:0.95rem;">${escapeHtmlAdmin(p.codigoPedido || '')}</strong></td>
                 <td>
-                    <div style="font-weight:800; color:#fff;">${p.clienteNombre}</div>
-                    <small style="color:#25D366;">📱 ${p.clienteTelefono}</small>
+                    <div style="font-weight:800; color:#fff;">${escapeHtmlAdmin(p.clienteNombre || '')}</div>
+                    <small style="color:#25D366;">📱 ${escapeHtmlAdmin(p.clienteTelefono || '')}</small>
                 </td>
                 <td style="font-size:0.82rem; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     ${itemsStr}

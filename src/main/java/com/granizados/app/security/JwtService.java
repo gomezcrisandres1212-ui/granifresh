@@ -70,9 +70,9 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
             Object role = claims.get("role");
-            return role != null ? role.toString() : "ROLE_ADMIN";
+            return role != null ? role.toString() : "ROLE_CLIENTE";
         } catch (Exception ex) {
-            return "ROLE_ADMIN";
+            return "ROLE_CLIENTE";
         }
     }
 }

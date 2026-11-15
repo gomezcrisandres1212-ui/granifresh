@@ -1277,9 +1277,14 @@
     };
 
     try {
+      var reqHeaders = { "Content-Type": "application/json" };
+      if (window.GraniClubState && window.GraniClubState.token) {
+        reqHeaders["Authorization"] = "Bearer " + window.GraniClubState.token;
+      }
+
       var res = await fetch("/api/public/pedidos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: reqHeaders,
         body: JSON.stringify(payload)
       });
 
@@ -1315,7 +1320,7 @@
         localStorage.setItem("granifresh_ultimo_pedido", cod);
         var inputTc = $("#tc");
         if (inputTc) inputTc.value = cod;
-      } catch (e) {}
+      } catch (e) { }
 
       var totalGuardado = typeof pedidoGuardado.total === "number" ? pedidoGuardado.total : payload.total;
       var puntosGuardados = pedidoGuardado.puntosUsados !== undefined ? pedidoGuardado.puntosUsados : payload.puntosUsados;
@@ -1512,7 +1517,7 @@
     if (inpTc && !inpTc.value && ultCod) {
       inpTc.value = ultCod;
     }
-  } catch (e) {}
+  } catch (e) { }
 
   // 12. Marquesina Botánica Infinita y Fluida
   function updateMarquee(customText) {

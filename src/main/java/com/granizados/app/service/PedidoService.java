@@ -3,12 +3,14 @@ package com.granizados.app.service;
 import com.granizados.app.model.Cliente;
 import com.granizados.app.model.ConfiguracionJuegos;
 import com.granizados.app.model.ConfiguracionNegocio;
+import com.granizados.app.model.Granizado;
 import com.granizados.app.model.ItemPedido;
 import com.granizados.app.model.Pedido;
 import com.granizados.app.model.TransaccionPuntos;
 import com.granizados.app.repository.ClienteRepository;
 import com.granizados.app.repository.ConfiguracionJuegosRepository;
 import com.granizados.app.repository.ConfiguracionNegocioRepository;
+import com.granizados.app.repository.GranizadoRepository;
 import com.granizados.app.repository.PedidoRepository;
 import com.granizados.app.repository.TransaccionPuntosRepository;
 import org.springframework.stereotype.Service;
@@ -26,18 +28,21 @@ public class PedidoService {
     private final ClienteRepository clienteRepository;
     private final ConfiguracionJuegosRepository configJuegosRepository;
     private final TransaccionPuntosRepository transaccionRepository;
+    private final GranizadoRepository granizadoRepository;
     private final SecureRandom random = new SecureRandom();
 
     public PedidoService(PedidoRepository pedidoRepository,
                          ConfiguracionNegocioRepository configRepository,
                          ClienteRepository clienteRepository,
                          ConfiguracionJuegosRepository configJuegosRepository,
-                         TransaccionPuntosRepository transaccionRepository) {
+                         TransaccionPuntosRepository transaccionRepository,
+                         GranizadoRepository granizadoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.configRepository = configRepository;
         this.clienteRepository = clienteRepository;
         this.configJuegosRepository = configJuegosRepository;
         this.transaccionRepository = transaccionRepository;
+        this.granizadoRepository = granizadoRepository;
     }
 
     public Pedido crearPedido(Pedido pedido) {
@@ -54,12 +59,28 @@ public class PedidoService {
         pedido.setFechaActualizacion(new Date());
         pedido.setTiempoEstimadoMinutos(35);
 
-        // Recalcular subtotal
+        // Recalcular subtotal con precios oficiales desde la base de datos (Blindaje contra manipulación de precios)
         double subtotal = 0.0;
         if (pedido.getItems() != null) {
             for (ItemPedido item : pedido.getItems()) {
                 if (item != null) {
-                    double itemSubtotal = (item.getPrecioUnitario() + item.getCostoToppings()) * Math.max(item.getCantidad(), 1);
+                    double precioReal = item.getPrecioUnitario();
+                    if (item.getGranizadoId() != null && !item.getGranizadoId().isBlank()) {
+                        Optional<Granizado> granOpt = granizadoRepository.findById(item.getGranizadoId());
+                        if (granOpt.isPresent()) {
+                            Granizado g = granOpt.get();
+                            precioReal = g.getPrecio();
+                            item.setGranizadoNombre(g.getNombre());
+                        }
+                    }
+                    int cant = Math.max(1, Math.min(item.getCantidad(), 100));
+                    item.setCantidad(cant);
+                    item.setPrecioUnitario(precioReal);
+
+                    double costoToppings = Math.max(0.0, item.getCostoToppings());
+                    item.setCostoToppings(costoToppings);
+
+                    double itemSubtotal = (precioReal + costoToppings) * cant;
                     item.setSubtotal(itemSubtotal);
                     subtotal += itemSubtotal;
                 }
@@ -103,6 +124,33 @@ public class PedidoService {
         } else if (pedido.getClienteTelefono() != null) {
             String telLimpio = pedido.getClienteTelefono().replaceAll("[^0-9]", "").trim();
             clienteOpt = clienteRepository.findByTelefono(telLimpio);
+        }
+
+        // Blindaje contra consumo no autorizado de puntos ajenos:
+        // Si se intenta usar puntos, verificar que la petición provenga de una sesión autenticada con dicho teléfono
+        if (puntosUsados > 0) {
+            boolean autenticado = false;
+            org.springframework.security.core.Authentication auth =
+                    org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                String usuarioAuth = auth.getName();
+                boolean esAdmin = auth.getAuthorities().stream().anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+                if (esAdmin) {
+                    autenticado = true;
+                } else if (clienteOpt.isPresent()) {
+                    Cliente cl = clienteOpt.get();
+                    if (usuarioAuth != null && (usuarioAuth.equals(cl.getTelefono()) || usuarioAuth.equals(cl.getId()))) {
+                        autenticado = true;
+                    }
+                }
+            }
+
+            if (!autenticado) {
+                puntosUsados = 0;
+                descuentoPuntos = 0.0;
+                pedido.setTipoCanje(null);
+            }
         }
 
         if (clienteOpt.isPresent()) {
